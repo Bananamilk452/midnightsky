@@ -3,6 +3,7 @@ import {
   FeedViewPost,
   ReasonRepost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import Image from "next/image";
 
 import { Feed } from "@/components/timeline/Feed";
 import { getAgent } from "@/lib/bluesky/action";
@@ -40,7 +41,8 @@ export default async function Home() {
       <div>
         <h2>Welcome, {user.displayName || user.handle}!</h2>
         <p>Your handle: {user.handle}</p>
-        <img
+        <Image
+          unoptimized
           src={user.avatar || "/default-avatar.png"}
           alt="Avatar"
           width={50}

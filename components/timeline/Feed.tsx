@@ -4,7 +4,6 @@ import {
   AppBskyEmbedImages,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
-  AppBskyFeedDefs,
   AppBskyFeedPost,
   RichText,
 } from "@atproto/api";
@@ -17,6 +16,7 @@ import { Record } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { EarthIcon, Repeat2Icon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -123,7 +123,8 @@ function FeedAvatar({
   className?: string;
 }) {
   return (
-    <img
+    <Image
+      unoptimized
       src={post.author.avatar || "/default-avatar.png"}
       alt={post.author.displayName || post.author.handle}
       className={cn("mr-1 size-10 rounded-full", className)}
@@ -311,7 +312,8 @@ function FeedImages({
   return (
     <div className="mt-2">
       {images.map((image) => (
-        <img
+        <Image
+          unoptimized
           key={image.fullsize}
           src={image.fullsize}
           alt={image.alt || "Image"}
