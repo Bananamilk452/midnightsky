@@ -29,10 +29,10 @@ export default function RootLayout({
       className={`${pretendard.variable}`}
       suppressHydrationWarning
     >
-      <body className="antialiased">
+      <body className="bg-linear-to-br from-violet-600 from-10% to-indigo-950 antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
