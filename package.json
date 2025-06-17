@@ -8,15 +8,18 @@
     "start": "next start",
     "lint": "next lint",
     "prisma": "pnpx prisma",
-    "migrateandstart": "pnpm prisma migrate && pnpm prisma generate && pnpm dev"
+    "migrateandstart": "pnpm prisma migrate && pnpm prisma generate && pnpm dev",
+    "tunnel": "pnpx untun@latest tunnel http://localhost:3000"
   },
   "dependencies": {
     "@atproto/api": "^0.15.14",
     "@atproto/jwk-jose": "^0.1.7",
     "@atproto/oauth-client-node": "^0.2.22",
     "@prisma/client": "^6.9.0",
+    "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "iron-session": "^8.0.4",
     "lucide-react": "^0.513.0",
     "next": "15.3.3",
@@ -31,7 +34,6 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
     "@next/eslint-plugin-next": "^15.3.3",
     "@tailwindcss/postcss": "^4",
-    "@types/cookie": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

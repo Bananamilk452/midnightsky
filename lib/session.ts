@@ -3,7 +3,7 @@
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
-import { User } from "@/lib/bluesky/types";
+import { User } from "@/lib/bluesky/utils";
 
 import type { IronSession } from "iron-session";
 
