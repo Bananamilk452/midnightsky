@@ -45,7 +45,7 @@ export default function SignIn() {
   }
 
   return (
-    <Card className="shadow-md bg-[rgba(255,255,255,0.1)] backdrop-blur-md border">
+    <Card className="border bg-[rgba(255,255,255,0.1)] shadow-md backdrop-blur-md">
       <CardHeader>
         <CardTitle>MidnightSky✨ 로그인</CardTitle>
       </CardHeader>

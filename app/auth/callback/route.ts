@@ -1,7 +1,10 @@
 import { Agent } from "@atproto/api";
+import { OAuthCallbackError } from "@atproto/oauth-client-node";
 import { NextRequest, NextResponse } from "next/server";
 
 import { blueskyClient } from "@/lib/bluesky";
+import { createUser } from "@/lib/bluesky/utils";
+import getSession from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   const nextUrl = request.nextUrl;
@@ -15,21 +18,46 @@ export async function GET(request: NextRequest) {
       actor: session.did,
     });
 
-    console.log(data);
+    const ironSession = await getSession();
+    ironSession.user = createUser(data);
 
-    // return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/private`)
-  } catch (e: unknown) {
-    console.error("Error during Bluesky OAuth callback:", e);
+    await ironSession.save();
 
-    if (e instanceof Error) {
+    console.log(ironSession);
+
+    return NextResponse.redirect(`${process.env.PUBLIC_URL}/home`);
+  } catch (err: unknown) {
+    if (err instanceof OAuthCallbackError) {
+      const oauthError = err.params.get("error");
+      if (
+        err instanceof OAuthCallbackError &&
+        oauthError &&
+        ["login_required", "consent_required"].includes(oauthError) &&
+        err.state
+      ) {
+        const { handle } = JSON.parse(err.state);
+
+        const url = await blueskyClient.authorize(handle, {
+          state: JSON.stringify({
+            handle,
+          }),
+        });
+
+        return NextResponse.redirect(url);
+      }
+    }
+
+    console.error("Error during Bluesky OAuth callback:", err);
+
+    if (err instanceof Error) {
       // Bluesky error
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_URL}/oauth/login?error=${e.message}`,
+        `${process.env.PUBLIC_URL}/auth/error?error=${err.message}`,
       );
     } else {
       // Unknown error
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_URL}/oauth/login?error=Unknown error`,
+        `${process.env.PUBLIC_URL}/auth/error?error=Unknown error`,
       );
     }
   }

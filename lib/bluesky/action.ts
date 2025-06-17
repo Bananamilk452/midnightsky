@@ -1,9 +1,17 @@
 "use server";
 
+import { Agent } from "@atproto/api";
+
 import { blueskyClient } from "@/lib/bluesky";
+import getSession from "@/lib/session";
 
 export async function signInWithBluesky(handle: string) {
-  const url = await blueskyClient.authorize(handle);
+  const url = await blueskyClient.authorize(handle, {
+    prompt: "none",
+    state: JSON.stringify({
+      handle,
+    }),
+  });
 
   return url.toString();
 }
@@ -13,3 +21,21 @@ export async function signInWithBluesky(handle: string) {
 
 //   session.destroy()
 // }
+
+export async function getAgent(did: string) {
+  const session = await blueskyClient.restore(did);
+  const agent = new Agent(session);
+
+  return agent;
+}
+
+export async function getSessionAgent() {
+  const session = await getSession();
+  if (!session.user || !session.user.did) {
+    throw new Error("User is not authenticated or did is missing");
+  }
+
+  const agent = await getAgent(session.user.did);
+
+  return agent;
+}
