@@ -1,4 +1,4 @@
-import { AppBskyActorDefs } from "@atproto/api";
+import { AppBskyActorDefs, AppBskyFeedPost } from "@atproto/api";
 
 export type User = {
   did: string;
@@ -18,4 +18,13 @@ export function createUser(data: AppBskyActorDefs.ProfileViewDetailed) {
     description: data.description,
     banner: data.banner,
   };
+}
+
+export function isValidateRecord(data: unknown) {
+  if (AppBskyFeedPost.isRecord(data)) {
+    const res = AppBskyFeedPost.validateRecord(data);
+    if (res.success) {
+      return res.value;
+    }
+  }
 }

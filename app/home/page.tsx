@@ -1,11 +1,9 @@
-import { $Typed } from "@atproto/api";
 import {
   FeedViewPost,
-  ReasonRepost,
+  isReasonRepost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
-import Image from "next/image";
 
-import { Feed } from "@/components/timeline/Feed";
+import { Feed } from "@/components/feed";
 import { getAgent } from "@/lib/bluesky/action";
 import getSession from "@/lib/session";
 
@@ -25,24 +23,21 @@ export default async function Home() {
   function createFeedKey(post: FeedViewPost) {
     let key = post.post.uri;
 
-    if (
-      post.reason &&
-      post.reason.$type === "app.bsky.feed.defs#reasonRepost"
-    ) {
-      key += `-${(post.reason as $Typed<ReasonRepost>).uri}`;
+    if (isReasonRepost(post.reason)) {
+      key += `-${post.reason.uri}`;
     }
 
     return key;
   }
 
-  console.log("Timeline Data:", timeline);
   return (
     <div>
       <div>
         <h2>Welcome, {user.displayName || user.handle}!</h2>
         <p>Your handle: {user.handle}</p>
-        <Image
-          unoptimized
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={user.avatar || "/default-avatar.png"}
           alt="Avatar"
           width={50}
@@ -50,7 +45,7 @@ export default async function Home() {
         />
       </div>
 
-      <div className="w-2/5">
+      <div className="mx-auto w-2/5 bg-black/50">
         {timeline.data.feed.map((feed) => (
           <Feed key={createFeedKey(feed)} feed={{ ...feed }} />
         ))}
