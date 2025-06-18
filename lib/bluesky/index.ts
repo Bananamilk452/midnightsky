@@ -16,7 +16,7 @@ if (
 const blueskyClient = new NodeOAuthClient({
   clientMetadata: {
     client_id: `${process.env.PUBLIC_URL}/auth/client-metadata.json`,
-    client_name: `Bluesky Extended`,
+    client_name: "Midnightsky",
     client_uri: `${process.env.PUBLIC_URL}`,
     // logo_uri: `${process.env.PUBLIC_URL}/logo.png`,
     // tos_uri: `${process.env.PUBLIC_URL}/tos`,

@@ -1,5 +1,7 @@
 import localFont from "next/font/local";
 
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
 import type { Metadata } from "next";
 
 import "./globals.css";
@@ -22,8 +24,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${pretendard.variable}`}>
-      <body className="antialiased">{children}</body>
+    <html
+      lang="ko"
+      className={`${pretendard.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="bg-linear-to-br from-violet-600 from-10% to-indigo-950 antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
