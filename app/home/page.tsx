@@ -32,23 +32,19 @@ export default async function Home() {
 
   return (
     <div>
-      <div>
-        <h2>Welcome, {user.displayName || user.handle}!</h2>
-        <p>Your handle: {user.handle}</p>
-
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={user.avatar || "/default-avatar.png"}
-          alt="Avatar"
-          width={50}
-          height={50}
-        />
-      </div>
-
-      <div className="mx-auto w-2/5 bg-black/50">
-        {timeline.data.feed.map((feed) => (
-          <Feed key={createFeedKey(feed)} feed={{ ...feed }} />
-        ))}
+      <div className="mx-auto max-w-[600px]">
+        <div className="flex w-full items-center justify-start bg-black/30 p-4">
+          <img
+            className="size-10 rounded-full"
+            src={user.avatar || "/default-avatar.png"}
+            alt="Avatar"
+          />
+        </div>
+        <div className="w-full bg-black/50">
+          {timeline.data.feed.map((feed) => (
+            <Feed key={createFeedKey(feed)} feed={{ ...feed }} />
+          ))}
+        </div>
       </div>
     </div>
   );
