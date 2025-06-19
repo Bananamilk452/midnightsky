@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma": "pnpx prisma",
+    "prisma": "prisma",
     "migrateandstart": "pnpm prisma migrate && pnpm prisma generate && pnpm dev",
     "tunnel": "pnpx untun@latest tunnel http://localhost:3000"
   },
