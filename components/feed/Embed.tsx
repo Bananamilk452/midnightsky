@@ -84,7 +84,11 @@ function FeedExternal({ content }: { content: AppBskyEmbedExternal.View }) {
     <Link href={content.external.uri} target="_blank">
       <div className="mt-2 overflow-hidden rounded-lg border border-gray-200">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={content.external.thumb} alt={content.external.title} />
+        <img
+          className="aspect-[1.91/1] w-full object-cover"
+          src={content.external.thumb}
+          alt={content.external.title}
+        />
         <div className="p-3">
           <h3 className="text-ellipsis font-semibold">
             {content.external.title || content.external.uri}
