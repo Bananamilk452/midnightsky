@@ -82,7 +82,7 @@ function FeedImages({ content }: { content: AppBskyEmbedImages.View }) {
 function FeedExternal({ content }: { content: AppBskyEmbedExternal.View }) {
   return (
     <Link href={content.external.uri} target="_blank">
-      <div className="mt-2 overflow-hidden rounded-lg border border-gray-200">
+      <div className="mt-2 overflow-hidden rounded-lg border border-gray-400">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="aspect-[1.91/1] w-full object-cover"

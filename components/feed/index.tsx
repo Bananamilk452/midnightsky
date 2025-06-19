@@ -49,7 +49,7 @@ export function Feed({ feed }: FeedProps) {
     hasReplyThread && hasMultipleReplies && parentReplyUri !== replyRoot?.uri;
 
   return (
-    <div className="flex flex-col border-b border-gray-200 p-4">
+    <div className="flex flex-col border-b border-gray-400 p-4">
       {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
       {hasMultipleReplies && replyRoot && <FeedRecord post={replyRoot} />}
       {hasLongThread && <div>쓰레드 전체 보기</div>}
@@ -95,7 +95,7 @@ export function EmbedPost({
   }
 
   return (
-    <div className="flex gap-2 rounded-lg border border-gray-200 p-3">
+    <div className="flex gap-2 rounded-lg border border-gray-400 p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
           <FeedAvatar post={post} className="size-4" />
