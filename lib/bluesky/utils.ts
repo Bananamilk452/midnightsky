@@ -1,4 +1,6 @@
 import { AppBskyActorDefs, AppBskyFeedPost } from "@atproto/api";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 
 export type User = {
   did: string;
@@ -27,4 +29,12 @@ export function validateRecord(data: unknown) {
       return res.value;
     }
   }
+}
+
+export function getRelativeTimeBasic(postDate: Date | string): string {
+  const date = typeof postDate === "string" ? new Date(postDate) : postDate;
+
+  return formatDistanceToNow(date, {
+    locale: ko,
+  });
 }
