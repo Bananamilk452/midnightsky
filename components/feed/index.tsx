@@ -85,12 +85,9 @@ export function EmbedPost({
   post: AppBskyEmbedRecord.ViewRecord;
   children?: React.ReactNode;
 }) {
-  const embeds = AppBskyEmbedRecord.isViewRecord(post)
-    ? post.embeds
-    : undefined;
   const value = isValidateRecord(post.value);
 
-  if (!embeds || !value) {
+  if (!value) {
     throw new Error("Invalid post embed or value");
   }
 
