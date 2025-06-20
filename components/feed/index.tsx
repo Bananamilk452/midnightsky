@@ -51,15 +51,35 @@ export function Feed({ feed }: FeedProps) {
   return (
     <div className="flex flex-col border-b border-gray-400 p-4">
       {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
-      {hasMultipleReplies && replyRoot && <FeedRecord post={replyRoot} />}
-      {hasLongThread && <div>쓰레드 전체 보기</div>}
-      {replyParent && <FeedRecord post={replyParent} />}
+      {hasMultipleReplies && replyRoot && (
+        <FeedRecord post={replyRoot} hasThreadLine={hasMultipleReplies} />
+      )}
+      {hasLongThread && <FeedThreadEllipsis uri={feed.post.uri} />}
+      {replyParent && (
+        <FeedRecord post={replyParent} hasThreadLine={!!replyParent} />
+      )}
       <FeedRecord post={post} />
     </div>
   );
 }
 
-function FeedRecord({ post }: { post: PostView }) {
+function FeedThreadEllipsis({ uri }: { uri: string }) {
+  return (
+    <div className="mb-3 ml-[17px] mt-2 border-l-2 border-dotted border-gray-400 pl-8">
+      <Link href={`/post/${uri}`} className="text-blue-500 hover:underline">
+        쓰레드 전체 보기
+      </Link>
+    </div>
+  );
+}
+
+function FeedRecord({
+  post,
+  hasThreadLine,
+}: {
+  post: PostView;
+  hasThreadLine?: boolean;
+}) {
   const record = isValidateRecord(post.record);
 
   if (!record) {
@@ -68,8 +88,11 @@ function FeedRecord({ post }: { post: PostView }) {
 
   return (
     <div className="flex gap-2">
+      <div className="mr-1 flex flex-col items-center">
       <FeedAvatar post={post} />
-      <div className="flex w-full min-w-0 flex-col gap-1">
+        {hasThreadLine && <div className="my-1 h-full w-0.5 bg-gray-400"></div>}
+      </div>
+      <div className="flex w-full min-w-0 flex-col gap-1 pb-3">
         <FeedHeader post={post} createdAt={record.createdAt} />
         <FeedContent text={record.text} facets={record.facets} />
         {post.embed && <FeedEmbed embed={post.embed} />}
