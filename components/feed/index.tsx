@@ -8,7 +8,12 @@ import {
 import { Record } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Repeat2Icon } from "lucide-react";
+import {
+  EllipsisIcon,
+  HeartIcon,
+  MessageSquareIcon,
+  Repeat2Icon,
+} from "lucide-react";
 import Link from "next/link";
 
 import { isValidateRecord } from "@/lib/bluesky/utils";
@@ -89,13 +94,14 @@ function FeedRecord({
   return (
     <div className="flex gap-2">
       <div className="mr-1 flex flex-col items-center">
-      <FeedAvatar post={post} />
+        <FeedAvatar post={post} />
         {hasThreadLine && <div className="my-1 h-full w-0.5 bg-gray-400"></div>}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1 pb-3">
         <FeedHeader post={post} createdAt={record.createdAt} />
         <FeedContent text={record.text} facets={record.facets} />
         {post.embed && <FeedEmbed embed={post.embed} />}
+        <FeedFooter post={post} className="mt-2" />
       </div>
     </div>
   );
@@ -152,7 +158,7 @@ function FeedAvatar({
     <img
       src={post.author.avatar || "/default-avatar.png"}
       alt={post.author.displayName || post.author.handle}
-      className={cn("mr-1 size-10 rounded-full", className)}
+      className={cn("size-10 rounded-full", className)}
     />
   );
 }
@@ -241,6 +247,34 @@ function FeedContent({
       <p className="whitespace-pre-wrap text-base">
         <>{...content}</>
       </p>
+    </div>
+  );
+}
+
+function FeedFooter({
+  post,
+  className,
+}: {
+  post: PostView;
+  className?: string;
+}) {
+  return (
+    <div className={cn("grid grid-cols-4", className)}>
+      <button className="flex items-center gap-1.5 text-gray-400">
+        <MessageSquareIcon className="size-4" />
+        {post.replyCount && post.replyCount > 0 ? post.replyCount : ""}
+      </button>
+      <button className="flex items-center gap-1.5 text-gray-400">
+        <Repeat2Icon className="size-4" />
+        {post.repostCount && post.repostCount > 0 ? post.repostCount : ""}
+      </button>
+      <button className="flex items-center gap-1.5 text-gray-400">
+        <HeartIcon className="size-4" />
+        {post.likeCount && post.likeCount > 0 ? post.likeCount : ""}
+      </button>
+      <button className="text-gray-400">
+        <EllipsisIcon className="size-4" />
+      </button>
     </div>
   );
 }
