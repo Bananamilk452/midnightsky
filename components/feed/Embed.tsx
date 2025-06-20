@@ -3,14 +3,15 @@ import {
   AppBskyEmbedImages,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
+  AppBskyEmbedVideo,
   AppBskyFeedDefs,
 } from "@atproto/api";
-import { EarthIcon } from "lucide-react";
-import Link from "next/link";
 
 import { validateRecord } from "@/lib/bluesky/utils";
 
 import { EmbedPost } from ".";
+import { FeedExternal } from "./embed/External";
+import { FeedVideo } from "./embed/Video";
 
 export function FeedEmbed({
   embed,
@@ -47,7 +48,6 @@ export function FeedEmbed({
   }
 
   // 4. Record With Media (미디어 포함 인용)
-
   if (AppBskyEmbedRecordWithMedia.isView(embed)) {
     return (
       <div className="flex flex-col gap-2">
@@ -60,6 +60,11 @@ export function FeedEmbed({
         />
       </div>
     );
+  }
+
+  // 5. Video
+  if (AppBskyEmbedVideo.isView(embed)) {
+    return <FeedVideo content={embed} />;
   }
 }
 
@@ -76,33 +81,5 @@ function FeedImages({ content }: { content: AppBskyEmbedImages.View }) {
         />
       ))}
     </div>
-  );
-}
-
-function FeedExternal({ content }: { content: AppBskyEmbedExternal.View }) {
-  return (
-    <Link href={content.external.uri} target="_blank">
-      <div className="mt-2 overflow-hidden rounded-lg border border-gray-400">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="aspect-[1.91/1] w-full object-cover"
-          src={content.external.thumb}
-          alt={content.external.title}
-        />
-        <div className="p-3">
-          <h3 className="text-ellipsis font-semibold">
-            {content.external.title || content.external.uri}
-          </h3>
-          <p className="text-sm">{content.external.description}</p>
-          <hr className="my-1" />
-          <div className="flex items-center gap-1">
-            <EarthIcon className="size-3 text-gray-400" />
-            <span className="text-xs text-gray-400">
-              {new URL(content.external.uri).origin}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }
