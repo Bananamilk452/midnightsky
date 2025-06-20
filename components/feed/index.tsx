@@ -54,36 +54,60 @@ export function Feed({ feed }: FeedProps) {
     hasReplyThread && hasMultipleReplies && parentReplyUri !== replyRoot?.uri;
 
   return (
-    <div className="flex flex-col border-b border-gray-400 p-4">
-      {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
+    <div className="flex flex-col border-b border-gray-400">
       {hasMultipleReplies && replyRoot && (
-        <FeedRecord post={replyRoot} hasThreadLine={hasMultipleReplies} />
+        <FeedRecord post={replyRoot} line={{ top: false, bottom: true }} />
       )}
       {hasLongThread && <FeedThreadEllipsis uri={feed.post.uri} />}
       {replyParent && (
-        <FeedRecord post={replyParent} hasThreadLine={!!replyParent} />
+        <FeedRecord
+          post={replyParent}
+          line={
+            hasMultipleReplies
+              ? { top: true, bottom: true }
+              : { top: false, bottom: true }
+          }
+        />
       )}
-      <FeedRecord post={post} />
+      <FeedRecord
+        post={post}
+        className="pb-2"
+        line={
+          replyParent
+            ? { top: true, bottom: false }
+            : { top: false, bottom: false }
+        }
+      >
+        {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
+      </FeedRecord>
     </div>
   );
 }
 
 function FeedThreadEllipsis({ uri }: { uri: string }) {
   return (
-    <div className="mb-3 ml-[17px] mt-2 border-l-2 border-dotted border-gray-400 pl-8">
-      <Link href={`/post/${uri}`} className="text-blue-500 hover:underline">
-        쓰레드 전체 보기
-      </Link>
-    </div>
+    <Link
+      href={`/post/${uri}`}
+      className="group flex px-4 py-2 hover:cursor-pointer hover:bg-white/5"
+    >
+      <div className="mr-3 flex h-6 w-10 justify-center">
+        <div className="border-l-2 border-dotted border-gray-400"></div>
+      </div>
+      <p className="text-blue-500 group-hover:underline">쓰레드 전체 보기</p>
+    </Link>
   );
 }
 
 function FeedRecord({
   post,
-  hasThreadLine,
+  line,
+  children,
+  className,
 }: {
   post: PostView;
-  hasThreadLine?: boolean;
+  line?: { top: boolean; bottom: boolean };
+  children?: React.ReactNode;
+  className?: string;
 }) {
   const record = validateRecord(post.record);
 
@@ -91,17 +115,32 @@ function FeedRecord({
     throw new Error("Invalid post record");
   }
 
+  const lineElement = <div className="h-full w-0.5 bg-gray-400" />;
+
   return (
-    <div className="flex gap-2">
-      <div className="mr-1 flex flex-col items-center">
-        <FeedAvatar post={post} />
-        {hasThreadLine && <div className="my-1 h-full w-0.5 bg-gray-400"></div>}
+    <div
+      className={cn(
+        "flex flex-col px-4 hover:cursor-pointer hover:bg-white/5",
+        className,
+      )}
+    >
+      <div className="grid grid-cols-[40px_1fr]">
+        <div className="flex min-h-4 justify-center">
+          {line?.top && lineElement}
+        </div>
+        {children}
       </div>
-      <div className="flex w-full min-w-0 flex-col gap-1 pb-3">
-        <FeedHeader post={post} createdAt={record.createdAt} />
-        <FeedContent text={record.text} facets={record.facets} />
-        {post.embed && <FeedEmbed embed={post.embed} />}
-        <FeedFooter post={post} className="mt-2" />
+      <div className="flex gap-2">
+        <div className="mr-1 flex shrink-0 flex-col items-center">
+          <FeedAvatar post={post} />
+          {line?.bottom && lineElement}
+        </div>
+        <div className="flex w-full min-w-0 flex-col gap-1">
+          <FeedHeader post={post} createdAt={record.createdAt} />
+          <FeedContent text={record.text} facets={record.facets} />
+          {post.embed && <FeedEmbed embed={post.embed} />}
+          <FeedFooter post={post} className="mt-1" />
+        </div>
       </div>
     </div>
   );
@@ -136,8 +175,8 @@ export function EmbedPost({
 function FeedRepost({ feed }: { feed: FeedViewPost }) {
   return (
     isReasonRepost(feed.reason) && (
-      <div className="ml-13 flex items-center gap-1 text-gray-400">
-        <Repeat2Icon className="h-4 w-4" />
+      <div className="ml-3 mt-4 flex items-center gap-1 text-gray-400">
+        <Repeat2Icon className="size-4" />
         <span className="text-xs font-medium">
           {feed.reason.by.displayName || feed.reason.by.handle} 님이 재게시함
         </span>
@@ -260,21 +299,29 @@ function FeedFooter({
 }) {
   return (
     <div className={cn("grid grid-cols-4", className)}>
-      <button className="flex items-center gap-1.5 text-gray-400">
-        <MessageSquareIcon className="size-4" />
-        {post.replyCount && post.replyCount > 0 ? post.replyCount : ""}
-      </button>
-      <button className="flex items-center gap-1.5 text-gray-400">
-        <Repeat2Icon className="size-4" />
-        {post.repostCount && post.repostCount > 0 ? post.repostCount : ""}
-      </button>
-      <button className="flex items-center gap-1.5 text-gray-400">
-        <HeartIcon className="size-4" />
-        {post.likeCount && post.likeCount > 0 ? post.likeCount : ""}
-      </button>
-      <button className="text-gray-400">
-        <EllipsisIcon className="size-4" />
-      </button>
+      <div className="flex items-center">
+        <button className="flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10">
+          <MessageSquareIcon className="size-4" />
+          {post.replyCount && post.replyCount > 0 ? post.replyCount : ""}
+        </button>
+      </div>
+      <div className="flex items-center">
+        <button className="flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10">
+          <Repeat2Icon className="size-5" />
+          {post.repostCount && post.repostCount > 0 ? post.repostCount : ""}
+        </button>
+      </div>
+      <div className="flex items-center">
+        <button className="flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10">
+          <HeartIcon className="size-4" />
+          {post.likeCount && post.likeCount > 0 ? post.likeCount : ""}
+        </button>
+      </div>
+      <div className="flex items-center">
+        <button className="text-gray-400">
+          <EllipsisIcon className="size-4" />
+        </button>
+      </div>
     </div>
   );
 }
