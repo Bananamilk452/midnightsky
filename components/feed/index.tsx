@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { isValidateRecord } from "@/lib/bluesky/utils";
+import { validateRecord } from "@/lib/bluesky/utils";
 import { cn } from "@/lib/utils";
 
 import { FeedEmbed } from "./Embed";
@@ -46,7 +46,7 @@ export function Feed({ feed }: FeedProps) {
   const hasMultipleReplies =
     replyRoot && replyParent && replyParent.uri !== replyRoot.uri;
 
-  const parentRecord = isValidateRecord(replyParent?.record);
+  const parentRecord = validateRecord(replyParent?.record);
   const parentReplyUri = parentRecord?.reply?.parent.uri;
   // 쓰레드 길이가 4개 이상이라 쓰레드 전체 보기가 필요한 경우
   // -3번째 reply(replyParent.reply.parent)가 root와 같지 않은 경우
@@ -85,7 +85,7 @@ function FeedRecord({
   post: PostView;
   hasThreadLine?: boolean;
 }) {
-  const record = isValidateRecord(post.record);
+  const record = validateRecord(post.record);
 
   if (!record) {
     throw new Error("Invalid post record");
@@ -114,7 +114,7 @@ export function EmbedPost({
   post: AppBskyEmbedRecord.ViewRecord;
   children?: React.ReactNode;
 }) {
-  const value = isValidateRecord(post.value);
+  const value = validateRecord(post.value);
 
   if (!value) {
     throw new Error("Invalid post embed or value");

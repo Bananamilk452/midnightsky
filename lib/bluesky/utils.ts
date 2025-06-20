@@ -20,7 +20,7 @@ export function createUser(data: AppBskyActorDefs.ProfileViewDetailed) {
   };
 }
 
-export function isValidateRecord(data: unknown) {
+export function validateRecord(data: unknown) {
   if (AppBskyFeedPost.isRecord(data)) {
     const res = AppBskyFeedPost.validateRecord(data);
     if (res.success) {

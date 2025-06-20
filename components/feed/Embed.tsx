@@ -8,7 +8,7 @@ import {
 import { EarthIcon } from "lucide-react";
 import Link from "next/link";
 
-import { isValidateRecord } from "@/lib/bluesky/utils";
+import { validateRecord } from "@/lib/bluesky/utils";
 
 import { EmbedPost } from ".";
 
@@ -33,7 +33,7 @@ export function FeedEmbed({
 
     // 3.1. Post
     if (AppBskyEmbedRecord.isViewRecord(record)) {
-      const value = isValidateRecord(record.value);
+      const value = validateRecord(record.value);
       if (value) {
         return (
           <EmbedPost post={record}>
