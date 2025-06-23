@@ -144,7 +144,7 @@ export function EmbedPost({
     <div className="flex gap-2 rounded-lg border border-gray-400 p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
-          <FeedAvatar post={post} className="size-4" />
+          <FeedAvatar post={post} className="mr-1 size-4" />
         </FeedHeader>
         <FeedContent text={value.text} facets={value.facets} />
         {children}

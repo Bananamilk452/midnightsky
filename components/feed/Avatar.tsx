@@ -5,6 +5,7 @@ import { Avatar } from "@/components/primitive/Avatar";
 
 export function FeedAvatar({
   post,
+  className,
 }: {
   post: PostView | AppBskyEmbedRecord.ViewRecord;
   className?: string;
@@ -13,6 +14,7 @@ export function FeedAvatar({
     <Avatar
       src={post.author.avatar}
       alt={post.author.displayName || post.author.handle}
+      className={className}
     />
   );
 }
