@@ -4,6 +4,7 @@ import {
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 
 import { Feed } from "@/components/feed";
+import { Avatar } from "@/components/primitive/Avatar";
 import { getAgent } from "@/lib/bluesky/action";
 import getSession from "@/lib/session";
 
@@ -34,11 +35,7 @@ export default async function Home() {
     <div>
       <div className="mx-auto max-w-[600px]">
         <div className="flex w-full items-center justify-start bg-black/30 p-4">
-          <img
-            className="size-10 rounded-full"
-            src={user.avatar || "/default-avatar.png"}
-            alt="Avatar"
-          />
+          <Avatar src={user.avatar} alt={user.displayName || user.handle} />
         </div>
         <div className="w-full bg-black/50">
           {timeline.data.feed.map((feed) => (
