@@ -11,13 +11,16 @@ export function FeedVideo({ content }: { content: AppBskyEmbedVideo.View }) {
     const hls = new Hls();
     hls.loadSource(content.playlist);
     hls.attachMedia(videoRef.current);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      videoRef.current?.play();
+    });
   }
 
   return (
     <div className="mt-2">
       <video
         ref={videoRef}
-        className="h-auto max-h-[515px] w-full rounded-lg border border-gray-400"
+        className="h-auto max-h-[515px] rounded-lg border border-gray-400"
         controls
         muted
         autoPlay
