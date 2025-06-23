@@ -11,6 +11,7 @@ import { validateRecord } from "@/lib/bluesky/utils";
 
 import { EmbedPost } from ".";
 import { FeedExternal } from "./embed/External";
+import { FeedImage } from "./embed/Image";
 import { FeedVideo } from "./embed/Video";
 
 export function FeedEmbed({
@@ -20,7 +21,7 @@ export function FeedEmbed({
 }) {
   // 1. Image
   if (AppBskyEmbedImages.isView(embed)) {
-    return <FeedImages content={embed} />;
+    return <FeedImage content={embed} />;
   }
 
   // 2. External Link
@@ -66,20 +67,4 @@ export function FeedEmbed({
   if (AppBskyEmbedVideo.isView(embed)) {
     return <FeedVideo content={embed} />;
   }
-}
-
-function FeedImages({ content }: { content: AppBskyEmbedImages.View }) {
-  return (
-    <div className="mt-2">
-      {content.images.map((image) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={image.fullsize}
-          src={image.fullsize}
-          alt={image.alt || "Image"}
-          className="h-auto max-h-[515px] rounded-lg"
-        />
-      ))}
-    </div>
-  );
 }
