@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +32,7 @@ const formSchema = z.object({
 
 export default function SignIn() {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,7 +44,9 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const url = await signInWithBluesky(values.handle);
 
-    router.push(url);
+    startTransition(() => {
+      router.push(url);
+    });
   }
 
   return (
@@ -76,8 +81,15 @@ export default function SignIn() {
         </Form>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={form.handleSubmit(onSubmit)}>
+        <Button
+          className="w-full"
+          onClick={form.handleSubmit(onSubmit)}
+          disabled={form.formState.isSubmitting || isPending}
+        >
           로그인
+          {(form.formState.isSubmitting || isPending) && (
+            <Spinner className="size-4" />
+          )}
         </Button>
       </CardFooter>
     </Card>
