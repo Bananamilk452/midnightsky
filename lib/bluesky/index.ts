@@ -18,7 +18,7 @@ const blueskyClient = new NodeOAuthClient({
     client_id: `${process.env.PUBLIC_URL}/auth/client-metadata.json`,
     client_name: "Midnightsky",
     client_uri: `${process.env.PUBLIC_URL}`,
-    // logo_uri: `${process.env.PUBLIC_URL}/logo.png`,
+    logo_uri: `${process.env.PUBLIC_URL}/logo.png`,
     // tos_uri: `${process.env.PUBLIC_URL}/tos`,
     // policy_uri: `${process.env.PUBLIC_URL}/policy`,
     redirect_uris: [`${process.env.PUBLIC_URL}/auth/callback`],
