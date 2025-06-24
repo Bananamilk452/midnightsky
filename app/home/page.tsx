@@ -1,48 +1,27 @@
-import {
-  FeedViewPost,
-  isReasonRepost,
-} from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+"use client";
 
-import { Feed } from "@/components/feed";
-import { Avatar } from "@/components/primitive/Avatar";
-import { getAgent } from "@/lib/bluesky/action";
-import getSession from "@/lib/session";
+import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
-export default async function Home() {
-  const session = await getSession();
-  if (!session.user || !session.user.did) {
-    throw new Error("User is not authenticated or did is missing");
-  }
-  const agent = await getAgent(session.user.did);
+import { HomeContent } from "@/components/home/HomeContent";
+import { Spinner } from "@/components/Spinner";
 
-  const user = session.user;
-  const timeline = await agent.getTimeline({
-    limit: 30,
-    algorithm: "reverse-chronological",
-  });
+import Error from "./error";
 
-  function createFeedKey(post: FeedViewPost) {
-    let key = post.post.uri;
-
-    if (isReasonRepost(post.reason)) {
-      key += `-${post.reason.uri}`;
-    }
-
-    return key;
-  }
-
+function LoadingFallback() {
   return (
-    <div>
-      <div className="mx-auto max-w-[600px]">
-        <div className="flex w-full items-center justify-start bg-black/30 p-4">
-          <Avatar src={user.avatar} alt={user.displayName || user.handle} />
-        </div>
-        <div className="w-full bg-black/50">
-          {timeline.data.feed.map((feed) => (
-            <Feed key={createFeedKey(feed)} feed={{ ...feed }} />
-          ))}
-        </div>
-      </div>
+    <div className="flex min-h-screen items-center justify-center">
+      <Spinner className="size-6" />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <ErrorBoundary FallbackComponent={Error}>
+      <Suspense fallback={<LoadingFallback />}>
+        <HomeContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
