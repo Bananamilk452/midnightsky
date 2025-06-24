@@ -51,7 +51,7 @@ export function FeedEmbed({
   // 4. Record With Media (미디어 포함 인용)
   if (AppBskyEmbedRecordWithMedia.isView(embed)) {
     return (
-      <div className="flex flex-col gap-2">
+      <div className="mt-2 flex flex-col gap-2">
         <FeedEmbed embed={embed.media} />
         <FeedEmbed
           embed={{

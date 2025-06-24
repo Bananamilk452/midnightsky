@@ -50,7 +50,7 @@ export function Feed({ feed }: FeedProps) {
     hasReplyThread && hasMultipleReplies && parentReplyUri !== replyRoot?.uri;
 
   return (
-    <div className="flex flex-col border-b border-gray-400">
+    <div className="flex flex-col border-b border-white/30">
       {hasMultipleReplies && replyRoot && (
         <FeedRecord post={replyRoot} line={{ top: false, bottom: true }} />
       )}
@@ -144,7 +144,7 @@ export function EmbedPost({
   }
 
   return (
-    <div className="flex gap-2 rounded-lg border border-gray-400 p-3">
+    <div className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
           <FeedAvatar post={post} className="mr-1 size-4" />
