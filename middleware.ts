@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import getSession from "@/lib/session";
+import { getOptionalSession } from "@/lib/session";
 
 const AUTH_PAGES = ["/sign-in"];
 
 export async function middleware(request: NextRequest) {
-  const session = await getSession();
+  const session = await getOptionalSession();
   console.log("Session:", session);
 
   if (Object.keys(session).length === 0) {

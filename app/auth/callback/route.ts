@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { blueskyClient } from "@/lib/bluesky";
 import { createUser } from "@/lib/bluesky/utils";
-import getSession from "@/lib/session";
+import { getOptionalSession } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   const nextUrl = request.nextUrl;
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       actor: session.did,
     });
 
-    const ironSession = await getSession();
+    const ironSession = await getOptionalSession();
     ironSession.user = createUser(data);
 
     await ironSession.save();
