@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import { QueryProvider } from "@/components/providers/QueryProvider";
+
 const pretendard = localFont({
   src: "./PretendardJPVariable.woff2",
   display: "swap",
@@ -36,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
     </html>
