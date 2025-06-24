@@ -20,7 +20,7 @@ export function FeedVideo({ content }: { content: AppBskyEmbedVideo.View }) {
     <div className="mt-2">
       <video
         ref={videoRef}
-        className="h-auto max-h-[515px] rounded-lg border border-gray-400"
+        className="h-auto max-h-[515px] rounded-lg border border-white/30"
         controls
         muted
         autoPlay

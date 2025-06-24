@@ -9,7 +9,7 @@ export function FeedExternal({
 }) {
   return (
     <Link href={content.external.uri} target="_blank">
-      <div className="mt-2 overflow-hidden rounded-lg border border-gray-400">
+      <div className="mt-2 overflow-hidden rounded-lg border border-white/30">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="aspect-[1.91/1] w-full object-cover"
