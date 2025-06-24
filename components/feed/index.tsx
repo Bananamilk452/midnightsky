@@ -11,6 +11,7 @@ import { FeedContent } from "@/components/feed/Content";
 import { FeedEmbed } from "@/components/feed/Embed";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedHeader } from "@/components/feed/Header";
+import { FeedLabel } from "@/components/feed/Label";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
@@ -118,8 +119,10 @@ function FeedRecord({
         </div>
         <div className="flex w-full min-w-0 flex-col gap-1">
           <FeedHeader post={post} createdAt={record.createdAt} />
-          <FeedContent text={record.text} facets={record.facets} />
-          {post.embed && <FeedEmbed embed={post.embed} />}
+          <FeedLabel labels={post.labels}>
+            <FeedContent text={record.text} facets={record.facets} />
+            {post.embed && <FeedEmbed embed={post.embed} />}
+          </FeedLabel>
           <FeedFooter post={post} className="mt-1" />
         </div>
       </div>
