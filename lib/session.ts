@@ -4,6 +4,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
 import { User } from "@/lib/bluesky/utils";
+import { ApiError } from "@/lib/utils.server";
 
 import type { IronSession } from "iron-session";
 
@@ -22,7 +23,7 @@ export async function getOptionalSession(): Promise<IronSession<Session>> {
 export async function getSession() {
   const session = await getOptionalSession();
   if (!session.user || !session.user.did) {
-    throw new Error("User is not authenticated or did is missing");
+    throw new ApiError("User is not authenticated or did is missing", 401);
   }
-  return session;
+  return session as IronSession<{ user: User }>;
 }
