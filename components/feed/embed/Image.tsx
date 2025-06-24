@@ -24,7 +24,29 @@ export function FeedImage({ content }: { content: AppBskyEmbedImages.View }) {
           ))}
         </div>
       )}
-      {content.images.length > 2 && (
+      {content.images.length === 3 && (
+        <div className="grid h-full grid-cols-2 gap-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={content.images[0].fullsize}
+            src={content.images[0].fullsize}
+            alt={content.images[0].alt || "Image"}
+            className="size-full object-cover"
+          />
+          <div className="grid h-full grid-rows-2 gap-1">
+            {content.images.slice(1).map((image) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={image.fullsize}
+                src={image.fullsize}
+                alt={image.alt || "Image"}
+                className="size-full object-cover"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      {content.images.length > 3 && (
         <div className="grid h-full grid-cols-2 grid-rows-2 gap-1">
           {content.images.map((image) => (
             // eslint-disable-next-line @next/next/no-img-element
