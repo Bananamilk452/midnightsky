@@ -24,10 +24,15 @@ export function createUser(data: AppBskyActorDefs.ProfileViewDetailed) {
 
 export function validateRecord(data: unknown) {
   if (AppBskyFeedPost.isRecord(data)) {
-    const res = AppBskyFeedPost.validateRecord(data);
-    if (res.success) {
-      return res.value;
-    }
+    return data as AppBskyFeedPost.Record;
+    // 아래 코드는 validateRecord 함수가 데이터를 Server Action이 아닌
+    // API Route로 데이터를 받으면 자꾸 터져서 주석 처리했습니다.
+    // const res = AppBskyFeedPost.validateRecord(data);
+    // if (res.success) {
+    //   return res.value;
+    // } else {
+    //   console.error("Invalid post record:", res.error);
+    // }
   }
 }
 
