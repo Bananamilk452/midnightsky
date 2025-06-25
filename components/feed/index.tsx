@@ -22,8 +22,6 @@ interface FeedProps {
 }
 
 export function Feed({ feed }: FeedProps) {
-  console.log("Feed Data:", feed, feed.post.record.text);
-
   const { post } = feed;
 
   const replyParent =

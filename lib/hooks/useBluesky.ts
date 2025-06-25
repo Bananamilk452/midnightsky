@@ -1,5 +1,5 @@
 import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import { User } from "@/lib/bluesky/utils";
 
@@ -29,7 +29,7 @@ async function fetchTimeline(
 }
 
 export function useSession() {
-  return useSuspenseQuery({
+  return useQuery({
     queryKey: ["session"],
     queryFn: fetchSession,
   });
@@ -42,8 +42,16 @@ export function useTimeline({
   limit?: number;
   cursor?: string;
 }) {
-  return useSuspenseQuery({
+  return useInfiniteQuery({
     queryKey: ["timeline", limit, cursor],
-    queryFn: () => fetchTimeline(limit, cursor),
+    queryFn: async ({ pageParam }) => {
+      const { limit, cursor } = pageParam || {};
+      return fetchTimeline(limit, cursor);
+    },
+    initialPageParam: { limit, cursor },
+    getNextPageParam: (lastPage) => ({
+      limit,
+      cursor: lastPage.cursor,
+    }),
   });
 }
