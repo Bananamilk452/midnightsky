@@ -25,7 +25,6 @@ export default function Home() {
     fetchNextPage,
     hasNextPage,
     isFetching,
-    isFetchingNextPage,
     status,
   } = useTimeline({
     limit: 30,
@@ -65,7 +64,7 @@ export default function Home() {
           </React.Fragment>
         ))}
         {/* Intersection Observer Trigger */}
-        <div ref={ref} className="h-1"></div>{" "}
+        <div ref={ref} className="h-1"></div>
         <div className="flex items-center justify-center p-4">
           {isFetching && <Spinner className="size-6" />}
         </div>
