@@ -37,6 +37,7 @@
     "remove": "^0.1.5",
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.3.0",
+    "usehooks-ts": "^3.1.1",
     "zod": "^3.25.67"
   },
   "devDependencies": {

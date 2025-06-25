@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import React, { useEffect, useRef } from "react";
+import { useIntersectionObserver } from "usehooks-ts";
 
-import { HomeContent } from "@/components/home/HomeContent";
+import { Feed } from "@/components/feed";
+import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
-
-import Error from "./error";
+import { useSession, useTimeline } from "@/lib/hooks/useBluesky";
+import { createFeedKey } from "@/lib/utils";
 
 function LoadingFallback() {
   return (
@@ -17,11 +18,58 @@ function LoadingFallback() {
 }
 
 export default function Home() {
-  return (
-    <ErrorBoundary FallbackComponent={Error}>
-      <Suspense fallback={<LoadingFallback />}>
-        <HomeContent />
-      </Suspense>
-    </ErrorBoundary>
+  const { data: user } = useSession();
+  const {
+    data: timeline,
+    error: timelineError,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useTimeline({
+    limit: 30,
+  });
+
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const { isIntersecting, ref } = useIntersectionObserver({
+    threshold: 0.5,
+    rootMargin: "1500px",
+    root: timelineRef.current,
+  });
+
+  useEffect(() => {
+    if (hasNextPage && isIntersecting) {
+      fetchNextPage();
+    }
+  }, [isIntersecting, fetchNextPage, hasNextPage]);
+  return status === "pending" ? (
+    <LoadingFallback />
+  ) : status === "error" ? (
+    <p>에러: {timelineError.message}</p>
+  ) : (
+    <div className="mx-auto max-w-[600px]">
+      <div className="sticky top-0 z-10 flex w-full items-center justify-start bg-black/30 p-4 backdrop-blur-sm">
+        {!user ? (
+          <Spinner className="size-6" />
+        ) : (
+          <Avatar src={user.avatar} alt={user.displayName || user.handle} />
+        )}
+      </div>
+      <div ref={timelineRef} className="bg-black/50">
+        {timeline.pages.map((group, i) => (
+          <React.Fragment key={i}>
+            {group.feed.map((feed) => (
+              <Feed key={createFeedKey(feed)} feed={{ ...feed }} />
+            ))}
+          </React.Fragment>
+        ))}
+        {/* Intersection Observer Trigger */}
+        <div ref={ref} className="h-1"></div>{" "}
+        <div className="flex items-center justify-center p-4">
+          {isFetching && <Spinner className="size-6" />}
+        </div>
+      </div>
+    </div>
   );
 }
