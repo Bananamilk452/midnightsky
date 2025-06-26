@@ -63,7 +63,7 @@ function ImageView({ image }: { image: AppBskyEmbedImages.ViewImage }) {
         <img
           src={image.fullsize}
           alt={image.alt || "Image"}
-          className="size-full object-cover"
+          className="size-full cursor-pointer object-cover"
         />
       </DialogTrigger>
       <DialogContent
