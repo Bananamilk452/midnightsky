@@ -16,6 +16,11 @@ html {
     "Segoe UI Emoji";
 }
 
+/* TinyMCE */
+.tox-promotion {
+  display: none;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
