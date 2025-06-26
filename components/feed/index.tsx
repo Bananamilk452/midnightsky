@@ -1,3 +1,5 @@
+"use client";
+
 import { AppBskyEmbedRecord } from "@atproto/api";
 import {
   FeedViewPost,
@@ -5,6 +7,7 @@ import {
   isReasonRepost,
   PostView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import { useRouter } from "next/navigation";
 
 import { FeedAvatar } from "@/components/feed/Avatar";
 import { FeedContent } from "@/components/feed/Content";
@@ -15,7 +18,7 @@ import { FeedLabel } from "@/components/feed/Label";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
-import { cn } from "@/lib/utils";
+import { cn, parseAtUri } from "@/lib/utils";
 
 interface FeedProps {
   feed: FeedViewPost;
@@ -89,6 +92,8 @@ function FeedRecord({
   children?: React.ReactNode;
   className?: string;
 }) {
+  const router = useRouter();
+
   const record = validateRecord(post.record);
 
   if (!record) {
@@ -97,12 +102,15 @@ function FeedRecord({
 
   const lineElement = <div className="h-full w-0.5 bg-gray-400" />;
 
+  const at = parseAtUri(post.uri);
+
   return (
     <div
       className={cn(
         "flex flex-col px-4 hover:cursor-pointer hover:bg-white/5",
         className,
       )}
+      onClick={() => router.push(`/post/${at.authority}/${at.rkey}`)}
     >
       <div className="grid grid-cols-[40px_1fr]">
         <div className="flex min-h-4 justify-center">

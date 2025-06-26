@@ -1,9 +1,13 @@
 import Link from "next/link";
 
+import { parseAtUri } from "@/lib/utils";
+
 export function FeedThreadEllipsis({ uri }: { uri: string }) {
+  const at = parseAtUri(uri);
+
   return (
     <Link
-      href={`/post/${uri}`}
+      href={`/post/${at.authority}/${at.rkey}`}
       className="group flex px-4 py-2 hover:cursor-pointer hover:bg-white/5"
     >
       <div className="mr-3 flex h-6 w-10 justify-center">
