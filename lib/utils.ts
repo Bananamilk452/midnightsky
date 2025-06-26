@@ -20,3 +20,15 @@ export function createFeedKey(post: FeedViewPost) {
 
   return key;
 }
+
+export function parseAtUri(uri: string) {
+  const parts = uri.slice(5).split("/");
+  if (parts.length !== 3) {
+    throw new Error("Invalid AT URI format");
+  }
+  return {
+    authority: parts[0],
+    collection: parts[1],
+    rkey: parts[2],
+  };
+}
