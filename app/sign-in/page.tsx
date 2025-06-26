@@ -72,7 +72,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div>
       <Card className="border bg-white/10 shadow-md backdrop-blur-md">
         <CardHeader>
           <CardTitle>MidnightSky✨ 로그인</CardTitle>
@@ -130,7 +130,11 @@ export default function SignIn() {
           </div>
         </CardFooter>
       </Card>
-      {formError && <Note variant="error">{formError}</Note>}
+      {formError && (
+        <Note variant="error" className="mt-2">
+          {formError}
+        </Note>
+      )}
     </div>
   );
 }
