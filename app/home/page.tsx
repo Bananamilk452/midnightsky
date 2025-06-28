@@ -4,18 +4,11 @@ import React, { useEffect, useRef } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 
 import { Feed } from "@/components/feed";
+import { LoadingFallback } from "@/components/LoadingFallback";
 import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
 import { useSession, useTimeline } from "@/lib/hooks/useBluesky";
 import { createFeedKey } from "@/lib/utils";
-
-function LoadingFallback() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Spinner className="size-6" />
-    </div>
-  );
-}
 
 export default function Home() {
   const { data: user } = useSession();
