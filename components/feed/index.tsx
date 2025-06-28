@@ -111,6 +111,12 @@ function FeedRecord({
         className,
       )}
       onClick={() => router.push(`/post/${at.authority}/${at.rkey}`)}
+      onAuxClick={(e) => {
+        if (e.button === 1) {
+          e.preventDefault();
+          window.open(`/post/${at.authority}/${at.rkey}`, "_blank");
+        }
+      }}
     >
       <div className="grid grid-cols-[40px_1fr]">
         <div className="flex min-h-4 justify-center">
