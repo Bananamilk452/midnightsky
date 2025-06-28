@@ -4,6 +4,7 @@ import { Agent } from "@atproto/api";
 
 import { blueskyClient } from "@/lib/bluesky";
 import { getOptionalSession } from "@/lib/session";
+import { ApiError } from "@/lib/utils.server";
 
 export async function signInWithBluesky(handle: string) {
   const url = await blueskyClient.authorize(handle, {
@@ -32,7 +33,7 @@ export async function getAgent(did: string) {
 export async function getSessionAgent() {
   const session = await getOptionalSession();
   if (!session.user || !session.user.did) {
-    throw new Error("User is not authenticated or did is missing");
+    throw new ApiError("User is not authenticated or did is missing", 401);
   }
 
   const agent = await getAgent(session.user.did);
