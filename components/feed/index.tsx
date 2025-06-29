@@ -155,8 +155,24 @@ export function EmbedPost({
     throw new Error("Invalid post embed or value");
   }
 
+  const router = useRouter();
+  const at = parseAtUri(post.uri);
+
   return (
-    <div className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3">
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/post/${at.authority}/${at.rkey}`);
+      }}
+      onAuxClick={(e) => {
+        if (e.button === 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.open(`/post/${at.authority}/${at.rkey}`, "_blank");
+        }
+      }}
+      className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3"
+    >
       <div className="flex min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
           <FeedAvatar post={post} className="mr-1 size-4" />

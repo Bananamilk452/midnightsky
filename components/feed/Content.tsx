@@ -20,6 +20,7 @@ export function FeedContent({
     if (segment.isLink()) {
       content.push(
         <Link
+          onClick={(e) => e.stopPropagation()}
           href={segment.link!.uri}
           target="_blank"
           className="text-blue-500 hover:underline"
@@ -30,6 +31,7 @@ export function FeedContent({
     } else if (segment.isMention()) {
       content.push(
         <Link
+          onClick={(e) => e.stopPropagation()}
           href={`/user/${segment.mention!.did}`}
           className="text-blue-500 hover:underline"
         >
@@ -38,7 +40,12 @@ export function FeedContent({
       );
     } else if (segment.isTag()) {
       content.push(
-        <span className="text-blue-500 hover:underline">{segment.text}</span>,
+        <span
+          onClick={(e) => e.stopPropagation()}
+          className="text-blue-500 hover:underline"
+        >
+          {segment.text}
+        </span>,
       );
     } else {
       content.push(segment.text);

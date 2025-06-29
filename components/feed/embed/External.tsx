@@ -8,7 +8,11 @@ export function FeedExternal({
   content: AppBskyEmbedExternal.View;
 }) {
   return (
-    <Link href={content.external.uri} target="_blank">
+    <Link
+      onClick={(e) => e.stopPropagation()}
+      href={content.external.uri}
+      target="_blank"
+    >
       <div className="mt-2 overflow-hidden rounded-lg border border-white/30">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

@@ -7,6 +7,7 @@ export function FeedThreadEllipsis({ uri }: { uri: string }) {
 
   return (
     <Link
+      onClick={(e) => e.stopPropagation()}
       href={`/post/${at.authority}/${at.rkey}`}
       className="group flex px-4 py-2 hover:cursor-pointer hover:bg-white/5"
     >

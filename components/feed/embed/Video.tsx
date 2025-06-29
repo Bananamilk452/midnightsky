@@ -16,7 +16,7 @@ export function FeedVideo({ content }: { content: AppBskyEmbedVideo.View }) {
   }, [content.playlist]);
 
   return (
-    <div className="mt-2">
+    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
       <video
         ref={videoRef}
         className="h-auto max-h-[515px] rounded-lg border border-white/30"

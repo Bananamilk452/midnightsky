@@ -34,7 +34,7 @@ export function FeedLabel({
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-3 rounded-lg bg-black/30 p-4">
         <CircleAlertIcon className="size-6 text-gray-400" />
         <p className="flex-grow text-sm font-semibold text-gray-400">{title}</p>
