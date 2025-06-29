@@ -10,7 +10,7 @@ export function DefaultLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-dvh w-dvw overflow-auto">
-      <div className="relative mx-auto max-w-[600px]">
+      <div className="relative mx-auto min-h-full max-w-[600px] bg-black/50">
         {children}
         <WriterButton onClick={() => setIsWriterOpen(true)} />
         <Writer open={isWriterOpen} setOpen={setIsWriterOpen} />

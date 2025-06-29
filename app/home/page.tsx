@@ -50,7 +50,7 @@ export default function Home() {
         )}
       </div>
 
-      <div ref={timelineRef} className="bg-black/50">
+      <div ref={timelineRef}>
         {timeline.pages.map((group, i) => (
           <React.Fragment key={i}>
             {group.feed.map((feed) => (
