@@ -55,7 +55,7 @@ export function Feed({ feed }: FeedProps) {
       {hasMultipleReplies && replyRoot && (
         <FeedRecord post={replyRoot} line={{ top: false, bottom: true }} />
       )}
-      {hasLongThread && <FeedThreadEllipsis uri={feed.post.uri} />}
+      {hasLongThread && <FeedThreadEllipsis post={feed.post} />}
       {replyParent && (
         <FeedRecord
           post={replyParent}
@@ -81,7 +81,7 @@ export function Feed({ feed }: FeedProps) {
   );
 }
 
-function FeedRecord({
+export function FeedRecord({
   post,
   line,
   children,
@@ -110,12 +110,18 @@ function FeedRecord({
         "flex flex-col px-4 hover:cursor-pointer hover:bg-white/5",
         className,
       )}
-      onClick={() => router.push(`/post/${at.authority}/${at.rkey}`)}
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/post/${post.author.handle}/${at.rkey}`);
+      }}
       onAuxClick={(e) => {
         if (e.button === 1) {
-          e.preventDefault();
-          window.open(`/post/${at.authority}/${at.rkey}`, "_blank");
+          e.stopPropagation();
+          window.open(`/post/${post.author.handle}/${at.rkey}`, "_blank");
         }
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
       }}
     >
       <div className="grid grid-cols-[40px_1fr]">
@@ -129,13 +135,13 @@ function FeedRecord({
           <FeedAvatar post={post} />
           {line?.bottom && lineElement}
         </div>
-        <div className="flex w-full min-w-0 flex-col gap-1">
+        <div className="flex w-full min-w-0 flex-col">
           <FeedHeader post={post} createdAt={record.createdAt} />
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
             {post.embed && <FeedEmbed embed={post.embed} />}
           </FeedLabel>
-          <FeedFooter post={post} className="mt-1" />
+          <FeedFooter post={post} />
         </div>
       </div>
     </div>
@@ -162,18 +168,20 @@ export function EmbedPost({
     <div
       onClick={(e) => {
         e.stopPropagation();
-        router.push(`/post/${at.authority}/${at.rkey}`);
+        router.push(`/post/${post.author.handle}/${at.rkey}`);
       }}
       onAuxClick={(e) => {
         if (e.button === 1) {
-          e.preventDefault();
           e.stopPropagation();
-          window.open(`/post/${at.authority}/${at.rkey}`, "_blank");
+          window.open(`/post/${post.author.handle}/${at.rkey}`, "_blank");
         }
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
       }}
       className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3"
     >
-      <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex w-full min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
           <FeedAvatar post={post} className="mr-1 size-4" />
         </FeedHeader>
