@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 
 import { Feed } from "@/components/feed";
+import { Header } from "@/components/Header";
 import { LoadingFallback } from "@/components/LoadingFallback";
 import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
@@ -42,13 +43,13 @@ export default function Home() {
     <p>에러: {timelineError.message}</p>
   ) : (
     <>
-      <div className="sticky top-0 z-10 flex w-full items-center justify-start bg-black/30 p-4 backdrop-blur-sm">
+      <Header>
         {!user ? (
           <Spinner className="size-6" />
         ) : (
           <Avatar src={user.avatar} alt={user.displayName || user.handle} />
         )}
-      </div>
+      </Header>
 
       <div ref={timelineRef}>
         {timeline.pages.map((group, i) => (
