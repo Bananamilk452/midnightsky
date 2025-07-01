@@ -20,6 +20,9 @@ export function FeedLabel({
 }) {
   const [show, setShow] = useState(false);
 
+  // 항상 로그인 상태이므로 '!no-unauthenticated' 라벨은 제외
+  labels = labels?.filter((l) => l.val !== "!no-unauthenticated");
+
   if (!labels || labels.length === 0) {
     return children;
   }
