@@ -45,7 +45,7 @@ export async function getSessionAgent() {
   return agent;
 }
 
-export async function createPost(params: CreatePostParams) {
+export async function createPublicPost(params: CreatePostParams) {
   const rkey = TID.nextStr();
 
   const [post, blueskyPost] = await Promise.all([

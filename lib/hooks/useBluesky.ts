@@ -6,7 +6,7 @@ import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { User } from "@/lib/bluesky/utils";
 
 import { CreatePostParams } from "../bluesky/types";
-import { Post } from "../generated/prisma";
+import { PublicPost } from "../generated/prisma";
 
 async function fetchSession(): Promise<User> {
   const response = await fetch("/api/session");
@@ -64,7 +64,7 @@ async function createPost(params: CreatePostParams) {
     throw new Error("Failed to create post");
   }
   return response.json() as Promise<{
-    post: Post;
+    post: PublicPost;
     blueskyPost: ApplyWritesResponse;
   }>;
 }

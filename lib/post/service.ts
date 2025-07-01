@@ -5,13 +5,12 @@ import { getSession } from "@/lib/session";
 export async function createPostRecord(rkey: string, params: CreatePostParams) {
   const session = await getSession();
 
-  const { content, blueskyContent, type } = params;
+  const { content, blueskyContent } = params;
 
-  const post = await prisma.post.create({
+  const post = await prisma.publicPost.create({
     data: {
       content,
       blueskyContent,
-      type,
       authorDid: session.user.did,
       rkey,
     },

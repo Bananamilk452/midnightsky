@@ -14,17 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
+model PublicPost {
   id             String   @id @default(uuid(7))
   blueskyContent String
   content        String
-  authorDid       String
+  authorDid      String
   rkey           String
-  type           String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  @@map("posts")
+  @@map("public_posts")
 }
 
 model AuthState {
