@@ -1,7 +1,10 @@
 "use client";
 
+import { ArrowLeftIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 
+import { FeedThread } from "@/components/feed/thread";
+import { Header } from "@/components/Header";
 import { LoadingFallback } from "@/components/LoadingFallback";
 import { usePostThread } from "@/lib/hooks/useBluesky";
 
@@ -19,6 +22,14 @@ export default function Page() {
   ) : status === "error" ? (
     <p>에러: {error.message}</p>
   ) : (
-    <pre>{JSON.stringify(data.thread, null, 2)}</pre>
+    <>
+      <Header>
+        <button>
+          <ArrowLeftIcon className="size-6 cursor-pointer" />
+        </button>
+        <p className="ml-4 text-lg font-semibold">게시물</p>
+      </Header>
+      <FeedThread thread={data.thread} />
+    </>
   );
 }
