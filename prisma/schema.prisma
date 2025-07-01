@@ -15,11 +15,16 @@ datasource db {
 }
 
 model Post {
-  id        String   @id @default(uuid(7))
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  authorId  String
+  id             String   @id @default(uuid(7))
+  blueskyContent String
+  content        String
+  authorDid       String
+  rkey           String
+  type           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("posts")
 }
 
 model AuthState {
