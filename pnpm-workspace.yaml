@@ -2,6 +2,7 @@ onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
   - '@tailwindcss/oxide'
+  - cbor-extract
   - prisma
   - sharp
   - unrs-resolver

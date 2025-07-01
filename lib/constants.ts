@@ -1,0 +1,1 @@
+export const BLUESKY_CONTENT_LIMIT = 250;
