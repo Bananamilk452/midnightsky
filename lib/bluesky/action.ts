@@ -1,8 +1,12 @@
 "use server";
 
 import { Agent } from "@atproto/api";
+import { TID } from "@atproto/common";
 
 import { blueskyClient } from "@/lib/bluesky";
+import { applyWrites } from "@/lib/bluesky/service";
+import { CreatePostParams } from "@/lib/bluesky/types";
+import { createPostRecord } from "@/lib/post/service";
 import { getOptionalSession } from "@/lib/session";
 import { ApiError } from "@/lib/utils.server";
 
@@ -39,4 +43,18 @@ export async function getSessionAgent() {
   const agent = await getAgent(session.user.did);
 
   return agent;
+}
+
+export async function createPublicPost(params: CreatePostParams) {
+  const rkey = TID.nextStr();
+
+  const [post, blueskyPost] = await Promise.all([
+    createPostRecord(rkey, params),
+    applyWrites(rkey, params),
+  ]);
+
+  return {
+    post,
+    blueskyPost,
+  };
 }

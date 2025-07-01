@@ -1,8 +1,12 @@
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { Response as ApplyWritesResponse } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 import { User } from "@/lib/bluesky/utils";
+
+import { CreatePostParams } from "../bluesky/types";
+import { PublicPost } from "../generated/prisma";
 
 async function fetchSession(): Promise<User> {
   const response = await fetch("/api/session");
@@ -47,6 +51,24 @@ export function useSession() {
   });
 }
 
+async function createPost(params: CreatePostParams) {
+  const response = await fetch("/api/post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create post");
+  }
+  return response.json() as Promise<{
+    post: PublicPost;
+    blueskyPost: ApplyWritesResponse;
+  }>;
+}
+
 export function useTimeline({
   limit = 30,
   cursor,
@@ -72,5 +94,14 @@ export function usePostThread(authority: string, rkey: string) {
   return useQuery({
     queryKey: ["postThread", authority, rkey],
     queryFn: () => fetchPostThread(authority, rkey),
+  });
+}
+
+export function useCreatePost() {
+  return useMutation({
+    mutationFn: createPost,
+    onError: (error) => {
+      console.error("Error creating post:", error);
+    },
   });
 }
