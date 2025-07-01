@@ -2,7 +2,7 @@ import { RichText } from "@atproto/api";
 import { Record } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import Link from "next/link";
 
-export function FeedContent({
+export function FeedThreadContent({
   text,
   facets,
 }: {
@@ -54,7 +54,7 @@ export function FeedContent({
 
   return (
     <div>
-      <p className="whitespace-pre-wrap text-base">
+      <p className="whitespace-pre-wrap text-lg">
         <>{...content}</>
       </p>
     </div>

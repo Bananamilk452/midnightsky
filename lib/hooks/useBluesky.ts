@@ -1,3 +1,4 @@
+import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
@@ -28,6 +29,17 @@ async function fetchTimeline(
   return response.json();
 }
 
+async function fetchPostThread(
+  authority: string,
+  rkey: string,
+): Promise<PostThreadData> {
+  const response = await fetch(`/api/post/${authority}/${rkey}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch post thread");
+  }
+  return response.json();
+}
+
 export function useSession() {
   return useQuery({
     queryKey: ["session"],
@@ -53,5 +65,12 @@ export function useTimeline({
       limit,
       cursor: lastPage.cursor,
     }),
+  });
+}
+
+export function usePostThread(authority: string, rkey: string) {
+  return useQuery({
+    queryKey: ["postThread", authority, rkey],
+    queryFn: () => fetchPostThread(authority, rkey),
   });
 }

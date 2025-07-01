@@ -73,7 +73,7 @@ export default function SignIn() {
 
   return (
     <div>
-      <Card className="border bg-white/10 shadow-md backdrop-blur-md">
+      <Card className="mx-auto w-fit border bg-white/10 shadow-md backdrop-blur-md">
         <CardHeader>
           <CardTitle>MidnightSky✨ 로그인</CardTitle>
         </CardHeader>

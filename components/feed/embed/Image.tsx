@@ -48,7 +48,6 @@ function ImageView({ image }: { image: AppBskyEmbedImages.ViewImage }) {
   const [open, setOpen] = useState(false);
 
   function handleDialogClick(event: React.MouseEvent<HTMLDivElement>) {
-    console.log(event.target, event.currentTarget);
     event.stopPropagation();
 
     if (!["BUTTON", "IMG"].includes((event.target as HTMLElement).tagName)) {
@@ -58,7 +57,7 @@ function ImageView({ image }: { image: AppBskyEmbedImages.ViewImage }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
+      <DialogTrigger onClick={(e) => e.stopPropagation()}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.fullsize}

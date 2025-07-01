@@ -1,3 +1,5 @@
+"use client";
+
 import { AppBskyEmbedRecord } from "@atproto/api";
 import {
   FeedViewPost,
@@ -5,6 +7,7 @@ import {
   isReasonRepost,
   PostView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import { useRouter } from "next/navigation";
 
 import { FeedAvatar } from "@/components/feed/Avatar";
 import { FeedContent } from "@/components/feed/Content";
@@ -15,7 +18,7 @@ import { FeedLabel } from "@/components/feed/Label";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
-import { cn } from "@/lib/utils";
+import { cn, parseAtUri } from "@/lib/utils";
 
 interface FeedProps {
   feed: FeedViewPost;
@@ -52,7 +55,7 @@ export function Feed({ feed }: FeedProps) {
       {hasMultipleReplies && replyRoot && (
         <FeedRecord post={replyRoot} line={{ top: false, bottom: true }} />
       )}
-      {hasLongThread && <FeedThreadEllipsis uri={feed.post.uri} />}
+      {hasLongThread && <FeedThreadEllipsis post={feed.post} />}
       {replyParent && (
         <FeedRecord
           post={replyParent}
@@ -78,7 +81,7 @@ export function Feed({ feed }: FeedProps) {
   );
 }
 
-function FeedRecord({
+export function FeedRecord({
   post,
   line,
   children,
@@ -89,6 +92,8 @@ function FeedRecord({
   children?: React.ReactNode;
   className?: string;
 }) {
+  const router = useRouter();
+
   const record = validateRecord(post.record);
 
   if (!record) {
@@ -97,12 +102,27 @@ function FeedRecord({
 
   const lineElement = <div className="h-full w-0.5 bg-gray-400" />;
 
+  const at = parseAtUri(post.uri);
+
   return (
     <div
       className={cn(
         "flex flex-col px-4 hover:cursor-pointer hover:bg-white/5",
         className,
       )}
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/post/${post.author.handle}/${at.rkey}`);
+      }}
+      onAuxClick={(e) => {
+        if (e.button === 1) {
+          e.stopPropagation();
+          window.open(`/post/${post.author.handle}/${at.rkey}`, "_blank");
+        }
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
     >
       <div className="grid grid-cols-[40px_1fr]">
         <div className="flex min-h-4 justify-center">
@@ -115,13 +135,13 @@ function FeedRecord({
           <FeedAvatar post={post} />
           {line?.bottom && lineElement}
         </div>
-        <div className="flex w-full min-w-0 flex-col gap-1">
+        <div className="flex w-full min-w-0 flex-col">
           <FeedHeader post={post} createdAt={record.createdAt} />
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
             {post.embed && <FeedEmbed embed={post.embed} />}
           </FeedLabel>
-          <FeedFooter post={post} className="mt-1" />
+          <FeedFooter post={post} />
         </div>
       </div>
     </div>
@@ -141,9 +161,27 @@ export function EmbedPost({
     throw new Error("Invalid post embed or value");
   }
 
+  const router = useRouter();
+  const at = parseAtUri(post.uri);
+
   return (
-    <div className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3">
-      <div className="flex min-w-0 flex-col gap-1">
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/post/${post.author.handle}/${at.rkey}`);
+      }}
+      onAuxClick={(e) => {
+        if (e.button === 1) {
+          e.stopPropagation();
+          window.open(`/post/${post.author.handle}/${at.rkey}`, "_blank");
+        }
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
+      className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3"
+    >
+      <div className="flex w-full min-w-0 flex-col gap-1">
         <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
           <FeedAvatar post={post} className="mr-1 size-4" />
         </FeedHeader>
