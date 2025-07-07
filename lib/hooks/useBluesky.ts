@@ -3,10 +3,9 @@ import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app
 import { Response as ApplyWritesResponse } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
+import { CreatePostParams } from "@/lib/bluesky/types";
 import { User } from "@/lib/bluesky/utils";
-
-import { CreatePostParams } from "../bluesky/types";
-import { PublicPost } from "../generated/prisma";
+import { PublicPost } from "@/lib/generated/prisma";
 
 async function fetchSession(): Promise<User> {
   const response = await fetch("/api/session");
