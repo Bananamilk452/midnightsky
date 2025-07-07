@@ -12,12 +12,14 @@ import { useRouter } from "next/navigation";
 import { FeedAvatar } from "@/components/feed/Avatar";
 import { FeedContent } from "@/components/feed/Content";
 import { FeedEmbed } from "@/components/feed/Embed";
+import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedHeader } from "@/components/feed/Header";
 import { FeedLabel } from "@/components/feed/Label";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
+import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
 import { cn, parseAtUri } from "@/lib/utils";
 
 interface FeedProps {
@@ -140,6 +142,11 @@ export function FeedRecord({
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
             {post.embed && <FeedEmbed embed={post.embed} />}
+            {Post.isRecord(record.embed) && (
+              <div className="my-2">
+                <FeedPost content={record.embed} />
+              </div>
+            )}
           </FeedLabel>
           <FeedFooter post={post} />
         </div>
