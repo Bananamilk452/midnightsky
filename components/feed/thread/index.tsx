@@ -12,11 +12,13 @@ import { ko } from "date-fns/locale";
 
 import { FeedRecord } from "@/components/feed";
 import { FeedEmbed } from "@/components/feed/Embed";
+import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedLabel } from "@/components/feed/Label";
 import { FeedThreadContent } from "@/components/feed/thread/Content";
 import { FeedThreadHeader } from "@/components/feed/thread/Header";
 import { validateRecord } from "@/lib/bluesky/utils";
+import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
 
 export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
   // 1. Not Found
@@ -86,6 +88,7 @@ function FeedThreadRecord({
         <FeedLabel labels={post.labels}>
           <FeedThreadContent text={record.text} facets={record.facets} />
           {post.embed && <FeedEmbed embed={post.embed} />}
+          {Post.isRecord(record.embed) && <FeedPost content={record.embed} />}
         </FeedLabel>
         <p className="text-xs text-gray-400">
           {format(new Date(post.indexedAt), "yyyy년 MM월 dd일 a h:mm", {

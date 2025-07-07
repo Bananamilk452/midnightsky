@@ -1,7 +1,12 @@
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
 import { Response as ApplyWritesResponse } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 import { CreatePostParams } from "@/lib/bluesky/types";
 import { User } from "@/lib/bluesky/utils";
@@ -43,13 +48,6 @@ async function fetchPostThread(
   return response.json();
 }
 
-export function useSession() {
-  return useQuery({
-    queryKey: ["session"],
-    queryFn: fetchSession,
-  });
-}
-
 async function createPost(params: CreatePostParams) {
   const response = await fetch("/api/post", {
     method: "POST",
@@ -66,6 +64,21 @@ async function createPost(params: CreatePostParams) {
     post: PublicPost;
     blueskyPost: ApplyWritesResponse;
   }>;
+}
+
+async function fetchPublicPost(id: string) {
+  const response = await fetch(`/api/post/public/${id}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch public post");
+  }
+  return response.json() as Promise<PublicPost>;
+}
+
+export function useSession() {
+  return useQuery({
+    queryKey: ["session"],
+    queryFn: fetchSession,
+  });
 }
 
 export function useTimeline({
@@ -102,5 +115,12 @@ export function useCreatePost() {
     onError: (error) => {
       console.error("Error creating post:", error);
     },
+  });
+}
+
+export function usePublicPost(id: string) {
+  return useSuspenseQuery({
+    queryKey: ["publicPost", id],
+    queryFn: () => fetchPublicPost(id),
   });
 }
