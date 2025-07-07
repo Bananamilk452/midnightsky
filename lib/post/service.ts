@@ -2,7 +2,10 @@ import { CreatePostParams } from "@/lib/bluesky/types";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-export async function createPostRecord(rkey: string, params: CreatePostParams) {
+export async function createPublicPostRecord(
+  rkey: string,
+  params: CreatePostParams,
+) {
   const session = await getSession();
 
   const { content, blueskyContent } = params;
