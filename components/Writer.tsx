@@ -210,10 +210,7 @@ export function Writer({
                       autosave_prefix: `editor-${id}-`,
                       autosave_restore_when_empty: true,
                       autosave_retention: "60m",
-                      content_css: "dark",
-                      skin: "oxide-dark",
                       language: "ko_KR",
-                      color_default_foreground: "white",
                     }}
                     onInit={(evt, editor) => {
                       editorRef.current = editor;
