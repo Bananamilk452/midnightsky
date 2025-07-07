@@ -221,6 +221,10 @@ export function Writer({
                       setTimeout(() => {
                         editorRef.current?.plugins.autosave.restoreDraft();
                         editorRef.current?.plugins.autosave.removeDraft(false);
+                        const content = editorRef.current?.getContent();
+                        if (content) {
+                          form.setValue("content", content);
+                        }
                       }, 500);
 
                       // Fix for TinyMCE menu being outside of dialog
