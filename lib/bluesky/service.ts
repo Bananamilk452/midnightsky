@@ -10,8 +10,8 @@ import {
 
 import { getAgent } from "@/lib/bluesky/action";
 import { getSession } from "@/lib/session";
+import { ApiError } from "@/lib/utils.server";
 
-import { ApiError } from "../utils.server";
 import { CreatePostParams } from "./types";
 
 export async function applyWrites(rkey: string, params: CreatePostParams) {
