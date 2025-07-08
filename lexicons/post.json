@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "app.midnightsky.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 36
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 36
+          }
+        }
+      }
+    }
+  }
+}

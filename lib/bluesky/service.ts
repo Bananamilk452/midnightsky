@@ -1,7 +1,7 @@
 import { RichText } from "@atproto/api";
 import {
-  isRecord,
-  validateRecord,
+  isRecord as isPost,
+  validateRecord as validatePost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import {
   isCreate,
@@ -9,12 +9,20 @@ import {
 } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 
 import { getAgent } from "@/lib/bluesky/action";
+import {
+  isRecord,
+  validateRecord,
+} from "@/lib/lexicon/types/app/midnightsky/post";
 import { getSession } from "@/lib/session";
 import { ApiError } from "@/lib/utils.server";
 
 import { CreatePostParams } from "./types";
 
-export async function applyWrites(rkey: string, params: CreatePostParams) {
+export async function applyWrites(
+  postId: string,
+  rkey: string,
+  params: CreatePostParams,
+) {
   const session = await getSession();
   const agent = await getAgent(session.user.did);
 
@@ -26,11 +34,18 @@ export async function applyWrites(rkey: string, params: CreatePostParams) {
   });
   rt.detectFacets(agent);
 
+  const embed = {
+    $type: "app.midnightsky.post",
+    id: postId,
+    type: params.type,
+  };
+
   const post = {
     $type: "app.bsky.feed.post",
     text: rt.text,
     facets: rt.facets,
     langs: ["ko"],
+    embed,
     createdAt: new Date().toISOString(),
   };
 
@@ -41,10 +56,16 @@ export async function applyWrites(rkey: string, params: CreatePostParams) {
     value: post,
   };
 
+  const postValidation = validatePost(post);
+  const embedValidation = validateRecord(embed);
+  const writesValidation = validateCreate(writes);
+
   if (
-    validateRecord(post).success &&
-    validateCreate(writes).success &&
-    isRecord(post) &&
+    postValidation.success &&
+    embedValidation.success &&
+    writesValidation.success &&
+    isPost(post) &&
+    isRecord(embed) &&
     isCreate(writes)
   ) {
     const record = await agent.com.atproto.repo.applyWrites({
@@ -55,6 +76,11 @@ export async function applyWrites(rkey: string, params: CreatePostParams) {
 
     return record;
   } else {
+    console.error("Post validation failed:", {
+      postValidation,
+      embedValidation,
+      writesValidation,
+    });
     throw new ApiError("Invalid post data", 400);
   }
 }

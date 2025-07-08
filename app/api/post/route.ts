@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
 
     if (parsed.data.type === "public") {
       const response = await createPublicPost(body);
+
+      if (Object.keys(response.blueskyPost).length === 0) {
+        throw new ApiError("Failed to create post", 500);
+      }
+
       return NextResponse.json(response);
     }
   } catch (error) {

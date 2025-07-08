@@ -7,12 +7,11 @@ import {
   AppBskyFeedDefs,
 } from "@atproto/api";
 
+import { EmbedPost } from "@/components/feed";
+import { FeedExternal } from "@/components/feed/embed/External";
+import { FeedImage } from "@/components/feed/embed/Image";
+import { FeedVideo } from "@/components/feed/embed/Video";
 import { validateRecord } from "@/lib/bluesky/utils";
-
-import { EmbedPost } from ".";
-import { FeedExternal } from "./embed/External";
-import { FeedImage } from "./embed/Image";
-import { FeedVideo } from "./embed/Video";
 
 export function FeedEmbed({
   embed,

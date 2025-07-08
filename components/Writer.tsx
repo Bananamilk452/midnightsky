@@ -210,10 +210,7 @@ export function Writer({
                       autosave_prefix: `editor-${id}-`,
                       autosave_restore_when_empty: true,
                       autosave_retention: "60m",
-                      content_css: "dark",
-                      skin: "oxide-dark",
                       language: "ko_KR",
-                      color_default_foreground: "white",
                     }}
                     onInit={(evt, editor) => {
                       editorRef.current = editor;
@@ -221,6 +218,10 @@ export function Writer({
                       setTimeout(() => {
                         editorRef.current?.plugins.autosave.restoreDraft();
                         editorRef.current?.plugins.autosave.removeDraft(false);
+                        const content = editorRef.current?.getContent();
+                        if (content) {
+                          form.setValue("content", content);
+                        }
                       }, 500);
 
                       // Fix for TinyMCE menu being outside of dialog
