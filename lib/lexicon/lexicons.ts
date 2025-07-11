@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Lexicons, ValidationError } from "@atproto/lexicon";
 
 import { is$typed, maybe$typed } from "./util";

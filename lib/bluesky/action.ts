@@ -7,8 +7,9 @@ import { blueskyClient } from "@/lib/bluesky";
 import { applyWrites } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
 import { createPublicPostRecord } from "@/lib/post/service";
-import { getOptionalSession } from "@/lib/session";
-import { ApiError } from "@/lib/utils.server";
+import { prisma } from "@/lib/prisma";
+import { getOptionalSession, getSession } from "@/lib/session";
+import { ApiError, jsonify } from "@/lib/utils.server";
 
 export async function signInWithBluesky(handle: string) {
   const url = await blueskyClient.authorize(handle, {
@@ -45,14 +46,58 @@ export async function getSessionAgent() {
   return agent;
 }
 
-export async function createPublicPost(params: CreatePostParams) {
+export async function getPostThread(authority: string, rkey: string) {
+  const agent = await getSessionAgent();
+
+  const res = await agent.getPostThread({
+    uri: `at://${authority}/app.bsky.feed.post/${rkey}`,
+    depth: 100,
+  });
+
+  return res.data;
+}
+
+export async function getPublicPost(id: string) {
+  await getSession();
+
+  const post = await prisma.publicPost.findFirst({ where: { id } });
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  return post;
+}
+
+export async function getTimeline(limit: number = 30, cursor?: string) {
+  const agent = await getSessionAgent();
+
+  const response = await agent.getTimeline({
+    limit,
+    cursor,
+  });
+
+  return jsonify(response.data);
+}
+
+export async function createPost(params: CreatePostParams) {
+  await getSession();
+
   const rkey = TID.nextStr();
 
-  const post = await createPublicPostRecord(rkey, params);
-  const blueskyPost = await applyWrites(post.id, rkey, params);
+  if (params.type === "public") {
+    const post = await createPublicPostRecord(rkey, params);
+    const blueskyPost = await applyWrites(post.id, rkey, params);
 
-  return {
-    post,
-    blueskyPost,
-  };
+    if (Object.keys(blueskyPost).length === 0) {
+      throw new Error("Failed to create post");
+    }
+
+    return {
+      post,
+      blueskyPost,
+    };
+  }
+
+  throw new Error("Invalid post type");
 }

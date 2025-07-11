@@ -11,6 +11,7 @@ export function ErrorBoundaryPage({
   error,
   onReset,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
   onReset: () => void;
 }) {

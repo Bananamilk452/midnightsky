@@ -24,3 +24,7 @@ export function handleApiError(error: unknown) {
   console.error("Unexpected error:", error);
   return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 }
+
+export function jsonify<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data)) as T;
+}

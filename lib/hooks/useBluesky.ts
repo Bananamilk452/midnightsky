@@ -1,6 +1,3 @@
-import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
-import { OutputSchema as TimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
-import { Response as ApplyWritesResponse } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 import {
   useInfiniteQuery,
   useMutation,
@@ -8,76 +5,19 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-import { CreatePostParams } from "@/lib/bluesky/types";
-import { User } from "@/lib/bluesky/utils";
-import { PublicPost } from "@/lib/generated/prisma";
-
-async function fetchSession(): Promise<User> {
-  const response = await fetch("/api/session");
-  if (!response.ok) {
-    throw new Error("Failed to fetch session data");
-  }
-  return response.json();
-}
-
-async function fetchTimeline(
-  limit: number = 30,
-  cursor?: string,
-): Promise<TimelineData> {
-  const seachParams = new URLSearchParams();
-  seachParams.set("limit", limit.toString());
-  if (cursor) {
-    seachParams.set("cursor", cursor);
-  }
-
-  const response = await fetch(`/api/timeline?${seachParams.toString()}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch timeline data");
-  }
-  return response.json();
-}
-
-async function fetchPostThread(
-  authority: string,
-  rkey: string,
-): Promise<PostThreadData> {
-  const response = await fetch(`/api/post/${authority}/${rkey}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch post thread");
-  }
-  return response.json();
-}
-
-async function createPost(params: CreatePostParams) {
-  const response = await fetch("/api/post", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(params),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create post");
-  }
-  return response.json() as Promise<{
-    post: PublicPost;
-    blueskyPost: ApplyWritesResponse;
-  }>;
-}
-
-async function fetchPublicPost(id: string) {
-  const response = await fetch(`/api/post/public/${id}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch public post");
-  }
-  return response.json() as Promise<PublicPost>;
-}
+import {
+  createPost,
+  getPostThread,
+  getPublicPost,
+  getTimeline,
+} from "@/lib/bluesky/action";
+import { getSession } from "@/lib/session";
 
 export function useSession() {
   return useQuery({
     queryKey: ["session"],
-    queryFn: fetchSession,
+    queryFn: getSession,
+    select: (session) => session.user,
   });
 }
 
@@ -92,7 +32,7 @@ export function useTimeline({
     queryKey: ["timeline", limit, cursor],
     queryFn: async ({ pageParam }) => {
       const { limit, cursor } = pageParam || {};
-      return fetchTimeline(limit, cursor);
+      return getTimeline(limit, cursor);
     },
     initialPageParam: { limit, cursor },
     getNextPageParam: (lastPage) => ({
@@ -105,7 +45,7 @@ export function useTimeline({
 export function usePostThread(authority: string, rkey: string) {
   return useQuery({
     queryKey: ["postThread", authority, rkey],
-    queryFn: () => fetchPostThread(authority, rkey),
+    queryFn: () => getPostThread(authority, rkey),
   });
 }
 
@@ -121,6 +61,6 @@ export function useCreatePost() {
 export function usePublicPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["publicPost", id],
-    queryFn: () => fetchPublicPost(id),
+    queryFn: () => getPublicPost(id),
   });
 }
