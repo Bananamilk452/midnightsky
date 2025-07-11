@@ -9,7 +9,7 @@ import { CreatePostParams } from "@/lib/bluesky/types";
 import { createPublicPostRecord } from "@/lib/post/service";
 import { prisma } from "@/lib/prisma";
 import { getOptionalSession, getSession } from "@/lib/session";
-import { ApiError } from "@/lib/utils.server";
+import { ApiError, jsonify } from "@/lib/utils.server";
 
 export async function signInWithBluesky(handle: string) {
   const url = await blueskyClient.authorize(handle, {
@@ -77,7 +77,7 @@ export async function getTimeline(limit: number = 30, cursor?: string) {
     cursor,
   });
 
-  return response.data;
+  return jsonify(response.data);
 }
 
 export async function createPost(params: CreatePostParams) {
