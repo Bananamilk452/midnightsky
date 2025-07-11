@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
