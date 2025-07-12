@@ -15,7 +15,10 @@ export default function Page() {
     throw new Error("Invalid parameters");
   }
 
-  const { data, error, status } = usePostThread(authority, rkey);
+  const { data, error, status } = usePostThread(
+    decodeURIComponent(authority),
+    rkey,
+  );
 
   return status === "pending" ? (
     <LoadingFallback />
