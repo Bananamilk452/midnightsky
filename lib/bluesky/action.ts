@@ -6,7 +6,10 @@ import { TID } from "@atproto/common";
 import { blueskyClient } from "@/lib/bluesky";
 import { applyWrites } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
-import { createPublicPostRecord } from "@/lib/post/service";
+import {
+  createPrivatePostRecord,
+  createPublicPostRecord,
+} from "@/lib/post/service";
 import { prisma } from "@/lib/prisma";
 import { getOptionalSession, getSession } from "@/lib/session";
 import { ApiError, jsonify } from "@/lib/utils.server";
@@ -95,7 +98,19 @@ export async function createPost(params: CreatePostParams) {
 
     return {
       post,
-      blueskyPost,
+      blueskyPost: jsonify(blueskyPost),
+    };
+  } else if (params.type === "private") {
+    const post = await createPrivatePostRecord(rkey, params);
+    const blueskyPost = await applyWrites(post.id, rkey, params);
+
+    if (Object.keys(blueskyPost).length === 0) {
+      throw new Error("Failed to create post");
+    }
+
+    return {
+      post,
+      blueskyPost: jsonify(blueskyPost),
     };
   }
 
