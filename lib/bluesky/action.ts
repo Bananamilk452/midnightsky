@@ -1,10 +1,14 @@
 "use server";
 
 import { Agent } from "@atproto/api";
+import {
+  isNotFoundActor,
+  isRelationship,
+} from "@atproto/api/dist/client/types/app/bsky/graph/defs";
 import { TID } from "@atproto/common";
 
 import { blueskyClient } from "@/lib/bluesky";
-import { applyWrites } from "@/lib/bluesky/service";
+import { applyWrites, getRelationship } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
 import {
   createPrivatePostRecord,
@@ -115,4 +119,19 @@ export async function createPost(params: CreatePostParams) {
   }
 
   throw new Error("Invalid post type");
+}
+
+export async function isFollowingEachOther(did1: string, did2: string) {
+  await getSession();
+
+  const relationships = await getRelationship(did1, did2);
+
+  const relation = relationships.data.relationships[0];
+  if (isNotFoundActor(relation)) {
+    throw new ApiError("Relationship not found", 404);
+  } else if (isRelationship(relation)) {
+    return Boolean(relation.followedBy && relation.following);
+  } else {
+    throw new ApiError("Invalid relationship data", 500);
+  }
 }
