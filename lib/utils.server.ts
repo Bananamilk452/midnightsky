@@ -51,7 +51,7 @@ export function encryptData(data: string) {
   };
 }
 
-export function decryptData(encryptedData: { iv: string; data: string }) {
+export function decryptData(data: string, iv: string) {
   if (!process.env.POST_PASSWORD) {
     throw new Error("POST_PASSWORD environment variable is not set");
   }
@@ -59,11 +59,11 @@ export function decryptData(encryptedData: { iv: string; data: string }) {
   const password = process.env.POST_PASSWORD;
   const hash = crypto.createHash("sha256").update(password).digest("hex");
   const key = Buffer.from(hash, "hex").subarray(0, 32);
-  const iv = Buffer.from(encryptedData.iv, "hex");
+  const iv_ = Buffer.from(iv, "hex");
 
-  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv_);
 
-  let decrypted = decipher.update(encryptedData.data, "hex", "utf8");
+  let decrypted = decipher.update(data, "hex", "utf8");
   decrypted += decipher.final("utf8");
 
   return decrypted;

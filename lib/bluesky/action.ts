@@ -13,8 +13,9 @@ import { CreatePostParams } from "@/lib/bluesky/types";
 import {
   createPrivatePostRecord,
   createPublicPostRecord,
+  getPrivatePostById,
+  getPublicPostById,
 } from "@/lib/post/service";
-import { prisma } from "@/lib/prisma";
 import { getOptionalSession, getSession } from "@/lib/session";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
@@ -61,19 +62,27 @@ export async function getPostThread(authority: string, rkey: string) {
     depth: 100,
   });
 
-  return res.data;
+  return jsonify(res.data);
 }
 
 export async function getPublicPost(id: string) {
   await getSession();
 
-  const post = await prisma.publicPost.findFirst({ where: { id } });
-
-  if (!post) {
-    throw new Error("Post not found");
-  }
+  const post = await getPublicPostById(id);
 
   return post;
+}
+
+export async function getPrivatePost(id: string) {
+  const session = await getSession();
+
+  const post = await getPrivatePostById(id);
+
+  const isViewable =
+    (await isFollowingEachOther(session.user.did, post.authorDid)) ||
+    post.authorDid === session.user.did;
+
+  return isViewable ? { ...post, isViewable } : { isViewable };
 }
 
 export async function getTimeline(limit: number = 30, cursor?: string) {
@@ -127,6 +136,7 @@ export async function isFollowingEachOther(did1: string, did2: string) {
   const relationships = await getRelationship(did1, did2);
 
   const relation = relationships.data.relationships[0];
+
   if (isNotFoundActor(relation)) {
     throw new ApiError("Relationship not found", 404);
   } else if (isRelationship(relation)) {

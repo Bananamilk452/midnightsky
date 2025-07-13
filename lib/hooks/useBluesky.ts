@@ -8,6 +8,7 @@ import {
 import {
   createPost,
   getPostThread,
+  getPrivatePost,
   getPublicPost,
   getTimeline,
 } from "@/lib/bluesky/action";
@@ -62,5 +63,12 @@ export function usePublicPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["publicPost", id],
     queryFn: () => getPublicPost(id),
+  });
+}
+
+export function usePrivatePost(id: string) {
+  return useSuspenseQuery({
+    queryKey: ["privatePost", id],
+    queryFn: () => getPrivatePost(id),
   });
 }
