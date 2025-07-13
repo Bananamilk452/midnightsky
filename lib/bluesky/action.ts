@@ -1,13 +1,21 @@
 "use server";
 
 import { Agent } from "@atproto/api";
+import {
+  isNotFoundActor,
+  isRelationship,
+} from "@atproto/api/dist/client/types/app/bsky/graph/defs";
 import { TID } from "@atproto/common";
 
 import { blueskyClient } from "@/lib/bluesky";
-import { applyWrites } from "@/lib/bluesky/service";
+import { applyWrites, getRelationship } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
-import { createPublicPostRecord } from "@/lib/post/service";
-import { prisma } from "@/lib/prisma";
+import {
+  createPrivatePostRecord,
+  createPublicPostRecord,
+  getPrivatePostById,
+  getPublicPostById,
+} from "@/lib/post/service";
 import { getOptionalSession, getSession } from "@/lib/session";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
@@ -54,19 +62,27 @@ export async function getPostThread(authority: string, rkey: string) {
     depth: 100,
   });
 
-  return res.data;
+  return jsonify(res.data);
 }
 
 export async function getPublicPost(id: string) {
   await getSession();
 
-  const post = await prisma.publicPost.findFirst({ where: { id } });
-
-  if (!post) {
-    throw new Error("Post not found");
-  }
+  const post = await getPublicPostById(id);
 
   return post;
+}
+
+export async function getPrivatePost(id: string) {
+  const session = await getSession();
+
+  const post = await getPrivatePostById(id);
+
+  const isViewable =
+    (await isFollowingEachOther(session.user.did, post.authorDid)) ||
+    post.authorDid === session.user.did;
+
+  return isViewable ? { ...post, isViewable } : { isViewable };
 }
 
 export async function getTimeline(limit: number = 30, cursor?: string) {
@@ -95,9 +111,37 @@ export async function createPost(params: CreatePostParams) {
 
     return {
       post,
-      blueskyPost,
+      blueskyPost: jsonify(blueskyPost),
+    };
+  } else if (params.type === "private") {
+    const post = await createPrivatePostRecord(rkey, params);
+    const blueskyPost = await applyWrites(post.id, rkey, params);
+
+    if (Object.keys(blueskyPost).length === 0) {
+      throw new Error("Failed to create post");
+    }
+
+    return {
+      post,
+      blueskyPost: jsonify(blueskyPost),
     };
   }
 
   throw new Error("Invalid post type");
+}
+
+export async function isFollowingEachOther(did1: string, did2: string) {
+  await getSession();
+
+  const relationships = await getRelationship(did1, did2);
+
+  const relation = relationships.data.relationships[0];
+
+  if (isNotFoundActor(relation)) {
+    throw new ApiError("Relationship not found", 404);
+  } else if (isRelationship(relation)) {
+    return Boolean(relation.followedBy && relation.following);
+  } else {
+    throw new ApiError("Invalid relationship data", 500);
+  }
 }

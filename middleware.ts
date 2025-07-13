@@ -6,7 +6,6 @@ const AUTH_PAGES = ["/sign-in"];
 
 export async function middleware(request: NextRequest) {
   const session = await getOptionalSession();
-  console.log("Session:", session);
 
   if (Object.keys(session).length === 0) {
     // 같은 페이지로 리디렉션되는 경우를 방지

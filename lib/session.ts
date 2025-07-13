@@ -4,7 +4,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
 import { User } from "@/lib/bluesky/utils";
-import { ApiError } from "@/lib/utils.server";
+import { ApiError, jsonify } from "@/lib/utils.server";
 
 import type { IronSession } from "iron-session";
 
@@ -25,5 +25,5 @@ export async function getSession() {
   if (!session.user || !session.user.did) {
     throw new ApiError("User is not authenticated or did is missing", 401);
   }
-  return session as IronSession<{ user: User }>;
+  return jsonify(session as IronSession<{ user: User }>);
 }

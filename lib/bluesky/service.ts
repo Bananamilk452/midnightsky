@@ -84,3 +84,14 @@ export async function applyWrites(
     throw new ApiError("Invalid post data", 400);
   }
 }
+
+export async function getRelationship(did1: string, did2: string) {
+  const agent = await getAgent(did1);
+
+  const relationships = await agent.app.bsky.graph.getRelationships({
+    actor: did1,
+    others: [did2],
+  });
+
+  return relationships;
+}

@@ -4,8 +4,19 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorBoundaryPage } from "@/components/ErrorBoundaryPage";
 import { LoadingFallback } from "@/components/LoadingFallback";
+import { PrivatePost } from "@/components/post/PrivatePost";
 import { PublicPost } from "@/components/post/PublicPost";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
+
+function PostContent({ content }: { content: Post.Record }) {
+  if (content.type === "public") {
+    return <PublicPost post={content} />;
+  } else if (content.type === "private") {
+    return <PrivatePost post={content} />;
+  } else {
+    return null;
+  }
+}
 
 export function FeedPost({ content }: { content: Post.Record }) {
   return (
@@ -18,7 +29,7 @@ export function FeedPost({ content }: { content: Post.Record }) {
           onReset={reset}
         >
           <Suspense fallback={<LoadingFallback />}>
-            {content.type === "public" ? <PublicPost post={content} /> : <></>}
+            <PostContent content={content} />
           </Suspense>
         </ErrorBoundary>
       )}
