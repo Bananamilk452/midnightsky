@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: bluesky-extended
+    container_name: midnightsky
     build:
       context: .
       dockerfile: prod.Dockerfile
