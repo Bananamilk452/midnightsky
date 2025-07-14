@@ -1,5 +1,6 @@
 "use client";
 
+import { ReplyRef } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Editor } from "@tinymce/tinymce-react";
@@ -36,11 +37,12 @@ export function Writer({
   id = "main",
   open,
   setOpen,
+  reply,
 }: {
-  children?: React.ReactNode;
   id?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
+  reply?: ReplyRef;
 }) {
   const router = useRouter();
   const editorRef = useRef<TinyMCEEditor>(null);
@@ -76,6 +78,7 @@ export function Writer({
         content: data.content,
         blueskyContent: data.blueskyContent,
         type: data.type,
+        reply,
       },
       {
         onSuccess: (data) => {
