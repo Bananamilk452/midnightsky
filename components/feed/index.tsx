@@ -141,7 +141,11 @@ export function FeedRecord({
           <FeedHeader post={post} createdAt={record.createdAt} />
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
-            {post.embed && <FeedEmbed embed={post.embed} />}
+            {post.embed && (
+              <div className="mb-2">
+                <FeedEmbed embed={post.embed} />
+              </div>
+            )}
             {Post.isRecord(record.embed) && (
               <div className="my-2">
                 <FeedPost content={record.embed} />

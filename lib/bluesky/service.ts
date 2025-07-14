@@ -47,6 +47,7 @@ export async function applyWrites(
     langs: ["ko"],
     embed,
     createdAt: new Date().toISOString(),
+    reply: params.reply,
   };
 
   const writes = {
