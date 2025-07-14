@@ -25,6 +25,7 @@ export function FeedFooter({
 
   function handleWriterOpen(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
+    console.log(record);
     if (record?.reply) {
       openWriter({
         root: record.reply.root,
@@ -34,7 +35,16 @@ export function FeedFooter({
         },
       });
     } else {
-      openWriter();
+      openWriter({
+        root: {
+          cid: post.cid,
+          uri: post.uri,
+        },
+        parent: {
+          cid: post.cid,
+          uri: post.uri,
+        },
+      });
     }
   }
 

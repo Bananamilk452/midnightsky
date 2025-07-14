@@ -24,7 +24,7 @@ function WriterButtonWrapper() {
 
   return (
     <>
-      <WriterButton onClick={openWriter} />
+      <WriterButton onClick={() => openWriter()} />
     </>
   );
 }
