@@ -54,7 +54,7 @@ export function FeedThreadContent({
 
   return (
     <div>
-      <p className="whitespace-pre-wrap text-lg">
+      <p className="whitespace-pre-wrap break-all text-lg">
         <>{...content}</>
       </p>
     </div>
