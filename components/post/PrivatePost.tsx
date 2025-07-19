@@ -26,7 +26,7 @@ export function PrivatePost({ post }: { post: Post.Record }) {
         비밀글
       </div>
       <div
-        className="prose rounded-lg border border-gray-400 bg-gray-50 p-3 shadow"
+        className="prose rounded-lg border border-gray-400 bg-gray-50 p-3 pb-8 shadow"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
