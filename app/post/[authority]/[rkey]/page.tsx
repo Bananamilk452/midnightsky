@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeftIcon } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { FeedThread } from "@/components/feed/thread";
 import { Header } from "@/components/Header";
@@ -9,6 +9,7 @@ import { LoadingFallback } from "@/components/LoadingFallback";
 import { usePostThread } from "@/lib/hooks/useBluesky";
 
 export default function Page() {
+  const router = useRouter();
   const { authority, rkey } = useParams();
 
   if (typeof authority !== "string" || typeof rkey !== "string") {
@@ -28,7 +29,10 @@ export default function Page() {
     <>
       <Header>
         <button>
-          <ArrowLeftIcon className="size-6 cursor-pointer" />
+          <ArrowLeftIcon
+            onClick={router.back}
+            className="size-6 cursor-pointer"
+          />
         </button>
         <p className="ml-4 text-lg font-semibold">게시물</p>
       </Header>
