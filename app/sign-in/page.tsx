@@ -31,6 +31,9 @@ const formSchema = z.object({
   handle: z
     .string()
     .min(1, "Bluesky 핸들을 입력해주세요.")
+    .regex(new RegExp("^(?!@)"), {
+      message: "@를 제외한 Bluesky 핸들을 입력해주세요.",
+    })
     .regex(new RegExp("^.+\..+"), {
       message: "유효한 Bluesky 핸들을 입력해주세요.",
     }),
@@ -91,7 +94,7 @@ export default function SignIn() {
                         className="w-72"
                         id="handle"
                         type="text"
-                        placeholder="Bluesky 핸들"
+                        placeholder="example.bsky.social"
                         autoFocus
                         {...field}
                       />
