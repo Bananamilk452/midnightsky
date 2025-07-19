@@ -19,11 +19,12 @@ import {
 import { getOptionalSession, getSession } from "@/lib/session";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
-export async function signInWithBluesky(handle: string) {
+export async function signInWithBluesky(handle: string, redirectTo?: string) {
   const url = await blueskyClient.authorize(handle, {
     prompt: "none",
     state: JSON.stringify({
       handle,
+      redirectTo,
     }),
   });
 

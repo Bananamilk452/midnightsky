@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
   const nextUrl = request.nextUrl;
 
   try {
-    const { session } = await blueskyClient.callback(nextUrl.searchParams);
+    const { session, state } = await blueskyClient.callback(
+      nextUrl.searchParams,
+    );
+
+    const redirectTo = state ? JSON.parse(state).redirectTo : "/home";
 
     const agent = new Agent(session);
 
@@ -23,9 +27,7 @@ export async function GET(request: NextRequest) {
 
     await ironSession.save();
 
-    console.log(ironSession);
-
-    return NextResponse.redirect(`${process.env.PUBLIC_URL}/home`);
+    return NextResponse.redirect(`${process.env.PUBLIC_URL}${redirectTo}`);
   } catch (err: unknown) {
     if (err instanceof OAuthCallbackError) {
       const oauthError = err.params.get("error");

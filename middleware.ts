@@ -14,7 +14,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // 아니면 로그인 페이지로 리디렉션
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(
+      new URL(`/sign-in?redirectTo=${request.nextUrl.pathname}`, request.url),
+    );
   }
 
   // 로그인된 상태에서 로그인 페이지에 접근하는 경우
