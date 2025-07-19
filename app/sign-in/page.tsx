@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,6 +41,7 @@ const formSchema = z.object({
 
 export default function SignIn() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -59,7 +60,8 @@ export default function SignIn() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const url = await signInWithBluesky(values.handle);
+      const redirectTo = searchParams.get("redirectTo") || "/home";
+      const url = await signInWithBluesky(values.handle, redirectTo);
 
       startTransition(() => {
         router.push(url);
