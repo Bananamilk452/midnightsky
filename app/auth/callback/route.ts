@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
       nextUrl.searchParams,
     );
 
-    const redirectTo = state ? JSON.parse(state).redirectTo : "/home";
+    const rt = JSON.parse(state!).redirectTo;
+    const redirectTo = rt ? rt : "/home";
 
     const agent = new Agent(session);
 
