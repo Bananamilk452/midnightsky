@@ -17,6 +17,7 @@ import { getSession } from "@/lib/session";
 import { ApiError } from "@/lib/utils.server";
 
 import { CreatePostParams } from "./types";
+import { addReadArticleFacets } from "./utils";
 
 export async function applyWrites(
   postId: string,
@@ -30,9 +31,11 @@ export async function applyWrites(
   const link = `https://midnightsky.app/post/${session.user.did}/${rkey}`;
 
   const rt = new RichText({
-    text: `${blueskyContent}\n\n${link}`,
+    text: blueskyContent,
   });
   rt.detectFacets(agent);
+
+  const facets = addReadArticleFacets(rt, link).facets;
 
   const embed = {
     $type: "app.midnightsky.post",
@@ -43,7 +46,7 @@ export async function applyWrites(
   const post = {
     $type: "app.bsky.feed.post",
     text: rt.text,
-    facets: rt.facets,
+    facets,
     langs: ["ko"],
     embed,
     createdAt: new Date().toISOString(),

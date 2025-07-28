@@ -1,4 +1,4 @@
-import { AppBskyActorDefs, AppBskyFeedPost } from "@atproto/api";
+import { AppBskyActorDefs, AppBskyFeedPost, RichText } from "@atproto/api";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -42,4 +42,38 @@ export function getRelativeTimeBasic(postDate: Date | string): string {
   return formatDistanceToNow(date, {
     locale: ko,
   });
+}
+
+function utf16IndexToUtf8Index(content: string, i: number) {
+  const encoder = new TextEncoder();
+  return encoder.encode(content.slice(0, i)).byteLength;
+}
+
+export function addReadArticleFacets(rt: RichText, link: string) {
+  const text = "글 보기";
+
+  if (rt.text.length === 0) {
+    rt.insert(0, text);
+  } else {
+    rt.insert(utf16IndexToUtf8Index(rt.text, rt.text.length), `\n\n${text}`);
+  }
+
+  if (!rt.facets) {
+    rt.facets = [];
+  }
+
+  rt.facets.push({
+    index: {
+      byteStart: utf16IndexToUtf8Index(rt.text, rt.text.length - text.length),
+      byteEnd: utf16IndexToUtf8Index(rt.text, rt.text.length),
+    },
+    features: [
+      {
+        $type: "app.bsky.richtext.facet#link",
+        uri: link,
+      },
+    ],
+  });
+
+  return rt;
 }
