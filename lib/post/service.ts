@@ -3,6 +3,51 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { ApiError, decryptData, encryptData } from "@/lib/utils.server";
 
+export async function getPostByRkey(rkey: string) {
+  await getSession();
+
+  const publicPost = await prisma.publicPost.findFirst({
+    where: {
+      rkey,
+    },
+  });
+
+  const privatePost = await prisma.privatePost.findFirst({
+    where: {
+      rkey,
+    },
+  });
+
+  const listPost = await prisma.listPost.findFirst({
+    where: {
+      rkey,
+    },
+  });
+
+  if (publicPost) {
+    return {
+      type: "public" as const,
+      post: publicPost,
+    };
+  }
+
+  if (privatePost) {
+    return {
+      type: "private" as const,
+      post: privatePost,
+    };
+  }
+
+  if (listPost) {
+    return {
+      type: "list" as const,
+      post: listPost,
+    };
+  }
+
+  throw new ApiError("Post not found", 404);
+}
+
 export async function getPublicPostById(id: string) {
   await getSession();
 
