@@ -39,6 +39,20 @@ model PrivatePost {
   @@map("private_posts")
 }
 
+model ListPost {
+  id               String   @id @default(uuid(7))
+  blueskyContent   String
+  encryptedContent String
+  iv               String
+  authorDid        String
+  rkey             String
+  listId           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("list_posts")
+}
+
 model AuthState {
   key   String @id
   state String
