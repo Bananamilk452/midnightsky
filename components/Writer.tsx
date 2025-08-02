@@ -7,6 +7,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Editor as TinyMCEEditor } from "tinymce";
 import { z } from "zod";
 
@@ -93,6 +94,9 @@ export function Writer({
         router.push(`/post/${data.post.authorDid}/${data.post.rkey}`);
       },
       onError: (error) => {
+        toast.error(
+          `글 작성에 실패했습니다. 다시 시도해주세요. (${error.message})`,
+        );
         console.error("Error creating post:", error);
       },
     });

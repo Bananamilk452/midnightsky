@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const pretendard = localFont({
   src: "./PretendardJPVariable.woff2",
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
