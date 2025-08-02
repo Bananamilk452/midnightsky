@@ -7,6 +7,8 @@ import {
 
 import {
   createPost,
+  getListPost,
+  getMyLists,
   getPostThread,
   getPrivatePost,
   getPublicPost,
@@ -50,6 +52,13 @@ export function usePostThread(authority: string, rkey: string) {
   });
 }
 
+export function useMyLists() {
+  return useQuery({
+    queryKey: ["lists"],
+    queryFn: async () => getMyLists(),
+  });
+}
+
 export function useCreatePost() {
   return useMutation({
     mutationFn: createPost,
@@ -70,5 +79,12 @@ export function usePrivatePost(id: string) {
   return useSuspenseQuery({
     queryKey: ["privatePost", id],
     queryFn: () => getPrivatePost(id),
+  });
+}
+
+export function useListPost(id: string) {
+  return useSuspenseQuery({
+    queryKey: ["listPost", id],
+    queryFn: () => getListPost(id),
   });
 }
