@@ -8,11 +8,17 @@ import {
 import { TID } from "@atproto/common";
 
 import { blueskyClient } from "@/lib/bluesky";
-import { applyWrites, getRelationship } from "@/lib/bluesky/service";
+import {
+  applyWrites,
+  getPostIsReplyDisabled,
+  getRelationship,
+} from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
 import {
+  createListPostRecord,
   createPrivatePostRecord,
   createPublicPostRecord,
+  getListPostById,
   getPrivatePostById,
   getPublicPostById,
 } from "@/lib/post/service";
@@ -86,6 +92,18 @@ export async function getPrivatePost(id: string) {
   return isViewable ? { ...post, isViewable } : { isViewable };
 }
 
+export async function getListPost(id: string) {
+  await getSession();
+
+  const post = await getListPostById(id);
+
+  const isViewable = !(await getPostIsReplyDisabled(
+    `at://${post.authorDid}/app.bsky.feed.post/${post.rkey}`,
+  ));
+
+  return isViewable ? { ...post, isViewable } : { isViewable };
+}
+
 export async function getTimeline(limit: number = 30, cursor?: string) {
   const agent = await getSessionAgent();
 
@@ -102,33 +120,34 @@ export async function createPost(params: CreatePostParams) {
 
   const rkey = TID.nextStr();
 
+  let post: Awaited<
+    ReturnType<
+      | typeof createPublicPostRecord
+      | typeof createPrivatePostRecord
+      | typeof createListPostRecord
+    >
+  >;
+
   if (params.type === "public") {
-    const post = await createPublicPostRecord(rkey, params);
-    const blueskyPost = await applyWrites(post.id, rkey, params);
-
-    if (Object.keys(blueskyPost).length === 0) {
-      throw new Error("Failed to create post");
-    }
-
-    return {
-      post,
-      blueskyPost: jsonify(blueskyPost),
-    };
+    post = await createPublicPostRecord(rkey, params);
   } else if (params.type === "private") {
-    const post = await createPrivatePostRecord(rkey, params);
-    const blueskyPost = await applyWrites(post.id, rkey, params);
-
-    if (Object.keys(blueskyPost).length === 0) {
-      throw new Error("Failed to create post");
-    }
-
-    return {
-      post,
-      blueskyPost: jsonify(blueskyPost),
-    };
+    post = await createPrivatePostRecord(rkey, params);
+  } else if (params.type === "list") {
+    post = await createListPostRecord(rkey, params);
+  } else {
+    throw new ApiError("Invalid post type", 400);
   }
 
-  throw new Error("Invalid post type");
+  const blueskyPost = await applyWrites(post.id, rkey, params);
+
+  if (Object.keys(blueskyPost).length === 0) {
+    throw new Error("Failed to create post");
+  }
+
+  return {
+    post,
+    blueskyPost: jsonify(blueskyPost),
+  };
 }
 
 export async function isFollowingEachOther(did1: string, did2: string) {
@@ -144,5 +163,20 @@ export async function isFollowingEachOther(did1: string, did2: string) {
     return Boolean(relation.followedBy && relation.following);
   } else {
     throw new ApiError("Invalid relationship data", 500);
+  }
+}
+
+export async function getMyLists() {
+  const session = await getSession();
+  const agent = await getAgent(session.user.did);
+
+  const response = await agent.app.bsky.graph.getLists({
+    actor: session.user.did,
+  });
+
+  if (response.success) {
+    return jsonify(response.data);
+  } else {
+    throw new ApiError("Failed to fetch lists", 500);
   }
 }

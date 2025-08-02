@@ -28,10 +28,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CreatePostParams, CreatePostSchema } from "@/lib/bluesky/types";
 import { BLUESKY_CONTENT_LIMIT } from "@/lib/constants";
-import { useCreatePost } from "@/lib/hooks/useBluesky";
+import { useCreatePost, useMyLists } from "@/lib/hooks/useBluesky";
 
 export function Writer({
   id = "main",
@@ -58,6 +65,7 @@ export function Writer({
     setOpen(value);
   }
 
+  const { data: listsData, status: listsStatus } = useMyLists();
   const { mutate, status } = useCreatePost();
   const form = useForm<CreatePostParams>({
     resolver: zodResolver(CreatePostSchema),
@@ -73,24 +81,21 @@ export function Writer({
   function onSubmit(data: z.infer<typeof CreatePostSchema>) {
     if (status === "pending") return;
 
-    mutate(
-      {
-        content: data.content,
-        blueskyContent: data.blueskyContent,
-        type: data.type,
-        reply,
+    const body =
+      data.type === "list"
+        ? { ...data, listId: data.listId, reply }
+        : { ...data, reply };
+
+    mutate(body, {
+      onSuccess: (data) => {
+        handleModalClose(false);
+        form.reset();
+        router.push(`/post/${data.post.authorDid}/${data.post.rkey}`);
       },
-      {
-        onSuccess: (data) => {
-          handleModalClose(false);
-          form.reset();
-          router.push(`/post/${data.post.authorDid}/${data.post.rkey}`);
-        },
-        onError: (error) => {
-          console.error("Error creating post:", error);
-        },
+      onError: (error) => {
+        console.error("Error creating post:", error);
       },
-    );
+    });
   }
 
   return (
@@ -142,8 +147,10 @@ export function Writer({
             </div>
             <hr className="my-4" />
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <h2 className="font-medium">추가 글</h2>
+
+                <div className="flex-grow"></div>
 
                 <FormField
                   control={form.control}
@@ -172,11 +179,50 @@ export function Writer({
                               팔로워만 공개
                             </FormLabel>
                           </FormItem>
+                          <FormItem className="flex items-center">
+                            <FormControl>
+                              <RadioGroupItem value="list" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              리스트
+                            </FormLabel>
+                          </FormItem>
                         </RadioGroup>
                       </FormControl>
                     </FormItem>
                   )}
                 />
+                {form.watch("type") === "list" &&
+                  (listsStatus === "success" ? (
+                    <FormField
+                      control={form.control}
+                      name="listId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="리스트 선택" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {listsData.lists.map((list) => (
+                                <SelectItem key={list.uri} value={list.uri}>
+                                  {list.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <Spinner className="size-4" />
+                  ))}
               </div>
 
               <div className="flex flex-col gap-2">

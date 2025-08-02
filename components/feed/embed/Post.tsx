@@ -4,6 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorBoundaryPage } from "@/components/ErrorBoundaryPage";
 import { LoadingFallback } from "@/components/LoadingFallback";
+import { ListPost } from "@/components/post/ListPost";
 import { PrivatePost } from "@/components/post/PrivatePost";
 import { PublicPost } from "@/components/post/PublicPost";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
@@ -13,6 +14,8 @@ function PostContent({ content }: { content: Post.Record }) {
     return <PublicPost post={content} />;
   } else if (content.type === "private") {
     return <PrivatePost post={content} />;
+  } else if (content.type === "list") {
+    return <ListPost post={content} />;
   } else {
     return null;
   }

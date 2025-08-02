@@ -45,6 +45,33 @@ export async function getPrivatePostById(id: string) {
   };
 }
 
+export async function getListPostById(id: string) {
+  await getSession();
+
+  const post = await prisma.listPost.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!post) {
+    throw new ApiError("Post not found", 404);
+  }
+
+  const content = decryptData(post.encryptedContent, post.iv);
+
+  return {
+    id,
+    blueskyContent: post.blueskyContent,
+    content,
+    authorDid: post.authorDid,
+    listId: post.listId,
+    rkey: post.rkey,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+  };
+}
+
 export async function createPublicPostRecord(
   rkey: string,
   params: CreatePostParams,
@@ -81,6 +108,37 @@ export async function createPrivatePostRecord(
       iv: encryptedData.iv,
       blueskyContent,
       authorDid: session.user.did,
+      rkey,
+    },
+  });
+
+  return post;
+}
+
+export async function createListPostRecord(
+  rkey: string,
+  params: CreatePostParams,
+) {
+  if (params.type !== "list") {
+    throw new ApiError("Invalid post type for list post", 400);
+  }
+  if (params.type === "list" && !params.listId) {
+    throw new ApiError("List ID is required for list posts", 400);
+  }
+
+  const session = await getSession();
+
+  const { content, blueskyContent } = params;
+
+  const encryptedData = encryptData(content);
+
+  const post = await prisma.listPost.create({
+    data: {
+      encryptedContent: encryptedData.data,
+      iv: encryptedData.iv,
+      blueskyContent,
+      authorDid: session.user.did,
+      listId: params.listId,
       rkey,
     },
   });
