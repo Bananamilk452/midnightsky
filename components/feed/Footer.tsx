@@ -25,7 +25,6 @@ export function FeedFooter({
 
   function handleWriterOpen(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-    console.log(record);
     if (record?.reply) {
       openWriter({
         root: record.reply.root,
@@ -51,7 +50,10 @@ export function FeedFooter({
   return (
     <>
       <div className={cn("flex items-center justify-between", className)}>
-        <FeedFooterButton onClick={handleWriterOpen}>
+        <FeedFooterButton
+          disabled={post.viewer?.replyDisabled}
+          onClick={handleWriterOpen}
+        >
           <MessageSquareIcon className="size-4" />
           {post.replyCount && post.replyCount > 0 ? post.replyCount : ""}
         </FeedFooterButton>
@@ -76,15 +78,18 @@ export function FeedFooter({
 
 export function FeedFooterButton({
   children,
+  disabled,
   onClick,
 }: {
   children: React.ReactNode;
+  disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
-      className="flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10"
+      className="flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10 disabled:cursor-auto disabled:text-gray-500"
     >
       {children}
     </button>
