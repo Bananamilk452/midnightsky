@@ -19,15 +19,25 @@ const PostBaseSchema = {
     .optional(),
 };
 
-export const CreatePostSchema = z
-  .object({
-    ...PostBaseSchema,
-    type: z.enum(["public", "private"]),
-  })
-  .or(
-    z.object({
+export const CreatePostSchema =
+  // Public / Private
+  z
+    .object({
       ...PostBaseSchema,
-      type: z.literal("list"),
-      listId: z.string(),
-    }),
-  );
+      type: z.enum(["public", "private"]),
+    })
+    // List는 listId가 필요
+    .or(
+      z.object({
+        ...PostBaseSchema,
+        type: z.literal("list"),
+        listId: z.string(),
+      }),
+    )
+    // Reply는 reply 객체가 필요
+    .or(
+      z.object({
+        ...PostBaseSchema,
+        type: z.literal("reply"),
+      }),
+    );

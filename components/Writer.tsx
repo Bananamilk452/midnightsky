@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Editor as TinyMCEEditor } from "tinymce";
@@ -73,9 +73,17 @@ export function Writer({
     defaultValues: {
       blueskyContent: "",
       content: "",
-      type: "private",
+      type: reply ? "reply" : "private",
+      reply,
     },
   });
+
+  useEffect(() => {
+    if (reply) {
+      form.setValue("type", "reply");
+      form.setValue("reply", reply);
+    }
+  }, [reply, form]);
 
   const blueskyContent = form.watch("blueskyContent");
 
@@ -149,54 +157,59 @@ export function Writer({
                 {blueskyContent.length}/{BLUESKY_CONTENT_LIMIT}
               </div>
             </div>
-            <hr className="my-4" />
+
+            <hr className="my-3" />
+
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <h2 className="font-medium">추가 글</h2>
 
                 <div className="flex-grow"></div>
 
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex gap-3"
-                        >
-                          <FormItem className="flex items-center">
-                            <FormControl>
-                              <RadioGroupItem value="public" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              전체 공개
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center">
-                            <FormControl>
-                              <RadioGroupItem value="private" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              팔로워만 공개
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center">
-                            <FormControl>
-                              <RadioGroupItem value="list" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              리스트
-                            </FormLabel>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                {!reply && (
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem className="pb-2 sm:pb-0">
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex gap-3"
+                          >
+                            <FormItem className="flex items-center">
+                              <FormControl>
+                                <RadioGroupItem value="public" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                전체 공개
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center">
+                              <FormControl>
+                                <RadioGroupItem value="private" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                팔로워만 공개
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center">
+                              <FormControl>
+                                <RadioGroupItem value="list" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                리스트
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                )}
                 {form.watch("type") === "list" &&
+                  !reply &&
                   (listsStatus === "success" ? (
                     <FormField
                       control={form.control}

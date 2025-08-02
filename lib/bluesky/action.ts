@@ -19,10 +19,12 @@ import {
   createPrivatePostRecord,
   createPublicPostRecord,
   getListPostById,
+  getPostByRkey,
   getPrivatePostById,
   getPublicPostById,
 } from "@/lib/post/service";
 import { getOptionalSession, getSession } from "@/lib/session";
+import { parseAtUri } from "@/lib/utils";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
 export async function signInWithBluesky(handle: string, redirectTo?: string) {
@@ -115,6 +117,35 @@ export async function getTimeline(limit: number = 30, cursor?: string) {
   return jsonify(response.data);
 }
 
+async function resolveReplyParams(uri: string, params: CreatePostParams) {
+  const { rkey } = parseAtUri(uri);
+  const { post, type } = await getPostByRkey(rkey);
+
+  let newParams = {
+    ...params,
+  };
+
+  if (!post) {
+    throw new ApiError("Post not found", 404);
+  }
+
+  if (type === "public") {
+    newParams.type = "public";
+  } else if (type === "private") {
+    newParams.type = "private";
+  } else if (type === "list") {
+    newParams = {
+      ...params,
+      type: "list",
+      listId: post.listId,
+    };
+  } else {
+    throw new ApiError("Invalid post type", 400);
+  }
+
+  return newParams;
+}
+
 export async function createPost(params: CreatePostParams) {
   await getSession();
 
@@ -128,17 +159,28 @@ export async function createPost(params: CreatePostParams) {
     >
   >;
 
-  if (params.type === "public") {
-    post = await createPublicPostRecord(rkey, params);
-  } else if (params.type === "private") {
-    post = await createPrivatePostRecord(rkey, params);
-  } else if (params.type === "list") {
-    post = await createListPostRecord(rkey, params);
+  let resolvedParams: CreatePostParams = params;
+
+  // Reply 객체에 parent가 있으면 해당 Post의 type, listId를 inherit
+  if (params.type === "reply") {
+    if (!params.reply || !params.reply.parent) {
+      throw new ApiError("Reply parent is required", 400);
+    }
+
+    resolvedParams = await resolveReplyParams(params.reply.parent.uri, params);
+  }
+
+  if (resolvedParams.type === "public") {
+    post = await createPublicPostRecord(rkey, resolvedParams);
+  } else if (resolvedParams.type === "private") {
+    post = await createPrivatePostRecord(rkey, resolvedParams);
+  } else if (resolvedParams.type === "list") {
+    post = await createListPostRecord(rkey, resolvedParams);
   } else {
     throw new ApiError("Invalid post type", 400);
   }
 
-  const blueskyPost = await applyWrites(post.id, rkey, params);
+  const blueskyPost = await applyWrites(post.id, rkey, resolvedParams);
 
   if (Object.keys(blueskyPost).length === 0) {
     throw new Error("Failed to create post");
