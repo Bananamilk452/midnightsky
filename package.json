@@ -47,6 +47,7 @@
     "react-hook-form": "^7.58.0",
     "remove": "^0.1.5",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.0",
     "tinymce": "^7.9.1",
     "usehooks-ts": "^3.1.1",
