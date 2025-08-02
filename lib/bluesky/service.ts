@@ -1,5 +1,9 @@
 import { RichText } from "@atproto/api";
 import {
+  isThreadViewPost,
+  validateThreadViewPost,
+} from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import {
   isRecord as isPost,
   validateRecord as validatePost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/post";
@@ -72,13 +76,52 @@ export async function applyWrites(
     isRecord(embed) &&
     isCreate(writes)
   ) {
-    const record = await agent.com.atproto.repo.applyWrites({
-      repo: session.user.did,
-      validate: true,
-      writes: [writes],
-    });
+    // List 포스트인 경우
+    if (params.type === "list" && params.listId) {
+      const listWrites = {
+        $type: "com.atproto.repo.applyWrites#create",
+        collection: "app.bsky.feed.threadgate",
+        rkey,
+        value: {
+          $type: "app.bsky.feed.threadgate",
+          allow: [
+            {
+              $type: "app.bsky.feed.threadgate#listRule",
+              list: params.listId,
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          hiddenReplies: [],
+          post: `at://${session.user.did}/app.bsky.feed.post/${rkey}`,
+        },
+      };
 
-    return record;
+      if (validateCreate(listWrites).success && isCreate(listWrites)) {
+        const listRecord = await agent.com.atproto.repo.applyWrites({
+          repo: session.user.did,
+          validate: true,
+          writes: [writes, listWrites],
+        });
+
+        return listRecord;
+      } else {
+        console.error("List post validation failed:", {
+          listWritesValidation: validateCreate(listWrites),
+        });
+        throw new ApiError("Invalid list post data", 400);
+      }
+    }
+
+    // Public이나 Private 포스트
+    else {
+      const record = await agent.com.atproto.repo.applyWrites({
+        repo: session.user.did,
+        validate: true,
+        writes: [writes],
+      });
+
+      return record;
+    }
   } else {
     console.error("Post validation failed:", {
       postValidation,
@@ -98,4 +141,27 @@ export async function getRelationship(did1: string, did2: string) {
   });
 
   return relationships;
+}
+
+export async function getPostIsReplyDisabled(uri: string) {
+  const session = await getSession();
+  const agent = await getAgent(session.user.did);
+
+  const postThread = await agent.app.bsky.feed.getPostThread({
+    uri,
+    depth: 0,
+    parentHeight: 0,
+  });
+
+  const thread = postThread.data.thread;
+
+  if (
+    !thread ||
+    !isThreadViewPost(thread) ||
+    !validateThreadViewPost(thread).success
+  ) {
+    throw new ApiError("Thread not found", 404);
+  }
+
+  return thread.post.viewer?.replyDisabled ?? false;
 }
