@@ -22,27 +22,36 @@ export function FeedFooter({
 }) {
   const { openWriter } = useWriter();
   const record = validateRecord(post.record);
+  const embed = record?.embed;
+
+  const hideTypeSelect = embed?.$type === "app.midnightsky.post";
 
   function handleWriterOpen(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     if (record?.reply) {
       openWriter({
-        root: record.reply.root,
-        parent: {
-          cid: post.cid,
-          uri: post.uri,
+        reply: {
+          root: record.reply.root,
+          parent: {
+            cid: post.cid,
+            uri: post.uri,
+          },
         },
+        hideTypeSelect,
       });
     } else {
       openWriter({
-        root: {
-          cid: post.cid,
-          uri: post.uri,
+        reply: {
+          root: {
+            cid: post.cid,
+            uri: post.uri,
+          },
+          parent: {
+            cid: post.cid,
+            uri: post.uri,
+          },
         },
-        parent: {
-          cid: post.cid,
-          uri: post.uri,
-        },
+        hideTypeSelect,
       });
     }
   }
