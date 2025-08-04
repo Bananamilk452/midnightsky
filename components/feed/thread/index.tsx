@@ -146,13 +146,7 @@ function FeedThreadReply({
   }
 }
 
-function FeedThreadParent({
-  reply,
-  depth = 1,
-}: {
-  reply: PostThreadData["thread"];
-  depth?: number;
-}) {
+function FeedThreadParent({ reply }: { reply: PostThreadData["thread"] }) {
   // 1. Not Found
   if (isNotFoundPost(reply)) {
     return <p>해당 게시글을 찾을 수 없습니다.</p>;
@@ -175,14 +169,12 @@ function FeedThreadParent({
 
     return (
       <>
-        {reply.parent && (
-          <FeedThreadParent reply={reply.parent} depth={depth + 1} />
-        )}
+        {reply.parent && <FeedThreadParent reply={reply.parent} />}
         <FeedRecord
           post={post}
           className="last:border-b last:border-white/30 last:pb-2"
           line={{
-            top: depth === 1 ? true : false,
+            top: Boolean(reply.parent),
             bottom: true,
           }}
         />
