@@ -46,11 +46,13 @@ export function Writer({
   open,
   setOpen,
   reply,
+  hideTypeSelect,
 }: {
   id?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
   reply?: ReplyRef;
+  hideTypeSelect?: boolean;
 }) {
   const router = useRouter();
   const editorRef = useRef<TinyMCEEditor>(null);
@@ -79,11 +81,13 @@ export function Writer({
   });
 
   useEffect(() => {
-    if (reply) {
+    if (hideTypeSelect) {
       form.setValue("type", "reply");
+    }
+    if (reply) {
       form.setValue("reply", reply);
     }
-  }, [reply, form]);
+  }, [hideTypeSelect, reply, form]);
 
   const blueskyContent = form.watch("blueskyContent");
 
@@ -166,7 +170,7 @@ export function Writer({
 
                 <div className="flex-grow"></div>
 
-                {!reply && (
+                {!hideTypeSelect && (
                   <FormField
                     control={form.control}
                     name="type"
@@ -209,7 +213,7 @@ export function Writer({
                   />
                 )}
                 {form.watch("type") === "list" &&
-                  !reply &&
+                  !hideTypeSelect &&
                   (listsStatus === "success" ? (
                     <FormField
                       control={form.control}

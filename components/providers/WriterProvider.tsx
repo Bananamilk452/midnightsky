@@ -5,8 +5,13 @@ import React, { createContext, ReactNode, useContext } from "react";
 
 import { Writer } from "@/components/Writer";
 
+interface OpenWriterParams {
+  reply: ReplyRef;
+  hideTypeSelect: boolean;
+}
+
 interface WriterContextType {
-  openWriter: (reply?: ReplyRef) => void;
+  openWriter: (params?: OpenWriterParams) => void;
 }
 
 const WriterContext = createContext<WriterContextType | undefined>(undefined);
@@ -18,16 +23,25 @@ interface WriterProviderProps {
 export const WriterProvider: React.FC<WriterProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [reply, setReply] = React.useState<ReplyRef>();
+  const [hideTypeSelect, setHideTypeSelect] = React.useState<boolean>(false);
 
-  const openWriter = (reply?: ReplyRef) => {
-    setReply(reply);
+  const openWriter = (params?: OpenWriterParams) => {
+    if (params) {
+      setReply(params.reply);
+      setHideTypeSelect(params.hideTypeSelect);
+    }
     setIsOpen(true);
   };
 
   return (
     <WriterContext.Provider value={{ openWriter }}>
       {children}
-      <Writer open={isOpen} setOpen={setIsOpen} reply={reply} />
+      <Writer
+        open={isOpen}
+        setOpen={setIsOpen}
+        reply={reply}
+        hideTypeSelect={hideTypeSelect}
+      />
     </WriterContext.Provider>
   );
 };
