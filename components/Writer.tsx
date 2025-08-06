@@ -122,10 +122,12 @@ export function Writer({
         className="max-w-full bg-gray-900 p-4 sm:max-w-2xl [&>button]:hidden"
       >
         <DialogHeader>
-          <div className="flex w-full justify-between">
+          <div className="flex w-full items-center gap-2">
             <Button variant="ghost" onClick={() => setOpen(false)}>
               취소
             </Button>
+            <div className="flex-grow"></div>
+            {status === "pending" && <Spinner className="size-4" />}
             <Button
               onClick={form.handleSubmit(onSubmit)}
               disabled={!isEditorReady || status === "pending"}
