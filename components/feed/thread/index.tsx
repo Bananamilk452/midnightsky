@@ -11,11 +11,11 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
 import { FeedRecord } from "@/components/feed";
+import { FeedContent } from "@/components/feed/Content";
 import { FeedEmbed } from "@/components/feed/Embed";
 import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedLabel } from "@/components/feed/Label";
-import { FeedThreadContent } from "@/components/feed/thread/Content";
 import { FeedThreadHeader } from "@/components/feed/thread/Header";
 import { validateRecord } from "@/lib/bluesky/utils";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
@@ -86,7 +86,11 @@ function FeedThreadRecord({
       <div className="flex w-full min-w-0 flex-col gap-2">
         <FeedThreadHeader post={post} />
         <FeedLabel labels={post.labels}>
-          <FeedThreadContent text={record.text} facets={record.facets} />
+          <FeedContent
+            className="text-lg"
+            text={record.text}
+            facets={record.facets}
+          />
           {post.embed && <FeedEmbed embed={post.embed} />}
           {Post.isRecord(record.embed) && <FeedPost content={record.embed} />}
         </FeedLabel>

@@ -2,10 +2,14 @@ import { RichText } from "@atproto/api";
 import { Record } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import Link from "next/link";
 
+import { cn } from "@/lib/utils";
+
 export function FeedContent({
+  className = "",
   text,
   facets,
 }: {
+  className: string;
   text: string;
   facets: Record["facets"];
 }) {
@@ -53,10 +57,8 @@ export function FeedContent({
   }
 
   return (
-    <div>
-      <p className="whitespace-pre-wrap text-base">
-        <>{...content}</>
-      </p>
-    </div>
+    <p className={cn("whitespace-pre-wrap break-all text-base", className)}>
+      <>{...content}</>
+    </p>
   );
 }
