@@ -9,7 +9,7 @@ export function FeedContent({
   text,
   facets,
 }: {
-  className: string;
+  className?: string;
   text: string;
   facets: Record["facets"];
 }) {
