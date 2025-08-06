@@ -21,6 +21,14 @@ export default function Page() {
     rkey,
   );
 
+  function onGoBack() {
+    if (history.length > 2) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  }
+
   return status === "pending" ? (
     <LoadingFallback />
   ) : status === "error" ? (
@@ -29,10 +37,7 @@ export default function Page() {
     <>
       <Header>
         <button>
-          <ArrowLeftIcon
-            onClick={router.back}
-            className="size-6 cursor-pointer"
-          />
+          <ArrowLeftIcon onClick={onGoBack} className="size-6 cursor-pointer" />
         </button>
         <p className="ml-4 text-lg font-semibold">게시물</p>
       </Header>
