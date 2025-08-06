@@ -119,7 +119,7 @@ export function Writer({
     <Dialog open={open} onOpenChange={handleModalClose}>
       <DialogContent
         onCloseAutoFocus={(e) => e.preventDefault()}
-        className="max-w-full bg-gray-900 p-4 sm:max-w-2xl [&>button]:hidden"
+        className="max-h-[calc(100vh-48px)] max-w-full overflow-auto bg-gray-900 p-4 sm:max-w-2xl [&>button]:hidden"
       >
         <DialogHeader>
           <div className="flex w-full items-center gap-2">
