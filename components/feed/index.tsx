@@ -108,6 +108,7 @@ export function FeedRecord({
 
   return (
     <div
+      id={at.rkey}
       className={cn(
         "flex flex-col px-4 hover:cursor-pointer hover:bg-white/5",
         className,

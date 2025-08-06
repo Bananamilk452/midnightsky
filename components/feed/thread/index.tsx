@@ -19,6 +19,7 @@ import { FeedLabel } from "@/components/feed/Label";
 import { FeedThreadHeader } from "@/components/feed/thread/Header";
 import { validateRecord } from "@/lib/bluesky/utils";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
+import { parseAtUri } from "@/lib/utils";
 
 export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
   // 1. Not Found
@@ -73,13 +74,14 @@ function FeedThreadRecord({
   line?: { top?: boolean; bottom?: boolean };
 }) {
   const record = validateRecord(post.record);
+  const { rkey } = parseAtUri(post.uri);
 
   if (!record) {
     throw new Error("Invalid post record");
   }
 
   return (
-    <div className="flex flex-col border-b border-white/30 px-4 pb-2">
+    <div id={rkey} className="flex flex-col border-b border-white/30 px-4 pb-2">
       <div className="flex h-4 w-[40px] justify-center">
         {line?.top && <div className="h-full w-0.5 bg-gray-400" />}
       </div>
