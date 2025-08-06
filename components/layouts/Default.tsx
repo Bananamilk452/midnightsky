@@ -1,10 +1,7 @@
-"use client";
-
 import React from "react";
 
 import { WriterButton } from "@/components/home/WriterButton";
-
-import { useWriter, WriterProvider } from "../providers/WriterProvider";
+import { WriterProvider } from "@/components/providers/WriterProvider";
 
 export function DefaultLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,19 +9,9 @@ export function DefaultLayout({ children }: { children: React.ReactNode }) {
       <div className="relative mx-auto min-h-full max-w-[600px] bg-black/50">
         <WriterProvider>
           {children}
-          <WriterButtonWrapper />
+          <WriterButton />
         </WriterProvider>
       </div>
     </div>
-  );
-}
-
-function WriterButtonWrapper() {
-  const { openWriter } = useWriter();
-
-  return (
-    <>
-      <WriterButton onClick={() => openWriter()} />
-    </>
   );
 }
