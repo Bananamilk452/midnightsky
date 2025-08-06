@@ -13,7 +13,7 @@ export function ErrorBoundaryPage({
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
-  onReset: () => void;
+  onReset?: () => void;
 }) {
   return (
     <div className="flex size-full items-center justify-center">
@@ -24,9 +24,11 @@ export function ErrorBoundaryPage({
         <CardContent>
           <pre style={{ whiteSpace: "normal" }}>{error.message}</pre>
         </CardContent>
-        <CardFooter>
-          <Button onClick={onReset}>다시 시도</Button>
-        </CardFooter>
+        {onReset && (
+          <CardFooter>
+            <Button onClick={onReset}>다시 시도</Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );
