@@ -29,7 +29,7 @@ import { parseAtUri } from "@/lib/utils";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
 export async function signInWithBluesky(handle: string, redirectTo?: string) {
-  const url = await blueskyClient.authorize(handle, {
+  const url = await blueskyClient.authorize(handle.trim(), {
     prompt: "none",
     state: JSON.stringify({
       handle,

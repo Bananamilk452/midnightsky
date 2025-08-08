@@ -36,7 +36,8 @@ const formSchema = z.object({
     })
     .regex(new RegExp("^.+\..+"), {
       message: "유효한 Bluesky 핸들을 입력해주세요.",
-    }),
+    })
+    .trim(),
 });
 
 export default function SignIn() {
