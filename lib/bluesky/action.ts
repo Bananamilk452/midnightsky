@@ -6,6 +6,7 @@ import {
   isRelationship,
 } from "@atproto/api/dist/client/types/app/bsky/graph/defs";
 import { TID } from "@atproto/common";
+import { redirect } from "next/navigation";
 
 import { blueskyClient } from "@/lib/bluesky";
 import {
@@ -39,11 +40,12 @@ export async function signInWithBluesky(handle: string, redirectTo?: string) {
   return url.toString();
 }
 
-// export async function signOut(): Promise<void> {
-//   const session = await getSession()
+export async function signOut(): Promise<void> {
+  const session = await getSession();
 
-//   session.destroy()
-// }
+  session.destroy();
+  redirect("/sign-in");
+}
 
 export async function getAgent(did: string) {
   const session = await blueskyClient.restore(did);

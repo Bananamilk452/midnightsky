@@ -5,12 +5,10 @@ import { useIntersectionObserver } from "usehooks-ts";
 
 import { ErrorBoundaryPage } from "@/components/ErrorBoundaryPage";
 import { Feed } from "@/components/feed";
-import { Header } from "@/components/Header";
+import { HomeHeader } from "@/components/home/HomeHeader";
 import { LoadingFallback } from "@/components/LoadingFallback";
-import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
-import { User } from "@/lib/bluesky/utils";
-import { useSession, useTimeline } from "@/lib/hooks/useBluesky";
+import { useTimeline } from "@/lib/hooks/useBluesky";
 import { createFeedKey } from "@/lib/utils";
 
 const InfiniteScrollTrigger = ({
@@ -74,19 +72,7 @@ const FeedList = React.memo(({ timeline }: { timeline: TimelineData }) => (
 ));
 FeedList.displayName = "FeedList";
 
-const TimelineHeader = React.memo(({ user }: { user: User | undefined }) => (
-  <Header>
-    {!user ? (
-      <Spinner className="size-6" />
-    ) : (
-      <Avatar src={user.avatar} alt={user.displayName || user.handle} />
-    )}
-  </Header>
-));
-TimelineHeader.displayName = "TimelineHeader";
-
 export default function Home() {
-  const { data: user } = useSession();
   const {
     data: timeline,
     error: timelineError,
@@ -100,16 +86,26 @@ export default function Home() {
   });
 
   if (status === "pending") {
-    return <LoadingFallback />;
+    return (
+      <>
+        <HomeHeader />
+        <LoadingFallback />
+      </>
+    );
   }
 
   if (status === "error") {
-    return <ErrorBoundaryPage error={timelineError} onReset={refetch} />;
+    return (
+      <>
+        <HomeHeader />
+        <ErrorBoundaryPage error={timelineError} onReset={refetch} />
+      </>
+    );
   }
 
   return (
     <>
-      <TimelineHeader user={user} />
+      <HomeHeader />
 
       <FeedList timeline={timeline} />
 
