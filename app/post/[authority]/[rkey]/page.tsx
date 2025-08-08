@@ -46,6 +46,8 @@ export default function Page() {
   ) : (
     <>
       <FeedThread thread={data.thread} />
+      {/* 여백 */}
+      <div className="h-[calc(50dvh)] w-full" />
     </>
   );
 }
