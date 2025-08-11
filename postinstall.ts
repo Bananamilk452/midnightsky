@@ -2,6 +2,8 @@ import path from "path";
 import fse from "fs-extra";
 
 const topDir = __dirname;
+fse.mkdirSync(path.join(topDir, "public", "tinymce"), { recursive: true });
+fse.mkdirSync(path.join(topDir, "public", "langs"), { recursive: true });
 fse.emptyDirSync(path.join(topDir, "public", "tinymce"));
 fse.copySync(
   path.join(topDir, "node_modules", "tinymce"),

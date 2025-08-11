@@ -77,6 +77,9 @@ importers:
       dompurify:
         specifier: ^3.2.6
         version: 3.2.6
+      fs-extra:
+        specifier: ^11.3.1
+        version: 11.3.1
       hls.js:
         specifier: ^1.6.5
         version: 1.6.5
@@ -171,9 +174,6 @@ importers:
       eslint-plugin-react-hooks:
         specifier: ^5.2.0
         version: 5.2.0(eslint@9.28.0(jiti@2.4.2))
-      fs-extra:
-        specifier: ^11.3.0
-        version: 11.3.0
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -1937,8 +1937,8 @@ packages:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
 
-  fs-extra@11.3.0:
-    resolution: {integrity: sha512-Z4XaCL6dUDHfP/jT25jJKMmtxvuwbkrD1vNSMFlo9lNLY2c5FHYSQgHPRZUjAB26TpDEoW9HCOgplrdbaPV/ew==}
+  fs-extra@11.3.1:
+    resolution: {integrity: sha512-eXvGGwZ5CL17ZSwHWd3bbgk7UUpF6IFHtP57NYYakPvHOs8GDgDe5KJI36jIJzDkJ6eJjuzRA8eBQb6SkKue0g==}
     engines: {node: '>=14.14'}
 
   function-bind@1.1.2:
@@ -5146,7 +5146,7 @@ snapshots:
 
   fresh@0.5.2: {}
 
-  fs-extra@11.3.0:
+  fs-extra@11.3.1:
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.1.0
