@@ -284,6 +284,10 @@ export function Writer({
                       autosave_restore_when_empty: true,
                       autosave_retention: "60m",
                       language: "ko_KR",
+                      mobile: {
+                        toolbar_mode: "floating",
+                        menubar: "file edit insert format table",
+                      },
                     }}
                     onInit={(evt, editor) => {
                       editorRef.current = editor;
