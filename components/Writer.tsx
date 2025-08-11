@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageButton } from "@/components/writer/ImageButton";
 import { CreatePostParams, CreatePostSchema } from "@/lib/bluesky/types";
 import { BLUESKY_CONTENT_LIMIT } from "@/lib/constants";
 import { useCreatePost, useMyLists } from "@/lib/hooks/useBluesky";
@@ -115,6 +116,21 @@ export function Writer({
     });
   }
 
+  function onImageAdded(image: File) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (!editorRef.current) return;
+
+      const base64 = e.target?.result as string;
+
+      editorRef.current.insertContent(
+        editorRef.current.dom.createHTML("img", { src: base64 }),
+      );
+    };
+
+    reader.readAsDataURL(image);
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleModalClose}>
       <DialogContent
@@ -169,9 +185,10 @@ export function Writer({
 
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                <h2 className="font-medium">추가 글</h2>
-
-                <div className="flex-grow"></div>
+                <div className="mb-1 flex flex-grow items-center justify-between sm:mb-0">
+                  <h2 className="font-medium">추가 글</h2>
+                  <ImageButton setImage={onImageAdded} />
+                </div>
 
                 {!hideTypeSelect && (
                   <FormField
