@@ -198,7 +198,7 @@ export function Writer({
                                 <RadioGroupItem value="private" />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                팔로워만 공개
+                                맞팔만 공개
                               </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center">

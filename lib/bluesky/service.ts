@@ -112,7 +112,45 @@ export async function applyWrites(
       }
     }
 
-    // Public이나 Private 포스트
+    // Private
+    else if (params.type === "private") {
+      const privateWrites = {
+        $type: "com.atproto.repo.applyWrites#create",
+        collection: "app.bsky.feed.threadgate",
+        rkey,
+        value: {
+          $type: "app.bsky.feed.threadgate",
+          allow: [
+            {
+              $type: "app.bsky.feed.threadgate#followingRule",
+            },
+            {
+              $type: "app.bsky.feed.threadgate#followerRule",
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          hiddenReplies: [],
+          post: `at://${session.user.did}/app.bsky.feed.post/${rkey}`,
+        },
+      };
+
+      if (validateCreate(privateWrites).success && isCreate(privateWrites)) {
+        const privateRecord = await agent.com.atproto.repo.applyWrites({
+          repo: session.user.did,
+          validate: true,
+          writes: [writes, privateWrites],
+        });
+
+        return privateRecord;
+      } else {
+        console.error("Private post validation failed:", {
+          privateWritesValidation: validateCreate(privateWrites),
+        });
+        throw new ApiError("Invalid private post data", 400);
+      }
+    }
+
+    // Public
     else {
       const record = await agent.com.atproto.repo.applyWrites({
         repo: session.user.did,
