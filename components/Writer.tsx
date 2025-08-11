@@ -101,8 +101,8 @@ export function Writer({
 
     mutate(body, {
       onSuccess: (data) => {
-        editorRef.current?.plugins.autosave.removeDraft(false);
         handleModalClose(false);
+        editorRef.current?.plugins.autosave.removeDraft(false);
         form.reset();
         router.push(`/post/${data.post.authorDid}/${data.post.rkey}`);
       },
