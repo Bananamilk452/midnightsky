@@ -32,3 +32,7 @@ export function parseAtUri(uri: string) {
     rkey: parts[2],
   };
 }
+
+export function formatNumber(num: number) {
+  return new Intl.NumberFormat("ko-KR").format(num);
+}
