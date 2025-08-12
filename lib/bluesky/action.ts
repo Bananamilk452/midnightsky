@@ -138,6 +138,32 @@ export async function getProfile(actor: string) {
   });
 }
 
+export async function getAuthorFeed({
+  limit = 30,
+  cursor,
+  actor,
+  filter = "posts_and_author_threads",
+  includePins = true,
+}: {
+  limit: number;
+  cursor?: string;
+  actor: string;
+  filter?: string;
+  includePins?: boolean;
+}) {
+  const agent = await getSessionAgent();
+
+  const response = await agent.getAuthorFeed({
+    limit,
+    cursor,
+    actor,
+    filter,
+    includePins,
+  });
+
+  return jsonify(response.data);
+}
+
 async function resolveReplyParams(uri: string, params: CreatePostParams) {
   const { rkey } = parseAtUri(uri);
   const { post, type } = await getPostByRkey(rkey);
