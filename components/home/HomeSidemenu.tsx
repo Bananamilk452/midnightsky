@@ -1,18 +1,25 @@
 "use client";
 
-import { HomeIcon, LogOutIcon, SquarePenIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  CircleUserRoundIcon,
+  HomeIcon,
+  LogOutIcon,
+  SquarePenIcon,
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Avatar } from "@/components/primitive/Avatar";
 import { useWriter } from "@/components/providers/WriterProvider";
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/bluesky/action";
+import { User } from "@/lib/bluesky/utils";
 import { useSession } from "@/lib/hooks/useBluesky";
 import { cn } from "@/lib/utils";
 
 export function HomeSidemenu() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: user } = useSession();
   const { openWriter } = useWriter();
 
@@ -27,26 +34,31 @@ export function HomeSidemenu() {
       {!user ? (
         <Spinner className="size-6 self-center" />
       ) : (
-        <div className="flex flex-col items-center px-0 lg:items-start lg:px-3">
-          <Avatar
-            className="size-11"
-            src={user.avatar}
-            alt={user.displayName || user.handle}
-          />
-          <h2 className="mt-2 hidden w-full overflow-hidden text-ellipsis text-sm font-semibold lg:block">
-            {user.displayName || user.handle}
-          </h2>
-          <h3 className="hidden w-full overflow-hidden text-ellipsis text-xs text-gray-400 lg:block">
-            @{user.handle}
-          </h3>
-        </div>
+        <SidemenuProfile user={user} />
       )}
       <div className="flex w-full flex-col items-center gap-2 lg:items-start">
-        <SidemenuButton active={true} onClick={() => router.push("/home")}>
+        <SidemenuButton
+          active={pathname === "/home"}
+          onClick={() => router.push("/home")}
+        >
           <HomeIcon className="size-6" />
           <span className="hidden lg:inline">홈</span>
         </SidemenuButton>
-        <SidemenuButton active={true} onClick={signOut}>
+        <SidemenuButton
+          active={
+            user
+              ? pathname === `/profile/${user.handle}` ||
+                pathname === `/profile/${user.did}`
+              : false
+          }
+          onClick={() => {
+            if (user) router.push(`/profile/${user.handle}`);
+          }}
+        >
+          <CircleUserRoundIcon className="size-6" />
+          <span className="hidden lg:inline">프로필</span>
+        </SidemenuButton>
+        <SidemenuButton active={false} onClick={signOut}>
           <LogOutIcon className="size-6" />
           <span className="hidden lg:inline">로그아웃</span>
         </SidemenuButton>
@@ -61,6 +73,24 @@ export function HomeSidemenu() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SidemenuProfile({ user }: { user: User }) {
+  return (
+    <div className="flex flex-col items-center px-0 lg:items-start lg:px-3">
+      <Avatar
+        className="size-11"
+        src={user.avatar}
+        alt={user.displayName || user.handle}
+      />
+      <h2 className="mt-2 hidden w-full overflow-hidden text-ellipsis text-sm font-semibold lg:block">
+        {user.displayName || user.handle}
+      </h2>
+      <h3 className="hidden w-full overflow-hidden text-ellipsis text-xs text-gray-400 lg:block">
+        @{user.handle}
+      </h3>
     </div>
   );
 }
