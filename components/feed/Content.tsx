@@ -36,7 +36,7 @@ export function FeedContent({
       content.push(
         <Link
           onClick={(e) => e.stopPropagation()}
-          href={`/user/${segment.mention!.did}`}
+          href={`/profile/${segment.mention!.did}`}
           className="text-blue-500 hover:underline"
         >
           {segment.text}
