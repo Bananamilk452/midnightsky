@@ -7,6 +7,7 @@ import {
   isReasonRepost,
   PostView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { FeedAvatar } from "@/components/feed/Avatar";
@@ -135,11 +136,27 @@ export function FeedRecord({
       </div>
       <div className="flex gap-2">
         <div className="mr-1 flex shrink-0 flex-col items-center">
-          <FeedAvatar post={post} />
+          <Link
+            href={`/profile/${post.author.handle}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FeedAvatar post={post} />
+          </Link>
           {line?.bottom && lineElement}
         </div>
         <div className="flex w-full min-w-0 flex-col">
-          <FeedHeader post={post} createdAt={record.createdAt} />
+          <div>
+            <Link
+              href={`/profile/${post.author.handle}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <FeedHeader
+                className="w-fit"
+                post={post}
+                createdAt={record.createdAt}
+              />
+            </Link>
+          </div>
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
             {post.embed && (
