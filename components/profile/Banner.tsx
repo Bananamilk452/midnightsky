@@ -14,7 +14,7 @@ export function ProfileBanner({ profile }: { profile: ProfileData }) {
   return (
     <div>
       <div className="relative">
-        <BackButton buttonClassName="absolute left-3 top-3 hover:cursor-pointer" />
+        <BackButton buttonClassName="absolute left-3 top-3 hover:cursor-pointer p-1 rounded-full bg-black/50" />
         {profile.banner ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
