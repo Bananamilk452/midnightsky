@@ -11,6 +11,7 @@ import {
   getMyLists,
   getPostThread,
   getPrivatePost,
+  getProfile,
   getPublicPost,
   getTimeline,
 } from "@/lib/bluesky/action";
@@ -86,5 +87,12 @@ export function useListPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["listPost", id],
     queryFn: () => getListPost(id),
+  });
+}
+
+export function useProfile(actor: string) {
+  return useQuery({
+    queryKey: ["profile", actor],
+    queryFn: () => getProfile(actor),
   });
 }

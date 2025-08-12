@@ -1,6 +1,6 @@
 "use server";
 
-import { Agent } from "@atproto/api";
+import { Agent, RichText } from "@atproto/api";
 import {
   isNotFoundActor,
   isRelationship,
@@ -117,6 +117,25 @@ export async function getTimeline(limit: number = 30, cursor?: string) {
   });
 
   return jsonify(response.data);
+}
+
+export async function getProfile(actor: string) {
+  const agent = await getSessionAgent();
+
+  const response = await agent.getProfile({
+    actor,
+  });
+
+  const rt = new RichText({
+    text: response.data.description ?? "",
+  });
+
+  rt.detectFacets(agent);
+
+  return jsonify({
+    ...response.data,
+    facets: rt.facets,
+  });
 }
 
 async function resolveReplyParams(uri: string, params: CreatePostParams) {
