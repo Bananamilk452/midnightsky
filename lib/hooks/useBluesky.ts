@@ -7,10 +7,12 @@ import {
 
 import {
   createPost,
+  getAuthorFeed,
   getListPost,
   getMyLists,
   getPostThread,
   getPrivatePost,
+  getProfile,
   getPublicPost,
   getTimeline,
 } from "@/lib/bluesky/action";
@@ -40,6 +42,26 @@ export function useTimeline({
     initialPageParam: { limit, cursor },
     getNextPageParam: (lastPage) => ({
       limit,
+      cursor: lastPage.cursor,
+    }),
+  });
+}
+
+export function useAuthorFeed(params: {
+  limit: number;
+  cursor?: string;
+  actor: string;
+  filter?: string;
+  includePins?: boolean;
+}) {
+  return useInfiniteQuery({
+    queryKey: ["authorFeed", params.actor, params.limit, params.cursor],
+    queryFn: async ({ pageParam }) => {
+      return getAuthorFeed(pageParam);
+    },
+    initialPageParam: params,
+    getNextPageParam: (lastPage) => ({
+      ...params,
       cursor: lastPage.cursor,
     }),
   });
@@ -86,5 +108,12 @@ export function useListPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["listPost", id],
     queryFn: () => getListPost(id),
+  });
+}
+
+export function useProfile(actor: string) {
+  return useQuery({
+    queryKey: ["profile", actor],
+    queryFn: () => getProfile(actor),
   });
 }

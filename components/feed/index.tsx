@@ -4,9 +4,11 @@ import { AppBskyEmbedRecord } from "@atproto/api";
 import {
   FeedViewPost,
   isPostView,
+  isReasonPin,
   isReasonRepost,
   PostView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { FeedAvatar } from "@/components/feed/Avatar";
@@ -16,6 +18,7 @@ import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedHeader } from "@/components/feed/Header";
 import { FeedLabel } from "@/components/feed/Label";
+import { FeedPin } from "@/components/feed/Pin";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
@@ -78,6 +81,7 @@ export function Feed({ feed }: FeedProps) {
         }
       >
         {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
+        {isReasonPin(feed.reason) && <FeedPin feed={feed} />}
       </FeedRecord>
     </div>
   );
@@ -135,11 +139,27 @@ export function FeedRecord({
       </div>
       <div className="flex gap-2">
         <div className="mr-1 flex shrink-0 flex-col items-center">
-          <FeedAvatar post={post} />
+          <Link
+            href={`/profile/${post.author.handle}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FeedAvatar post={post} />
+          </Link>
           {line?.bottom && lineElement}
         </div>
         <div className="flex w-full min-w-0 flex-col">
-          <FeedHeader post={post} createdAt={record.createdAt} />
+          <div>
+            <Link
+              href={`/profile/${post.author.handle}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <FeedHeader
+                className="w-fit"
+                post={post}
+                createdAt={record.createdAt}
+              />
+            </Link>
+          </div>
           <FeedLabel labels={post.labels}>
             <FeedContent text={record.text} facets={record.facets} />
             {post.embed && (

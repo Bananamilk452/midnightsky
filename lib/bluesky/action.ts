@@ -1,6 +1,6 @@
 "use server";
 
-import { Agent } from "@atproto/api";
+import { Agent, RichText } from "@atproto/api";
 import {
   isNotFoundActor,
   isRelationship,
@@ -114,6 +114,51 @@ export async function getTimeline(limit: number = 30, cursor?: string) {
   const response = await agent.getTimeline({
     limit,
     cursor,
+  });
+
+  return jsonify(response.data);
+}
+
+export async function getProfile(actor: string) {
+  const agent = await getSessionAgent();
+
+  const response = await agent.getProfile({
+    actor,
+  });
+
+  const rt = new RichText({
+    text: response.data.description ?? "",
+  });
+
+  rt.detectFacets(agent);
+
+  return jsonify({
+    ...response.data,
+    facets: rt.facets,
+  });
+}
+
+export async function getAuthorFeed({
+  limit = 30,
+  cursor,
+  actor,
+  filter = "posts_and_author_threads",
+  includePins = true,
+}: {
+  limit: number;
+  cursor?: string;
+  actor: string;
+  filter?: string;
+  includePins?: boolean;
+}) {
+  const agent = await getSessionAgent();
+
+  const response = await agent.getAuthorFeed({
+    limit,
+    cursor,
+    actor,
+    filter,
+    includePins,
   });
 
   return jsonify(response.data);

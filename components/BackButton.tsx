@@ -3,7 +3,15 @@
 import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function BackButton() {
+import { cn } from "@/lib/utils";
+
+export default function BackButton({
+  buttonClassName = "",
+  iconClassName = "",
+}: {
+  buttonClassName?: string;
+  iconClassName?: string;
+}) {
   const router = useRouter();
 
   function onGoBack() {
@@ -15,8 +23,11 @@ export default function BackButton() {
   }
 
   return (
-    <button>
-      <ArrowLeftIcon onClick={onGoBack} className="size-6 cursor-pointer" />
+    <button className={buttonClassName}>
+      <ArrowLeftIcon
+        onClick={onGoBack}
+        className={cn("size-6 cursor-pointer", iconClassName)}
+      />
     </button>
   );
 }
