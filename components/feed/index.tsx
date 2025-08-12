@@ -4,6 +4,7 @@ import { AppBskyEmbedRecord } from "@atproto/api";
 import {
   FeedViewPost,
   isPostView,
+  isReasonPin,
   isReasonRepost,
   PostView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
@@ -17,6 +18,7 @@ import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
 import { FeedHeader } from "@/components/feed/Header";
 import { FeedLabel } from "@/components/feed/Label";
+import { FeedPin } from "@/components/feed/Pin";
 import { FeedRepost } from "@/components/feed/Repost";
 import { FeedThreadEllipsis } from "@/components/feed/ThreadEllipsis";
 import { validateRecord } from "@/lib/bluesky/utils";
@@ -79,6 +81,7 @@ export function Feed({ feed }: FeedProps) {
         }
       >
         {isReasonRepost(feed.reason) && <FeedRepost feed={feed} />}
+        {isReasonPin(feed.reason) && <FeedPin feed={feed} />}
       </FeedRecord>
     </div>
   );
