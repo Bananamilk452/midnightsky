@@ -73,21 +73,24 @@ function SignInForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const redirectTo = searchParams.get("redirectTo") || "/home";
-    signIn([values.handle, redirectTo], {
-      onSuccess: (url) => {
-        startTransition(() => {
-          router.push(url);
-        });
+    signIn(
+      { handle: values.handle, redirectTo },
+      {
+        onSuccess: (url) => {
+          startTransition(() => {
+            router.push(url);
+          });
+        },
+        onError(error) {
+          console.error("Sign in error:", error);
+          let str = "로그인에 실패했습니다. 다시 시도해주세요.";
+          if (error instanceof Error) {
+            str += `\n에러: ${error.message}`;
+          }
+          setFormError(str);
+        },
       },
-      onError(error) {
-        console.error("Sign in error:", error);
-        let str = "로그인에 실패했습니다. 다시 시도해주세요.";
-        if (error instanceof Error) {
-          str += `\n에러: ${error.message}`;
-        }
-        setFormError(str);
-      },
-    });
+    );
   }
 
   return (

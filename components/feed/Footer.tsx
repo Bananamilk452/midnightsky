@@ -112,7 +112,7 @@ function RepostButton({ post }: { post: PostView }) {
   function handleRepost(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     if (reposted) {
-      unrepost([post.uri], {
+      unrepost(post.uri, {
         onError: (error) => {
           console.error("Error deleting repost:", error);
           setReposted(true);
@@ -122,13 +122,16 @@ function RepostButton({ post }: { post: PostView }) {
       setReposted(false);
       setRepostCount((prev) => prev - 1);
     } else {
-      repost([{ cid: post.cid, uri: post.uri }], {
-        onError: (error) => {
-          console.error("Error liking post:", error);
-          setReposted(false);
-          setRepostCount((prev) => prev - 1);
+      repost(
+        { cid: post.cid, uri: post.uri },
+        {
+          onError: (error) => {
+            console.error("Error liking post:", error);
+            setReposted(false);
+            setRepostCount((prev) => prev - 1);
+          },
         },
-      });
+      );
       setReposted(true);
       setRepostCount((prev) => prev + 1);
     }
@@ -155,7 +158,7 @@ function LikeButton({ post }: { post: PostView }) {
   function handleLike(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     if (liked) {
-      unlikePost([post.uri], {
+      unlikePost(post.uri, {
         onError: (error) => {
           console.error("Error deleting like:", error);
           setLiked(true);
@@ -165,13 +168,16 @@ function LikeButton({ post }: { post: PostView }) {
       setLiked(false);
       setLikeCount((prev) => prev - 1);
     } else {
-      likePost([{ cid: post.cid, uri: post.uri }], {
-        onError: (error) => {
-          console.error("Error liking post:", error);
-          setLiked(false);
-          setLikeCount((prev) => prev - 1);
+      likePost(
+        { cid: post.cid, uri: post.uri },
+        {
+          onError: (error) => {
+            console.error("Error liking post:", error);
+            setLiked(false);
+            setLikeCount((prev) => prev - 1);
+          },
         },
-      });
+      );
       setLiked(true);
       setLikeCount((prev) => prev + 1);
     }
@@ -230,14 +236,12 @@ function MenuButton({ post }: { post: PostView }) {
 
   function handleDeletePost() {
     deletePost(
-      [
-        {
-          uri: post.uri,
-          post: isMidnightSkyPost
-            ? { type: (embed as Post).type, postId: (embed as Post).id }
-            : undefined,
-        },
-      ],
+      {
+        uri: post.uri,
+        post: isMidnightSkyPost
+          ? { type: (embed as Post).type, postId: (embed as Post).id }
+          : undefined,
+      },
       {
         onSuccess: () => {
           toast.success("게시글이 삭제되었습니다.");
