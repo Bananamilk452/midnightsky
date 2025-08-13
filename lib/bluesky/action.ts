@@ -1,6 +1,7 @@
 "use server";
 
-import { Agent, RichText } from "@atproto/api";
+import { Agent, AppBskyRichtextFacet, RichText } from "@atproto/api";
+import { Response as GetProfileData } from "@atproto/api/dist/client/types/app/bsky/actor/getProfile";
 import { OutputSchema as getAuthorFeedData } from "@atproto/api/dist/client/types/app/bsky/feed/getAuthorFeed";
 import { OutputSchema as getPostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as getTimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
@@ -105,9 +106,9 @@ export async function getPublicPost(
   id: string,
 ): Promise<ActionResult<PublicPost>> {
   try {
-  await getSession();
+    await getSession();
 
-  const post = await getPublicPostById(id);
+    const post = await getPublicPostById(id);
 
     return {
       success: true,
@@ -116,7 +117,7 @@ export async function getPublicPost(
   } catch (error) {
     console.error("Error fetching public post:", error);
     return { success: false, error: "게시물 조회에 실패했습니다." };
-}
+  }
 }
 
 type GetPrivatePostReturnType =
@@ -126,13 +127,13 @@ export async function getPrivatePost(
   id: string,
 ): Promise<ActionResult<GetPrivatePostReturnType>> {
   try {
-  const session = await getSession();
+    const session = await getSession();
 
-  const post = await getPrivatePostById(id);
+    const post = await getPrivatePostById(id);
 
-  const isViewable =
-    (await isFollowingEachOther(session.user.did, post.authorDid)) ||
-    post.authorDid === session.user.did;
+    const isViewable =
+      (await isFollowingEachOther(session.user.did, post.authorDid)) ||
+      post.authorDid === session.user.did;
 
     return isViewable
       ? { success: true, data: { ...post, isViewable } }
@@ -150,13 +151,13 @@ export async function getListPost(
   id: string,
 ): Promise<ActionResult<GetListPostReturnType>> {
   try {
-  await getSession();
+    await getSession();
 
-  const post = await getListPostById(id);
+    const post = await getListPostById(id);
 
-  const isViewable = !(await getPostIsReplyDisabled(
-    `at://${post.authorDid}/app.bsky.feed.post/${post.rkey}`,
-  ));
+    const isViewable = !(await getPostIsReplyDisabled(
+      `at://${post.authorDid}/app.bsky.feed.post/${post.rkey}`,
+    ));
 
     return isViewable
       ? { success: true, data: { ...post, isViewable } }
@@ -189,23 +190,37 @@ export async function getTimeline(
   }
 }
 
-export async function getProfile(actor: string) {
-  const agent = await getSessionAgent();
+export async function getProfile(
+  actor: string,
+): Promise<
+  ActionResult<
+    GetProfileData["data"] & { facets?: AppBskyRichtextFacet.Main[] }
+  >
+> {
+  try {
+    const agent = await getSessionAgent();
 
-  const response = await agent.getProfile({
-    actor,
-  });
+    const response = await agent.getProfile({
+      actor,
+    });
 
-  const rt = new RichText({
-    text: response.data.description ?? "",
-  });
+    const rt = new RichText({
+      text: response.data.description ?? "",
+    });
 
-  rt.detectFacets(agent);
+    rt.detectFacets(agent);
 
-  return jsonify({
-    ...response.data,
-    facets: rt.facets,
-  });
+    return {
+      success: true,
+      data: jsonify({
+        ...response.data,
+        facets: rt.facets,
+      }),
+    };
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return { success: false, error: "프로필 조회에 실패했습니다." };
+  }
 }
 
 export async function getAuthorFeed({
@@ -271,14 +286,14 @@ async function resolveReplyParams(uri: string, params: CreatePostParams) {
   return newParams;
 }
 
-interface CreatedPost {
+interface CreatePostReturnType {
   post: PublicPost | PrivatePost | ListPost;
   blueskyPost: ApplyWritesData;
 }
 
 export async function createPost(
   params: CreatePostParams,
-): Promise<ActionResult<CreatedPost>> {
+): Promise<ActionResult<CreatePostReturnType>> {
   try {
     await getSession();
 

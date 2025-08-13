@@ -123,6 +123,6 @@ export function useListPost(id: string) {
 export function useProfile(actor: string) {
   return useQuery({
     queryKey: ["profile", actor],
-    queryFn: () => getProfile(actor),
+    queryFn: () => serverActionErrorHandler(getProfile)([actor]),
   });
 }
