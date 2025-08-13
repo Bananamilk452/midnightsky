@@ -190,3 +190,29 @@ export async function createListPostRecord(
 
   return post;
 }
+
+export async function deletePostById(type: string, id: string) {
+  await getSession();
+
+  if (type === "public") {
+    await prisma.publicPost.delete({
+      where: {
+        id,
+      },
+    });
+  } else if (type === "private") {
+    await prisma.privatePost.delete({
+      where: {
+        id,
+      },
+    });
+  } else if (type === "list") {
+    await prisma.listPost.delete({
+      where: {
+        id,
+      },
+    });
+  } else {
+    throw new ApiError("Invalid post type", 400);
+  }
+}
