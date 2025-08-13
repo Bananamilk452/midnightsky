@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Note } from "@/components/ui/note";
-import { signInWithBluesky } from "@/lib/bluesky/action";
+import { useSignIn } from "@/lib/hooks/useBluesky";
 
 const formSchema = z.object({
   handle: z
@@ -56,6 +56,8 @@ function SignInForm() {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
+  const { mutate: signIn } = useSignIn();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,21 +72,22 @@ function SignInForm() {
   }, [handle]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const redirectTo = searchParams.get("redirectTo") || "/home";
-      const url = await signInWithBluesky(values.handle, redirectTo);
-
-      startTransition(() => {
-        router.push(url);
-      });
-    } catch (error) {
-      console.error("Sign in error:", error);
-      let str = "로그인에 실패했습니다. 다시 시도해주세요.";
-      if (error instanceof Error) {
-        str += `\n에러: ${error.message}`;
-      }
-      setFormError(str);
-    }
+    const redirectTo = searchParams.get("redirectTo") || "/home";
+    signIn([values.handle, redirectTo], {
+      onSuccess: (url) => {
+        startTransition(() => {
+          router.push(url);
+        });
+      },
+      onError(error) {
+        console.error("Sign in error:", error);
+        let str = "로그인에 실패했습니다. 다시 시도해주세요.";
+        if (error instanceof Error) {
+          str += `\n에러: ${error.message}`;
+        }
+        setFormError(str);
+      },
+    });
   }
 
   return (

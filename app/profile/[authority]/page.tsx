@@ -33,7 +33,7 @@ export default function Page() {
   }
 
   const at = decodeURIComponent(authority);
-  const { data, error, status } = useProfile(at);
+  const { data, error, status, refetch } = useProfile(at);
 
   const {
     data: authorFeed,
@@ -42,7 +42,7 @@ export default function Page() {
     hasNextPage,
     isFetching,
     status: authorFeedStatus,
-    refetch,
+    refetch: authorFeedRefetch,
   } = useAuthorFeed({
     actor: at,
     limit: 30,
@@ -50,18 +50,31 @@ export default function Page() {
 
   return status === "pending" && authorFeedStatus === "pending" ? (
     <LoadingFallback />
-  ) : status === "error" || authorFeedStatus === "error" ? (
-    <ErrorBoundaryPage error={error || authorFeedError} onReset={refetch} />
   ) : (
     <>
-      {status === "success" && (
+      {status === "pending" ? (
+        <LoadingFallback />
+      ) : status === "error" ? (
+        <div>
+          <ErrorBoundaryPage error={error} onReset={refetch} />
+        </div>
+      ) : (
         <>
           <ProfileBanner profile={data} />
           <hr />
         </>
       )}
 
-      {authorFeedStatus === "success" && (
+      {authorFeedStatus === "pending" ? (
+        <LoadingFallback />
+      ) : authorFeedStatus === "error" ? (
+        <div>
+          <ErrorBoundaryPage
+            error={authorFeedError}
+            onReset={authorFeedRefetch}
+          />
+        </div>
+      ) : (
         <>
           <FeedList feeds={authorFeed} />
           <InfiniteScrollTrigger

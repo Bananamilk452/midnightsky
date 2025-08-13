@@ -7,6 +7,10 @@ import { twMerge } from "tailwind-merge";
 
 import type { ClassValue } from "clsx";
 
+export type ActionResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -35,4 +39,17 @@ export function parseAtUri(uri: string) {
 
 export function formatNumber(num: number) {
   return new Intl.NumberFormat("ko-KR").format(num);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function serverActionErrorHandler<T, P extends any[]>(
+  action: (...args: P) => Promise<ActionResult<T>>,
+) {
+  return async (args: P) => {
+    const result = await action(...args);
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+    return result.data;
+  };
 }

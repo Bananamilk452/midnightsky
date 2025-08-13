@@ -70,7 +70,7 @@ export function Writer({
   }
 
   const { data: listsData, status: listsStatus } = useMyLists();
-  const { mutate, status } = useCreatePost();
+  const { mutate: createPost, status } = useCreatePost();
   const form = useForm<CreatePostParams>({
     resolver: zodResolver(CreatePostSchema),
     defaultValues: {
@@ -100,7 +100,7 @@ export function Writer({
         ? { ...data, listId: data.listId, reply }
         : { ...data, reply };
 
-    mutate(body, {
+    createPost([body], {
       onSuccess: (data) => {
         handleModalClose(false);
         editorRef.current?.plugins.autosave.removeDraft(false);
