@@ -2,6 +2,9 @@ import { AppBskyActorDefs, AppBskyFeedPost, RichText } from "@atproto/api";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
+import { getAgent } from "@/lib/bluesky/action";
+import { getSession } from "@/lib/session";
+
 export type User = {
   did: string;
   handle: string;
@@ -76,4 +79,47 @@ export function addReadArticleFacets(rt: RichText, link: string) {
   });
 
   return rt;
+}
+
+export async function createRecord({
+  collection,
+  cid,
+  uri,
+}: {
+  collection: string;
+  cid: string;
+  uri: string;
+}) {
+  const session = await getSession();
+  const agent = await getAgent(session.user.did);
+
+  return await agent.com.atproto.repo.createRecord({
+    collection,
+    record: {
+      $type: collection,
+      createdAt: new Date().toISOString(),
+      subject: {
+        cid,
+        uri,
+      },
+    },
+    repo: session.user.did,
+  });
+}
+
+export async function deleteRecord({
+  collection,
+  rkey,
+}: {
+  collection: string;
+  rkey: string;
+}) {
+  const session = await getSession();
+  const agent = await getAgent(session.user.did);
+
+  return await agent.com.atproto.repo.deleteRecord({
+    collection,
+    repo: session.user.did,
+    rkey,
+  });
 }
