@@ -101,15 +101,31 @@ export async function getPostThread(
   }
 }
 
-export async function getPublicPost(id: string) {
+export async function getPublicPost(
+  id: string,
+): Promise<ActionResult<PublicPost>> {
+  try {
   await getSession();
 
   const post = await getPublicPostById(id);
 
-  return post;
+    return {
+      success: true,
+      data: post,
+    };
+  } catch (error) {
+    console.error("Error fetching public post:", error);
+    return { success: false, error: "게시물 조회에 실패했습니다." };
+}
 }
 
-export async function getPrivatePost(id: string) {
+type GetPrivatePostReturnType =
+  | (Awaited<ReturnType<typeof getPrivatePostById>> & { isViewable: true })
+  | { isViewable: false };
+export async function getPrivatePost(
+  id: string,
+): Promise<ActionResult<GetPrivatePostReturnType>> {
+  try {
   const session = await getSession();
 
   const post = await getPrivatePostById(id);
@@ -118,10 +134,22 @@ export async function getPrivatePost(id: string) {
     (await isFollowingEachOther(session.user.did, post.authorDid)) ||
     post.authorDid === session.user.did;
 
-  return isViewable ? { ...post, isViewable } : { isViewable };
+    return isViewable
+      ? { success: true, data: { ...post, isViewable } }
+      : { success: true, data: { isViewable } };
+  } catch (error) {
+    console.error("Error fetching private post:", error);
+    return { success: false, error: "게시물 조회에 실패했습니다." };
+  }
 }
 
-export async function getListPost(id: string) {
+type GetListPostReturnType =
+  | (Awaited<ReturnType<typeof getListPostById>> & { isViewable: true })
+  | { isViewable: false };
+export async function getListPost(
+  id: string,
+): Promise<ActionResult<GetListPostReturnType>> {
+  try {
   await getSession();
 
   const post = await getListPostById(id);
@@ -130,7 +158,13 @@ export async function getListPost(id: string) {
     `at://${post.authorDid}/app.bsky.feed.post/${post.rkey}`,
   ));
 
-  return isViewable ? { ...post, isViewable } : { isViewable };
+    return isViewable
+      ? { success: true, data: { ...post, isViewable } }
+      : { success: true, data: { isViewable } };
+  } catch (error) {
+    console.error("Error fetching list post:", error);
+    return { success: false, error: "게시물 조회에 실패했습니다." };
+  }
 }
 
 export async function getTimeline(

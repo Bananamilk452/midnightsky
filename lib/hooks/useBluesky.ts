@@ -102,21 +102,21 @@ export function useCreatePost() {
 export function usePublicPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["publicPost", id],
-    queryFn: () => getPublicPost(id),
+    queryFn: () => serverActionErrorHandler(getPublicPost)([id]),
   });
 }
 
 export function usePrivatePost(id: string) {
   return useSuspenseQuery({
     queryKey: ["privatePost", id],
-    queryFn: () => getPrivatePost(id),
+    queryFn: () => serverActionErrorHandler(getPrivatePost)([id]),
   });
 }
 
 export function useListPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["listPost", id],
-    queryFn: () => getListPost(id),
+    queryFn: () => serverActionErrorHandler(getListPost)([id]),
   });
 }
 
