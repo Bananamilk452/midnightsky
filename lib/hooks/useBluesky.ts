@@ -79,7 +79,7 @@ export function useAuthorFeed(params: {
 export function usePostThread(authority: string, rkey: string) {
   return useQuery({
     queryKey: ["postThread", authority, rkey],
-    queryFn: () => getPostThread(authority, rkey),
+    queryFn: () => serverActionErrorHandler(getPostThread)([authority, rkey]),
   });
 }
 

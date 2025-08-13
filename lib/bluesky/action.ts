@@ -2,6 +2,7 @@
 
 import { Agent, RichText } from "@atproto/api";
 import { OutputSchema as getAuthorFeedData } from "@atproto/api/dist/client/types/app/bsky/feed/getAuthorFeed";
+import { OutputSchema as getPostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as getTimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
 import {
   isNotFoundActor,
@@ -75,15 +76,26 @@ export async function getSessionAgent() {
   return agent;
 }
 
-export async function getPostThread(authority: string, rkey: string) {
-  const agent = await getSessionAgent();
+export async function getPostThread(
+  authority: string,
+  rkey: string,
+): Promise<ActionResult<getPostThreadData>> {
+  try {
+    const agent = await getSessionAgent();
 
-  const res = await agent.getPostThread({
-    uri: `at://${authority}/app.bsky.feed.post/${rkey}`,
-    depth: 100,
-  });
+    const response = await agent.getPostThread({
+      uri: `at://${authority}/app.bsky.feed.post/${rkey}`,
+      depth: 100,
+    });
 
-  return jsonify(res.data);
+    return {
+      success: true,
+      data: jsonify(response.data),
+    };
+  } catch (error) {
+    console.error("Error fetching post thread:", error);
+    return { success: false, error: "게시물 스레드 조회에 실패했습니다." };
+  }
 }
 
 export async function getPublicPost(id: string) {
