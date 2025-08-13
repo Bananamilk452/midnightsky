@@ -15,14 +15,23 @@ import {
   getProfile,
   getPublicPost,
   getTimeline,
+  signInWithBluesky,
 } from "@/lib/bluesky/action";
 import { getSession } from "@/lib/session";
+
+import { serverActionErrorHandler } from "../utils";
 
 export function useSession() {
   return useQuery({
     queryKey: ["session"],
     queryFn: getSession,
     select: (session) => session.user,
+  });
+}
+
+export function useSignIn() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(signInWithBluesky),
   });
 }
 

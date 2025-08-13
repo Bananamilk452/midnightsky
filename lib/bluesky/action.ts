@@ -25,19 +25,27 @@ import {
   getPublicPostById,
 } from "@/lib/post/service";
 import { getOptionalSession, getSession } from "@/lib/session";
-import { parseAtUri } from "@/lib/utils";
+import { ActionResult, parseAtUri } from "@/lib/utils";
 import { ApiError, jsonify } from "@/lib/utils.server";
 
-export async function signInWithBluesky(handle: string, redirectTo?: string) {
-  const url = await blueskyClient.authorize(handle.trim(), {
-    prompt: "none",
-    state: JSON.stringify({
-      handle,
-      redirectTo,
-    }),
-  });
+export async function signInWithBluesky(
+  handle: string,
+  redirectTo?: string,
+): Promise<ActionResult<string>> {
+  try {
+    const url = await blueskyClient.authorize(handle.trim(), {
+      prompt: "none",
+      state: JSON.stringify({
+        handle,
+        redirectTo,
+      }),
+    });
 
-  return url.toString();
+    return { success: true, data: url.toString() };
+  } catch (error) {
+    console.error("Error signing in:", error);
+    return { success: false, error: "로그인 요청에 실패하였습니다." };
+  }
 }
 
 export async function signOut(): Promise<void> {
