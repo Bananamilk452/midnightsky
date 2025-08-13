@@ -21,11 +21,13 @@ import {
   getRelationship,
 } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
+import { createRecord, deleteRecord } from "@/lib/bluesky/utils";
 import { ListPost, PrivatePost, PublicPost } from "@/lib/generated/prisma";
 import {
   createListPostRecord,
   createPrivatePostRecord,
   createPublicPostRecord,
+  deletePostById,
   getListPostById,
   getPostByRkey,
   getPrivatePostById,
@@ -392,5 +394,125 @@ export async function getMyLists(): Promise<ActionResult<getListsData>> {
       success: false,
       error: "리스트 조회에 실패했습니다.",
     };
+  }
+}
+
+export async function repostPost({
+  cid,
+  uri,
+}: {
+  cid: string;
+  uri: string;
+}): Promise<ActionResult<void>> {
+  try {
+    const response = await createRecord({
+      collection: "app.bsky.feed.repost",
+      cid,
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "게시물 리포스트에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error reposting post:", error);
+    return { success: false, error: "게시물 리포스트에 실패했습니다." };
+  }
+}
+
+export async function unrepostPost(uri: string): Promise<ActionResult<void>> {
+  try {
+    const { rkey } = parseAtUri(uri);
+
+    const response = await deleteRecord({
+      collection: "app.bsky.feed.repost",
+      rkey,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "게시물 리포스트 취소에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error unreposting post:", error);
+    return { success: false, error: "게시물 리포스트 취소에 실패했습니다." };
+  }
+}
+
+export async function likePost({
+  cid,
+  uri,
+}: {
+  cid: string;
+  uri: string;
+}): Promise<ActionResult<void>> {
+  try {
+    const response = await createRecord({
+      collection: "app.bsky.feed.like",
+      cid,
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "게시물 좋아요에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error liking post:", error);
+    return { success: false, error: "게시물 좋아요에 실패했습니다." };
+  }
+}
+
+export async function unlikePost(uri: string): Promise<ActionResult<void>> {
+  try {
+    const { rkey } = parseAtUri(uri);
+
+    const response = await deleteRecord({
+      collection: "app.bsky.feed.like",
+      rkey,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "게시물 좋아요 취소에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error liking post:", error);
+    return { success: false, error: "게시물 좋아요 취소에 실패했습니다." };
+  }
+}
+
+export async function deletePost({
+  uri,
+  post,
+}: {
+  uri: string;
+  post?: { postId: string; type: string };
+}): Promise<ActionResult<void>> {
+  try {
+    const { rkey } = parseAtUri(uri);
+
+    const response = await deleteRecord({
+      collection: "app.bsky.feed.post",
+      rkey,
+    });
+
+    if (post) {
+      await deletePostById(post.type, post.postId);
+    }
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "게시물 삭제에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return { success: false, error: "게시물 삭제에 실패했습니다." };
   }
 }

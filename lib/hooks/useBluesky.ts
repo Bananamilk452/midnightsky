@@ -7,6 +7,7 @@ import {
 
 import {
   createPost,
+  deletePost,
   getAuthorFeed,
   getListPost,
   getMyLists,
@@ -15,7 +16,11 @@ import {
   getProfile,
   getPublicPost,
   getTimeline,
+  likePost,
+  repostPost,
   signInWithBluesky,
+  unlikePost,
+  unrepostPost,
 } from "@/lib/bluesky/action";
 import { getSession } from "@/lib/session";
 
@@ -124,5 +129,35 @@ export function useProfile(actor: string) {
   return useQuery({
     queryKey: ["profile", actor],
     queryFn: () => serverActionErrorHandler(getProfile)([actor]),
+  });
+}
+
+export function useRepost() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(repostPost),
+  });
+}
+
+export function useUnrepost() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(unrepostPost),
+  });
+}
+
+export function useLike() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(likePost),
+  });
+}
+
+export function useUnlike() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(unlikePost),
+  });
+}
+
+export function useDeletePost() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(deletePost),
   });
 }
