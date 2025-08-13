@@ -86,7 +86,7 @@ export function usePostThread(authority: string, rkey: string) {
 export function useMyLists() {
   return useQuery({
     queryKey: ["lists"],
-    queryFn: async () => getMyLists(),
+    queryFn: async () => serverActionErrorHandler(getMyLists)([]),
   });
 }
 

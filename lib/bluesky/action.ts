@@ -8,6 +8,7 @@ import {
   isNotFoundActor,
   isRelationship,
 } from "@atproto/api/dist/client/types/app/bsky/graph/defs";
+import { OutputSchema as getListsData } from "@atproto/api/dist/client/types/app/bsky/graph/getLists";
 import { TID } from "@atproto/common";
 import { redirect } from "next/navigation";
 
@@ -296,17 +297,28 @@ export async function isFollowingEachOther(did1: string, did2: string) {
   }
 }
 
-export async function getMyLists() {
-  const session = await getSession();
-  const agent = await getAgent(session.user.did);
+export async function getMyLists(): Promise<ActionResult<getListsData>> {
+  try {
+    const session = await getSession();
+    const agent = await getAgent(session.user.did);
 
-  const response = await agent.app.bsky.graph.getLists({
-    actor: session.user.did,
-  });
+    const response = await agent.app.bsky.graph.getLists({
+      actor: session.user.did,
+    });
 
-  if (response.success) {
-    return jsonify(response.data);
-  } else {
-    throw new ApiError("Failed to fetch lists", 500);
+    if (response.success) {
+      return {
+        success: true,
+        data: jsonify(response.data),
+      };
+    } else {
+      throw new Error("리스트 조회에 실패했습니다.");
+    }
+  } catch (error) {
+    console.error("Error fetching lists:", error);
+    return {
+      success: false,
+      error: "리스트 조회에 실패했습니다.",
+    };
   }
 }
