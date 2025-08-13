@@ -92,7 +92,7 @@ export function useMyLists() {
 
 export function useCreatePost() {
   return useMutation({
-    mutationFn: createPost,
+    mutationFn: serverActionErrorHandler(createPost),
     onError: (error) => {
       console.error("Error creating post:", error);
     },

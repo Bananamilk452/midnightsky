@@ -9,6 +9,7 @@ import {
   isRelationship,
 } from "@atproto/api/dist/client/types/app/bsky/graph/defs";
 import { OutputSchema as getListsData } from "@atproto/api/dist/client/types/app/bsky/graph/getLists";
+import { Response as ApplyWritesData } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 import { TID } from "@atproto/common";
 import { redirect } from "next/navigation";
 
@@ -19,6 +20,7 @@ import {
   getRelationship,
 } from "@/lib/bluesky/service";
 import { CreatePostParams } from "@/lib/bluesky/types";
+import { ListPost, PrivatePost, PublicPost } from "@/lib/generated/prisma";
 import {
   createListPostRecord,
   createPrivatePostRecord,
@@ -235,50 +237,71 @@ async function resolveReplyParams(uri: string, params: CreatePostParams) {
   return newParams;
 }
 
-export async function createPost(params: CreatePostParams) {
-  await getSession();
+interface CreatedPost {
+  post: PublicPost | PrivatePost | ListPost;
+  blueskyPost: ApplyWritesData;
+}
 
-  const rkey = TID.nextStr();
+export async function createPost(
+  params: CreatePostParams,
+): Promise<ActionResult<CreatedPost>> {
+  try {
+    await getSession();
 
-  let post: Awaited<
-    ReturnType<
-      | typeof createPublicPostRecord
-      | typeof createPrivatePostRecord
-      | typeof createListPostRecord
-    >
-  >;
+    const rkey = TID.nextStr();
 
-  let resolvedParams: CreatePostParams = params;
+    let post: Awaited<
+      ReturnType<
+        | typeof createPublicPostRecord
+        | typeof createPrivatePostRecord
+        | typeof createListPostRecord
+      >
+    >;
 
-  // Reply 객체에 parent가 있으면 해당 Post의 type, listId를 inherit
-  if (params.type === "reply") {
-    if (!params.reply || !params.reply.parent) {
-      throw new ApiError("Reply parent is required", 400);
+    let resolvedParams: CreatePostParams = params;
+
+    // Reply 객체에 parent가 있으면 해당 Post의 type, listId를 inherit
+    if (params.type === "reply") {
+      if (!params.reply || !params.reply.parent) {
+        throw new ApiError("Reply parent is required", 400);
+      }
+
+      resolvedParams = await resolveReplyParams(
+        params.reply.parent.uri,
+        params,
+      );
     }
 
-    resolvedParams = await resolveReplyParams(params.reply.parent.uri, params);
+    if (resolvedParams.type === "public") {
+      post = await createPublicPostRecord(rkey, resolvedParams);
+    } else if (resolvedParams.type === "private") {
+      post = await createPrivatePostRecord(rkey, resolvedParams);
+    } else if (resolvedParams.type === "list") {
+      post = await createListPostRecord(rkey, resolvedParams);
+    } else {
+      throw new ApiError("Invalid post type", 400);
+    }
+
+    const blueskyPost = await applyWrites(post.id, rkey, resolvedParams);
+
+    if (Object.keys(blueskyPost).length === 0) {
+      throw new Error("Failed to create post");
+    }
+
+    return {
+      success: true,
+      data: {
+        post,
+        blueskyPost: jsonify(blueskyPost),
+      },
+    };
+  } catch (error) {
+    console.error("Error creating post:", error);
+    return {
+      success: false,
+      error: "게시물 생성에 실패했습니다.",
+    };
   }
-
-  if (resolvedParams.type === "public") {
-    post = await createPublicPostRecord(rkey, resolvedParams);
-  } else if (resolvedParams.type === "private") {
-    post = await createPrivatePostRecord(rkey, resolvedParams);
-  } else if (resolvedParams.type === "list") {
-    post = await createListPostRecord(rkey, resolvedParams);
-  } else {
-    throw new ApiError("Invalid post type", 400);
-  }
-
-  const blueskyPost = await applyWrites(post.id, rkey, resolvedParams);
-
-  if (Object.keys(blueskyPost).length === 0) {
-    throw new Error("Failed to create post");
-  }
-
-  return {
-    post,
-    blueskyPost: jsonify(blueskyPost),
-  };
 }
 
 export async function isFollowingEachOther(did1: string, did2: string) {
