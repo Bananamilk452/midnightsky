@@ -1,6 +1,7 @@
 "use server";
 
 import { Agent, RichText } from "@atproto/api";
+import { OutputSchema as getTimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
 import {
   isNotFoundActor,
   isRelationship,
@@ -116,15 +117,26 @@ export async function getListPost(id: string) {
   return isViewable ? { ...post, isViewable } : { isViewable };
 }
 
-export async function getTimeline(limit: number = 30, cursor?: string) {
-  const agent = await getSessionAgent();
+export async function getTimeline(
+  limit: number = 30,
+  cursor?: string,
+): Promise<ActionResult<getTimelineData>> {
+  try {
+    const agent = await getSessionAgent();
 
-  const response = await agent.getTimeline({
-    limit,
-    cursor,
-  });
+    const response = await agent.getTimeline({
+      limit,
+      cursor,
+    });
 
-  return jsonify(response.data);
+    return {
+      success: true,
+      data: jsonify(response.data),
+    };
+  } catch (error) {
+    console.error("Error fetching timeline:", error);
+    return { success: false, error: "타임라인 조회에 실패했습니다." };
+  }
 }
 
 export async function getProfile(actor: string) {

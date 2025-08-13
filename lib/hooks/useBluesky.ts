@@ -46,7 +46,7 @@ export function useTimeline({
     queryKey: ["timeline", limit, cursor],
     queryFn: async ({ pageParam }) => {
       const { limit, cursor } = pageParam || {};
-      return getTimeline(limit, cursor);
+      return serverActionErrorHandler(getTimeline)([limit, cursor]);
     },
     initialPageParam: { limit, cursor },
     getNextPageParam: (lastPage) => ({
