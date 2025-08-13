@@ -66,7 +66,7 @@ export function useAuthorFeed(params: {
   return useInfiniteQuery({
     queryKey: ["authorFeed", params.actor, params.limit, params.cursor],
     queryFn: async ({ pageParam }) => {
-      return getAuthorFeed(pageParam);
+      return serverActionErrorHandler(getAuthorFeed)([pageParam]);
     },
     initialPageParam: params,
     getNextPageParam: (lastPage) => ({

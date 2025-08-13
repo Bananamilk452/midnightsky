@@ -1,6 +1,7 @@
 "use server";
 
 import { Agent, RichText } from "@atproto/api";
+import { OutputSchema as getAuthorFeedData } from "@atproto/api/dist/client/types/app/bsky/feed/getAuthorFeed";
 import { OutputSchema as getTimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
 import {
   isNotFoundActor,
@@ -170,18 +171,26 @@ export async function getAuthorFeed({
   actor: string;
   filter?: string;
   includePins?: boolean;
-}) {
-  const agent = await getSessionAgent();
+}): Promise<ActionResult<getAuthorFeedData>> {
+  try {
+    const agent = await getSessionAgent();
 
-  const response = await agent.getAuthorFeed({
-    limit,
-    cursor,
-    actor,
-    filter,
-    includePins,
-  });
+    const response = await agent.getAuthorFeed({
+      limit,
+      cursor,
+      actor,
+      filter,
+      includePins,
+    });
 
-  return jsonify(response.data);
+    return {
+      success: true,
+      data: jsonify(response.data),
+    };
+  } catch (error) {
+    console.error("Error fetching author feed:", error);
+    return { success: false, error: "작성자 피드 조회에 실패했습니다." };
+  }
 }
 
 async function resolveReplyParams(uri: string, params: CreatePostParams) {
