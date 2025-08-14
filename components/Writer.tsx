@@ -100,7 +100,7 @@ export function Writer({
         ? { ...data, listId: data.listId, reply }
         : { ...data, reply };
 
-    createPost([body], {
+    createPost(body, {
       onSuccess: (data) => {
         handleModalClose(false);
         editorRef.current?.plugins.autosave.removeDraft(false);

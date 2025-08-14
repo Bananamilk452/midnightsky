@@ -45,7 +45,7 @@ export function formatNumber(num: number) {
 export function serverActionErrorHandler<T, P extends any[]>(
   action: (...args: P) => Promise<ActionResult<T>>,
 ) {
-  return async (args: P) => {
+  return async (...args: P) => {
     const result = await action(...args);
     if (!result.success) {
       throw new Error(result.error);

@@ -36,7 +36,13 @@ export function useSession() {
 
 export function useSignIn() {
   return useMutation({
-    mutationFn: serverActionErrorHandler(signInWithBluesky),
+    mutationFn: ({
+      handle,
+      redirectTo,
+    }: {
+      handle: string;
+      redirectTo: string;
+    }) => serverActionErrorHandler(signInWithBluesky)(handle, redirectTo),
   });
 }
 
@@ -51,7 +57,7 @@ export function useTimeline({
     queryKey: ["timeline", limit, cursor],
     queryFn: async ({ pageParam }) => {
       const { limit, cursor } = pageParam || {};
-      return serverActionErrorHandler(getTimeline)([limit, cursor]);
+      return serverActionErrorHandler(getTimeline)(limit, cursor);
     },
     initialPageParam: { limit, cursor },
     getNextPageParam: (lastPage) => ({
@@ -71,7 +77,7 @@ export function useAuthorFeed(params: {
   return useInfiniteQuery({
     queryKey: ["authorFeed", params.actor, params.limit, params.cursor],
     queryFn: async ({ pageParam }) => {
-      return serverActionErrorHandler(getAuthorFeed)([pageParam]);
+      return serverActionErrorHandler(getAuthorFeed)(pageParam);
     },
     initialPageParam: params,
     getNextPageParam: (lastPage) => ({
@@ -84,14 +90,14 @@ export function useAuthorFeed(params: {
 export function usePostThread(authority: string, rkey: string) {
   return useQuery({
     queryKey: ["postThread", authority, rkey],
-    queryFn: () => serverActionErrorHandler(getPostThread)([authority, rkey]),
+    queryFn: () => serverActionErrorHandler(getPostThread)(authority, rkey),
   });
 }
 
 export function useMyLists() {
   return useQuery({
     queryKey: ["lists"],
-    queryFn: async () => serverActionErrorHandler(getMyLists)([]),
+    queryFn: async () => serverActionErrorHandler(getMyLists)(),
   });
 }
 
@@ -107,28 +113,28 @@ export function useCreatePost() {
 export function usePublicPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["publicPost", id],
-    queryFn: () => serverActionErrorHandler(getPublicPost)([id]),
+    queryFn: () => serverActionErrorHandler(getPublicPost)(id),
   });
 }
 
 export function usePrivatePost(id: string) {
   return useSuspenseQuery({
     queryKey: ["privatePost", id],
-    queryFn: () => serverActionErrorHandler(getPrivatePost)([id]),
+    queryFn: () => serverActionErrorHandler(getPrivatePost)(id),
   });
 }
 
 export function useListPost(id: string) {
   return useSuspenseQuery({
     queryKey: ["listPost", id],
-    queryFn: () => serverActionErrorHandler(getListPost)([id]),
+    queryFn: () => serverActionErrorHandler(getListPost)(id),
   });
 }
 
 export function useProfile(actor: string) {
   return useQuery({
     queryKey: ["profile", actor],
-    queryFn: () => serverActionErrorHandler(getProfile)([actor]),
+    queryFn: () => serverActionErrorHandler(getProfile)(actor),
   });
 }
 
