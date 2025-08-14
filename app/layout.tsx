@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import Script from "next/script";
+
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -33,6 +35,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-linear-to-br from-violet-600 from-50% to-indigo-950 antialiased">
+        <Script
+          defer
+          data-domain="midnightsky.app"
+          src="https://plausible.junsu.io/js/script.js"
+          strategy="beforeInteractive"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
