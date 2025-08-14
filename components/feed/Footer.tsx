@@ -257,12 +257,8 @@ function MenuButton({ post }: { post: PostView }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger disabled={user?.did !== post.author.did}>
-        <FeedFooterButton
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+      <DropdownMenuTrigger asChild disabled={user?.did !== post.author.did}>
+        <FeedFooterButton>
           <EllipsisIcon className="size-4" />
         </FeedFooterButton>
       </DropdownMenuTrigger>
@@ -279,24 +275,17 @@ function MenuButton({ post }: { post: PostView }) {
 }
 
 export function FeedFooterButton({
-  children,
   className = "",
-  disabled,
-  onClick,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  disabled?: boolean;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}) {
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      disabled={disabled}
-      onClick={onClick}
       className={cn(
         "flex items-center gap-1.5 rounded-full p-1 text-gray-400 hover:cursor-pointer hover:bg-white/10 disabled:cursor-auto disabled:text-gray-500",
         className,
       )}
+      {...props}
     >
       {children}
     </button>
