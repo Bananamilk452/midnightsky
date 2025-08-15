@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -97,7 +98,8 @@ function SignInForm() {
     <div>
       <Card className="mx-auto w-fit border bg-white/10 shadow-md backdrop-blur-md">
         <CardHeader>
-          <CardTitle>MidnightSky✨ 로그인</CardTitle>
+          <CardTitle>MidnightSky✨</CardTitle>
+          <CardDescription>Bluesky 공개글/비밀글 플랫폼</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
