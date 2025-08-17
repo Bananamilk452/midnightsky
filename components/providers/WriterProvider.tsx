@@ -29,6 +29,9 @@ export const WriterProvider: React.FC<WriterProviderProps> = ({ children }) => {
     if (params) {
       setReply(params.reply);
       setHideTypeSelect(params.hideTypeSelect);
+    } else {
+      setReply(undefined);
+      setHideTypeSelect(false);
     }
     setIsOpen(true);
   };

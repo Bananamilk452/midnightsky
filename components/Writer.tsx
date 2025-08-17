@@ -218,14 +218,16 @@ export function Writer({
                                 맞팔만 공개
                               </FormLabel>
                             </FormItem>
-                            <FormItem className="flex items-center">
-                              <FormControl>
-                                <RadioGroupItem value="list" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                리스트
-                              </FormLabel>
-                            </FormItem>
+                            {!(!hideTypeSelect && reply) && (
+                              <FormItem className="flex items-center">
+                                <FormControl>
+                                  <RadioGroupItem value="list" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  리스트
+                                </FormLabel>
+                              </FormItem>
+                            )}
                           </RadioGroup>
                         </FormControl>
                       </FormItem>
