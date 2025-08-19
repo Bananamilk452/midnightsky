@@ -23,8 +23,7 @@ import {
   unrepostPost,
 } from "@/lib/bluesky/action";
 import { getSession } from "@/lib/session";
-
-import { serverActionErrorHandler } from "../utils";
+import { serverActionErrorHandler } from "@/lib/utils";
 
 export function useSession() {
   return useQuery({

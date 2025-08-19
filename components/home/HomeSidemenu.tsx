@@ -1,16 +1,13 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { HomeSidemenuClient } from "@/components/home/HomeSidemenuClient";
+import { getQueryClient } from "@/lib/getQueryClient";
 import { getSession } from "@/lib/session";
 
 export async function HomeSidemenu() {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ["session"],
     queryFn: getSession,
   });
