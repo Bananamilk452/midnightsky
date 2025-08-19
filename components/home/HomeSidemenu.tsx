@@ -7,14 +7,11 @@ import { getSession } from "@/lib/session";
 export async function HomeSidemenu() {
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["session"],
-    queryFn: getSession,
-  });
+  const session = await getSession();
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <HomeSidemenuClient />
+      <HomeSidemenuClient user={session.user} />
     </HydrationBoundary>
   );
 }

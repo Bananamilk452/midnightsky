@@ -13,15 +13,12 @@ import { useWriter } from "@/components/providers/WriterProvider";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/bluesky/action";
 import { User } from "@/lib/bluesky/utils";
-import { useSessionSuspense } from "@/lib/hooks/useBluesky";
 import { cn } from "@/lib/utils";
 
-export function HomeSidemenuClient() {
+export function HomeSidemenuClient({ user }: { user: User }) {
   const router = useRouter();
   const pathname = usePathname();
   const { openWriter } = useWriter();
-
-  const { data: user } = useSessionSuspense();
 
   return (
     <div

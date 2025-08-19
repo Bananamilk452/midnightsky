@@ -33,14 +33,6 @@ export function useSession() {
   });
 }
 
-export function useSessionSuspense() {
-  return useSuspenseQuery({
-    queryKey: ["session"],
-    queryFn: getSession,
-    select: (session) => session.user,
-  });
-}
-
 export function useSignIn() {
   return useMutation({
     mutationFn: ({
