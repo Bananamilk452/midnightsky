@@ -57,7 +57,7 @@ function SignInForm() {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { mutate: signIn } = useSignIn();
+  const { mutate: signIn, status } = useSignIn();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,6 +93,9 @@ function SignInForm() {
       },
     );
   }
+
+  const isLoading =
+    form.formState.isSubmitting || status === "pending" || isPending;
 
   return (
     <div>
@@ -144,12 +147,10 @@ function SignInForm() {
             <Button
               className="w-full"
               onClick={form.handleSubmit(onSubmit)}
-              disabled={form.formState.isSubmitting || isPending}
+              disabled={isLoading}
             >
               로그인
-              {(form.formState.isSubmitting || isPending) && (
-                <Spinner className="size-4" />
-              )}
+              {isLoading && <Spinner className="size-4" />}
             </Button>
           </div>
         </CardFooter>
