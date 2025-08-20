@@ -1,6 +1,5 @@
 "use client";
 
-import { ReplyRef } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Editor } from "@tinymce/tinymce-react";
@@ -11,6 +10,7 @@ import { toast } from "sonner";
 import { Editor as TinyMCEEditor } from "tinymce";
 import { z } from "zod";
 
+import { OpenWriterParams } from "@/components/providers/WriterProvider";
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,13 +48,12 @@ export function Writer({
   setOpen,
   reply,
   hideTypeSelect,
+  listRule,
 }: {
   id?: string;
   open: boolean;
   setOpen: (value: boolean) => void;
-  reply?: ReplyRef;
-  hideTypeSelect?: boolean;
-}) {
+} & OpenWriterParams) {
   const router = useRouter();
   const editorRef = useRef<TinyMCEEditor>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -83,12 +82,19 @@ export function Writer({
 
   useEffect(() => {
     if (hideTypeSelect) {
+      // 서버에서 자동 inherit 되게 타입을 reply로
       form.setValue("type", "reply");
     }
+
     if (reply) {
       form.setValue("reply", reply);
     }
-  }, [hideTypeSelect, reply, form]);
+
+    if (listRule) {
+      form.setValue("type", "list");
+      form.setValue("listId", listRule.list);
+    }
+  }, [hideTypeSelect, reply, form, listRule]);
 
   const blueskyContent = form.watch("blueskyContent");
 
@@ -130,6 +136,9 @@ export function Writer({
 
     reader.readAsDataURL(image);
   }
+
+  // 답글이 있을 경우엔 제외 (리스트 글은 내가 처음 쓴 글이어야 가능)
+  const hideListType = reply ? true : false;
 
   return (
     <Dialog open={open} onOpenChange={handleModalClose}>
@@ -218,7 +227,7 @@ export function Writer({
                                 맞팔만 공개
                               </FormLabel>
                             </FormItem>
-                            {!(!hideTypeSelect && reply) && (
+                            {!hideListType && (
                               <FormItem className="flex items-center">
                                 <FormControl>
                                   <RadioGroupItem value="list" />

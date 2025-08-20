@@ -1,6 +1,10 @@
 "use client";
 
-import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import {
+  PostView,
+  ThreadgateView,
+} from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import { isListRule } from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import {
   EllipsisIcon,
   HeartIcon,
@@ -22,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { validateRecord } from "@/lib/bluesky/utils";
+import { getValidThreadgateRecord, validateRecord } from "@/lib/bluesky/utils";
 import {
   useDeletePost,
   useLike,
@@ -36,15 +40,17 @@ import { cn, parseAtUri } from "@/lib/utils";
 
 export function FeedFooter({
   post,
+  threadgate,
   className,
 }: {
   post: PostView;
+  threadgate?: ThreadgateView;
   className?: string;
 }) {
   return (
     <>
       <div className={cn("flex items-center justify-between", className)}>
-        <MentionButton post={post} />
+        <MentionButton post={post} threadgate={threadgate} />
         <RepostButton post={post} />
         <LikeButton post={post} />
         <ShareButton post={post} />
@@ -54,12 +60,21 @@ export function FeedFooter({
   );
 }
 
-function MentionButton({ post }: { post: PostView }) {
+function MentionButton({
+  post,
+  threadgate,
+}: {
+  post: PostView;
+  threadgate?: ThreadgateView;
+}) {
   const { openWriter } = useWriter();
   const record = validateRecord(post.record);
   const embed = record?.embed;
 
-  const hideTypeSelect = embed?.$type === "app.midnightsky.post";
+  const threadgateRecord = getValidThreadgateRecord(threadgate?.record);
+  const listRule = threadgateRecord?.allow?.find((x) => isListRule(x));
+  const hideTypeSelect =
+    embed?.$type === "app.midnightsky.post" || Boolean(listRule);
 
   function handleWriterOpen(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
@@ -73,6 +88,7 @@ function MentionButton({ post }: { post: PostView }) {
           },
         },
         hideTypeSelect,
+        listRule,
       });
     } else {
       openWriter({
@@ -87,6 +103,7 @@ function MentionButton({ post }: { post: PostView }) {
           },
         },
         hideTypeSelect,
+        listRule,
       });
     }
   }

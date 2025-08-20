@@ -1,13 +1,15 @@
 "use client";
 
 import { ReplyRef } from "@atproto/api/dist/client/types/app/bsky/feed/post";
+import { ListRule } from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import React, { createContext, ReactNode, useContext } from "react";
 
 import { Writer } from "@/components/Writer";
 
-interface OpenWriterParams {
-  reply: ReplyRef;
+export interface OpenWriterParams {
+  reply?: ReplyRef;
   hideTypeSelect: boolean;
+  listRule?: ListRule;
 }
 
 interface WriterContextType {
@@ -24,14 +26,17 @@ export const WriterProvider: React.FC<WriterProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [reply, setReply] = React.useState<ReplyRef>();
   const [hideTypeSelect, setHideTypeSelect] = React.useState<boolean>(false);
+  const [listRule, setListRule] = React.useState<ListRule | undefined>();
 
   const openWriter = (params?: OpenWriterParams) => {
     if (params) {
       setReply(params.reply);
       setHideTypeSelect(params.hideTypeSelect);
+      setListRule(params.listRule);
     } else {
       setReply(undefined);
       setHideTypeSelect(false);
+      setListRule(undefined);
     }
     setIsOpen(true);
   };
@@ -44,6 +49,7 @@ export const WriterProvider: React.FC<WriterProviderProps> = ({ children }) => {
         setOpen={setIsOpen}
         reply={reply}
         hideTypeSelect={hideTypeSelect}
+        listRule={listRule}
       />
     </WriterContext.Provider>
   );
