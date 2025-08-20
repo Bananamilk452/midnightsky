@@ -1,4 +1,9 @@
 import { AppBskyActorDefs, AppBskyFeedPost, RichText } from "@atproto/api";
+import {
+  isRecord as isThreadgateRecord,
+  Record as ThreadgateRecord,
+  validateRecord as validateThreadgateRecord,
+} from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -122,4 +127,13 @@ export async function deleteRecord({
     repo: session.user.did,
     rkey,
   });
+}
+
+export function getValidThreadgateRecord(
+  record: unknown,
+): ThreadgateRecord | undefined {
+  if (isThreadgateRecord(record) && validateThreadgateRecord(record)) {
+    return record as ThreadgateRecord;
+  }
+  return undefined;
 }
