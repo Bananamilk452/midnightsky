@@ -5,6 +5,7 @@ import {
   isNotFoundPost,
   isThreadViewPost,
   PostView,
+  ThreadgateView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { format } from "date-fns";
@@ -21,7 +22,13 @@ import { validateRecord } from "@/lib/bluesky/utils";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
 import { parseAtUri } from "@/lib/utils";
 
-export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
+export function FeedThread({
+  thread,
+  threadgate,
+}: {
+  thread: PostThreadData["thread"];
+  threadgate?: ThreadgateView;
+}) {
   // 1. Not Found
   if (isNotFoundPost(thread)) {
     return <p>해당 게시글을 찾을 수 없습니다.</p>;
@@ -48,9 +55,12 @@ export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
 
     return (
       <>
-        {thread.parent && <FeedThreadParent reply={thread.parent} />}
+        {thread.parent && (
+          <FeedThreadParent reply={thread.parent} threadgate={threadgate} />
+        )}
         <FeedThreadRecord
           post={post}
+          threadgate={threadgate}
           line={{
             top: Boolean(thread.parent),
             bottom: false,
@@ -58,7 +68,7 @@ export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
         />
         {replies.map((reply, i) => (
           <div key={i}>
-            <FeedThreadReply reply={reply} />
+            <FeedThreadReply reply={reply} threadgate={threadgate} />
           </div>
         ))}
       </>
@@ -68,9 +78,11 @@ export function FeedThread({ thread }: { thread: PostThreadData["thread"] }) {
 
 function FeedThreadRecord({
   post,
+  threadgate,
   line,
 }: {
   post: PostView;
+  threadgate?: ThreadgateView;
   line?: { top?: boolean; bottom?: boolean };
 }) {
   const record = validateRecord(post.record);
@@ -101,7 +113,7 @@ function FeedThreadRecord({
             locale: ko,
           })}
         </p>
-        <FeedFooter post={post} className="mt-2" />
+        <FeedFooter post={post} threadgate={threadgate} className="mt-2" />
       </div>
     </div>
   );
@@ -109,9 +121,11 @@ function FeedThreadRecord({
 
 function FeedThreadReply({
   reply,
+  threadgate,
   depth = 1,
 }: {
   reply: PostThreadData["thread"];
+  threadgate?: ThreadgateView;
   depth?: number;
 }) {
   // 1. Not Found
@@ -138,6 +152,7 @@ function FeedThreadReply({
       <>
         <FeedRecord
           post={post}
+          threadgate={threadgate}
           className="last:border-b last:border-white/30 last:pb-2"
           line={{
             top: depth === 1 ? false : true,
@@ -152,7 +167,13 @@ function FeedThreadReply({
   }
 }
 
-function FeedThreadParent({ reply }: { reply: PostThreadData["thread"] }) {
+function FeedThreadParent({
+  reply,
+  threadgate,
+}: {
+  reply: PostThreadData["thread"];
+  threadgate?: ThreadgateView;
+}) {
   // 1. Not Found
   if (isNotFoundPost(reply)) {
     return <p>해당 게시글을 찾을 수 없습니다.</p>;
@@ -178,6 +199,7 @@ function FeedThreadParent({ reply }: { reply: PostThreadData["thread"] }) {
         {reply.parent && <FeedThreadParent reply={reply.parent} />}
         <FeedRecord
           post={post}
+          threadgate={threadgate}
           className="last:border-b last:border-white/30 last:pb-2"
           line={{
             top: Boolean(reply.parent),

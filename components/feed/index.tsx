@@ -7,6 +7,7 @@ import {
   isReasonPin,
   isReasonRepost,
   PostView,
+  ThreadgateView,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -55,15 +56,23 @@ export function Feed({ feed }: FeedProps) {
   const hasLongThread =
     hasReplyThread && hasMultipleReplies && parentReplyUri !== replyRoot?.uri;
 
+  const root = isPostView(feed.reply?.root) ? feed.reply.root : undefined;
+  const threadgate = root?.threadgate;
+
   return (
     <div className="flex flex-col border-b border-white/30">
       {hasMultipleReplies && replyRoot && (
-        <FeedRecord post={replyRoot} line={{ top: false, bottom: true }} />
+        <FeedRecord
+          post={replyRoot}
+          threadgate={threadgate}
+          line={{ top: false, bottom: true }}
+        />
       )}
       {hasLongThread && <FeedThreadEllipsis post={feed.post} />}
       {replyParent && (
         <FeedRecord
           post={replyParent}
+          threadgate={threadgate}
           line={
             hasMultipleReplies
               ? { top: true, bottom: true }
@@ -73,6 +82,7 @@ export function Feed({ feed }: FeedProps) {
       )}
       <FeedRecord
         post={post}
+        threadgate={threadgate}
         className="pb-2"
         line={
           replyParent
@@ -89,11 +99,13 @@ export function Feed({ feed }: FeedProps) {
 
 export function FeedRecord({
   post,
+  threadgate,
   line,
   children,
   className,
 }: {
   post: PostView;
+  threadgate: ThreadgateView | undefined;
   line?: { top: boolean; bottom: boolean };
   children?: React.ReactNode;
   className?: string;
@@ -173,7 +185,7 @@ export function FeedRecord({
               </div>
             )}
           </FeedLabel>
-          <FeedFooter post={post} />
+          <FeedFooter post={post} threadgate={threadgate} />
         </div>
       </div>
     </div>

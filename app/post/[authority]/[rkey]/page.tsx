@@ -45,7 +45,7 @@ export default function Page() {
     <ErrorBoundaryPage error={error} />
   ) : (
     <>
-      <FeedThread thread={data.thread} />
+      <FeedThread thread={data.thread} threadgate={data.threadgate} />
       {/* 여백 */}
       <div className="h-[calc(50dvh)] w-full" />
     </>
