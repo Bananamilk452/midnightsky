@@ -162,11 +162,12 @@ export function FeedRecord({
         <div className="flex w-full min-w-0 flex-col">
           <div>
             <Link
+              className="inline-block max-w-full"
               href={`/profile/${post.author.handle}`}
               onClick={(e) => e.stopPropagation()}
             >
               <FeedHeader
-                className="w-fit"
+                className="w-full"
                 post={post}
                 createdAt={record.createdAt}
               />
@@ -226,7 +227,11 @@ export function EmbedPost({
       className="mt-2 flex gap-2 rounded-lg border border-white/30 p-3"
     >
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <FeedHeader post={post} createdAt={value.createdAt} className="gap-0.5">
+        <FeedHeader
+          post={post}
+          createdAt={value.createdAt}
+          className="w-fit max-w-full gap-0.5"
+        >
           <FeedAvatar post={post} className="mr-1 size-4" />
         </FeedHeader>
         <FeedContent text={value.text} facets={value.facets} />
