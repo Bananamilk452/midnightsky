@@ -10,6 +10,7 @@ import {
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import Link from "next/link";
 
 import { FeedRecord } from "@/components/feed";
 import { FeedContent } from "@/components/feed/Content";
@@ -98,7 +99,12 @@ function FeedThreadRecord({
         {line?.top && <div className="h-full w-0.5 bg-gray-400" />}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-2">
-        <FeedThreadHeader post={post} />
+        <Link
+          className="inline-block w-fit max-w-full"
+          href={`/profile/${post.author.handle}`}
+        >
+          <FeedThreadHeader post={post} />
+        </Link>
         <FeedLabel labels={post.labels}>
           <FeedContent
             className="text-lg"

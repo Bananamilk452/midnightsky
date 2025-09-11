@@ -14,7 +14,7 @@ export function FeedThreadHeader({
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <FeedAvatar post={post} />
-      <div className="flex flex-col">
+      <div className="flex w-full min-w-0 flex-col">
         <h3 className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold">
           {post.author.displayName || post.author.handle}
         </h3>
