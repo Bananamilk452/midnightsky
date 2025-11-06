@@ -11,6 +11,7 @@ import {
   deleteBookmark,
   deletePost,
   getAuthorFeed,
+  getBookmarks,
   getListPost,
   getMyLists,
   getPostThread,
@@ -178,5 +179,26 @@ export function useCreateBookmark() {
 export function useDeleteBookmark() {
   return useMutation({
     mutationFn: serverActionErrorHandler(deleteBookmark),
+  });
+}
+
+export function useBookmarks({
+  limit = 30,
+  cursor,
+}: {
+  limit?: number;
+  cursor?: string;
+}) {
+  return useInfiniteQuery({
+    queryKey: ["bookmarks", limit, cursor],
+    queryFn: async ({ pageParam }) => {
+      const { limit, cursor } = pageParam || {};
+      return serverActionErrorHandler(getBookmarks)(limit, cursor);
+    },
+    initialPageParam: { limit, cursor },
+    getNextPageParam: (lastPage) => ({
+      limit,
+      cursor: lastPage.cursor,
+    }),
   });
 }
