@@ -6,6 +6,7 @@ import {
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { isListRule } from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import {
+  BookmarkIcon,
   EllipsisIcon,
   HeartIcon,
   MessageSquareIcon,
@@ -28,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getValidThreadgateRecord, validateRecord } from "@/lib/bluesky/utils";
 import {
+  useCreateBookmark,
+  useDeleteBookmark,
   useDeletePost,
   useLike,
   useRepost,
@@ -53,8 +56,12 @@ export function FeedFooter({
         <MentionButton post={post} threadgate={threadgate} />
         <RepostButton post={post} />
         <LikeButton post={post} />
-        <ShareButton post={post} />
-        <MenuButton post={post} />
+
+        <div className="flex items-center gap-4">
+          <BookmarkButton post={post} />
+          <ShareButton post={post} />
+          <MenuButton post={post} />
+        </div>
       </div>
     </>
   );
@@ -237,6 +244,58 @@ function ShareButton({ post }: { post: PostView }) {
       }}
     >
       <ShareIcon className="size-4" />
+    </FeedFooterButton>
+  );
+}
+
+function BookmarkButton({ post }: { post: PostView }) {
+  const [bookmarked, setBookmarked] = useState(
+    Boolean(post.viewer?.bookmarked),
+  );
+  const [bookmarkCount, setBookmarkCount] = useState(post.bookmarkCount || 0);
+
+  const { mutate: createBookmark } = useCreateBookmark();
+  const { mutate: deleteBookmark } = useDeleteBookmark();
+
+  function handleBookmark(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+    if (bookmarked) {
+      deleteBookmark(post.uri, {
+        onError: (error) => {
+          console.error("Error deleting bookmark:", error);
+          setBookmarked(true);
+          setBookmarkCount((prev) => prev + 1);
+        },
+      });
+      setBookmarked(false);
+      setBookmarkCount((prev) => prev - 1);
+    } else {
+      createBookmark(
+        { cid: post.cid, uri: post.uri },
+        {
+          onError: (error) => {
+            console.error("Error creating bookmark:", error);
+            setBookmarked(false);
+            setBookmarkCount((prev) => prev - 1);
+          },
+        },
+      );
+      setBookmarked(true);
+      setBookmarkCount((prev) => prev + 1);
+    }
+  }
+
+  return (
+    <FeedFooterButton
+      onClick={handleBookmark}
+      className={bookmarked ? "text-violet-600" : ""}
+    >
+      <BookmarkIcon
+        className={
+          bookmarked ? "size-4 fill-violet-600 text-violet-600" : "size-4"
+        }
+      />
+      {bookmarkCount}
     </FeedFooterButton>
   );
 }

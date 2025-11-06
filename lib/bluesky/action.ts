@@ -516,3 +516,50 @@ export async function deletePost({
     return { success: false, error: "게시물 삭제에 실패했습니다." };
   }
 }
+
+export async function createBookmark({
+  cid,
+  uri,
+}: {
+  cid: string;
+  uri: string;
+}): Promise<ActionResult<void>> {
+  try {
+    const session = await getSession();
+    const agent = await getAgent(session.user.did);
+
+    const response = await agent.app.bsky.bookmark.createBookmark({
+      cid,
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "북마크 생성에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error creating bookmark:", error);
+    return { success: false, error: "북마크 생성에 실패했습니다." };
+  }
+}
+
+export async function deleteBookmark(uri: string): Promise<ActionResult<void>> {
+  try {
+    const session = await getSession();
+    const agent = await getAgent(session.user.did);
+
+    const response = await agent.app.bsky.bookmark.deleteBookmark({
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "북마크 삭제에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error deleting bookmark:", error);
+    return { success: false, error: "북마크 삭제에 실패했습니다." };
+  }
+}

@@ -6,7 +6,9 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  createBookmark,
   createPost,
+  deleteBookmark,
   deletePost,
   getAuthorFeed,
   getListPost,
@@ -164,5 +166,17 @@ export function useUnlike() {
 export function useDeletePost() {
   return useMutation({
     mutationFn: serverActionErrorHandler(deletePost),
+  });
+}
+
+export function useCreateBookmark() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(createBookmark),
+  });
+}
+
+export function useDeleteBookmark() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(deleteBookmark),
   });
 }
