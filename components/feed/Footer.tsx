@@ -57,7 +57,7 @@ export function FeedFooter({
         <RepostButton post={post} />
         <LikeButton post={post} />
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <BookmarkButton post={post} />
           <ShareButton post={post} />
           <MenuButton post={post} />
