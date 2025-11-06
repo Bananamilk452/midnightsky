@@ -6,9 +6,12 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  createBookmark,
   createPost,
+  deleteBookmark,
   deletePost,
   getAuthorFeed,
+  getBookmarks,
   getListPost,
   getMyLists,
   getPostThread,
@@ -164,5 +167,38 @@ export function useUnlike() {
 export function useDeletePost() {
   return useMutation({
     mutationFn: serverActionErrorHandler(deletePost),
+  });
+}
+
+export function useCreateBookmark() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(createBookmark),
+  });
+}
+
+export function useDeleteBookmark() {
+  return useMutation({
+    mutationFn: serverActionErrorHandler(deleteBookmark),
+  });
+}
+
+export function useBookmarks({
+  limit = 30,
+  cursor,
+}: {
+  limit?: number;
+  cursor?: string;
+}) {
+  return useInfiniteQuery({
+    queryKey: ["bookmarks", limit, cursor],
+    queryFn: async ({ pageParam }) => {
+      const { limit, cursor } = pageParam || {};
+      return serverActionErrorHandler(getBookmarks)(limit, cursor);
+    },
+    initialPageParam: { limit, cursor },
+    getNextPageParam: (lastPage) => ({
+      limit,
+      cursor: lastPage.cursor,
+    }),
   });
 }

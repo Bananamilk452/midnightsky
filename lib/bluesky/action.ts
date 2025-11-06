@@ -2,6 +2,7 @@
 
 import { Agent, AppBskyRichtextFacet, RichText } from "@atproto/api";
 import { Response as GetProfileData } from "@atproto/api/dist/client/types/app/bsky/actor/getProfile";
+import { OutputSchema as getBookmarkData } from "@atproto/api/dist/client/types/app/bsky/bookmark/getBookmarks";
 import { OutputSchema as getAuthorFeedData } from "@atproto/api/dist/client/types/app/bsky/feed/getAuthorFeed";
 import { OutputSchema as getPostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { OutputSchema as getTimelineData } from "@atproto/api/dist/client/types/app/bsky/feed/getTimeline";
@@ -514,5 +515,74 @@ export async function deletePost({
   } catch (error) {
     console.error("Error deleting post:", error);
     return { success: false, error: "게시물 삭제에 실패했습니다." };
+  }
+}
+
+export async function createBookmark({
+  cid,
+  uri,
+}: {
+  cid: string;
+  uri: string;
+}): Promise<ActionResult<void>> {
+  try {
+    const session = await getSession();
+    const agent = await getAgent(session.user.did);
+
+    const response = await agent.app.bsky.bookmark.createBookmark({
+      cid,
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "북마크 생성에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error creating bookmark:", error);
+    return { success: false, error: "북마크 생성에 실패했습니다." };
+  }
+}
+
+export async function deleteBookmark(uri: string): Promise<ActionResult<void>> {
+  try {
+    const session = await getSession();
+    const agent = await getAgent(session.user.did);
+
+    const response = await agent.app.bsky.bookmark.deleteBookmark({
+      uri,
+    });
+
+    if (response.success) {
+      return { success: true, data: undefined };
+    } else {
+      return { success: false, error: "북마크 삭제에 실패했습니다." };
+    }
+  } catch (error) {
+    console.error("Error deleting bookmark:", error);
+    return { success: false, error: "북마크 삭제에 실패했습니다." };
+  }
+}
+
+export async function getBookmarks(
+  limit: number = 30,
+  cursor?: string,
+): Promise<ActionResult<getBookmarkData>> {
+  try {
+    const agent = await getSessionAgent();
+
+    const response = await agent.app.bsky.bookmark.getBookmarks({
+      limit,
+      cursor,
+    });
+
+    return {
+      success: true,
+      data: jsonify(response.data),
+    };
+  } catch (error) {
+    console.error("Error fetching bookmarks:", error);
+    return { success: false, error: "북마크 조회에 실패했습니다." };
   }
 }

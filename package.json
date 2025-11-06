@@ -14,7 +14,7 @@
     "lex": "lex"
   },
   "dependencies": {
-    "@atproto/api": "^0.15.14",
+    "@atproto/api": "^0.18.0",
     "@atproto/common": "^0.4.11",
     "@atproto/jwk-jose": "^0.1.7",
     "@atproto/lexicon": "^0.4.11",

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookmarkIcon,
   CircleUserRoundIcon,
   HomeIcon,
   LogOutIcon,
@@ -46,6 +47,13 @@ export function HomeSidemenuClient({ user }: { user: User }) {
         >
           <CircleUserRoundIcon className="size-6" />
           <span className="hidden lg:inline">프로필</span>
+        </SidemenuButton>
+        <SidemenuButton
+          active={pathname === "/bookmarks"}
+          onClick={() => router.push(`/bookmarks`)}
+        >
+          <BookmarkIcon className="size-6" />
+          <span className="hidden lg:inline">북마크</span>
         </SidemenuButton>
         <SidemenuButton active={false} onClick={signOut}>
           <LogOutIcon className="size-6" />
