@@ -1,6 +1,11 @@
 "use client";
 
-import { CircleUserRoundIcon, HomeIcon, LogOutIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  CircleUserRoundIcon,
+  HomeIcon,
+  LogOutIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Avatar } from "@/components/primitive/Avatar";
@@ -59,6 +64,12 @@ export function HomeSidebar() {
                 <Link href={user ? `/profile/${user.handle}` : ""}>
                   <CircleUserRoundIcon className="!size-6" />
                   <span className="text-lg font-semibold">프로필</span>
+                </Link>
+              </SidebarMenuButton>
+              <SidebarMenuButton asChild className="h-12">
+                <Link href="/bookmarks">
+                  <BookmarkIcon className="!size-6" />
+                  <span className="text-lg font-semibold">북마크</span>
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton className="h-12" onClick={signOut}>

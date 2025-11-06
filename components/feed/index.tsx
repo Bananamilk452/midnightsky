@@ -105,7 +105,7 @@ export function FeedRecord({
   className,
 }: {
   post: PostView;
-  threadgate: ThreadgateView | undefined;
+  threadgate?: ThreadgateView;
   line?: { top: boolean; bottom: boolean };
   children?: React.ReactNode;
   className?: string;
