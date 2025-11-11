@@ -108,6 +108,8 @@ class ShootingStar {
 }
 
 export function Meteor() {
+  const [isFading, setIsFading] = React.useState(false);
+
   const terrainCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -221,6 +223,25 @@ export function Meteor() {
 
     window.addEventListener("resize", handleResize);
 
+    // Track window resize behavior for fading effect
+    // The canvas will fade in again once resizing is finished
+    let timeout: NodeJS.Timeout | null = null;
+    function handleWindowMoveFinish() {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      function handleFadeInOver() {
+          initializeCanvas();
+          setIsFading(false);
+      }
+
+      setIsFading(true);
+      timeout = setTimeout(handleFadeInOver, 500);
+    }
+
+    window.addEventListener("resize", handleWindowMoveFinish);
+
     // Cleanup function
     return () => {
       if (animationFrameRef.current) {
@@ -231,7 +252,7 @@ export function Meteor() {
   }, []);
 
   return (
-    <div className="relative h-full w-full">
+    <div className={`transition-opacity duration-100 ${isFading ? "opacity-0" : null} relative h-full w-full`}>
       <canvas
         ref={backgroundCanvasRef}
         id="bgCanvas"
