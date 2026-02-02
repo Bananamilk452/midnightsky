@@ -38,7 +38,7 @@ export default function RootLayout({
         <Script
           defer
           data-domain="midnightsky.app"
-          src="https://plausible.junsu.io/js/script.js"
+          src="https://plausible.seoa.dev/js/script.js"
           strategy="beforeInteractive"
         />
         <ThemeProvider
