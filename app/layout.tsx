@@ -1,12 +1,11 @@
 import localFont from "next/font/local";
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 import type { Metadata } from "next";
 
 import "./globals.css";
-
-import Script from "next/script";
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
@@ -35,12 +34,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-linear-to-br from-violet-600 from-50% to-indigo-950 antialiased">
-        <Script
-          defer
-          data-domain="midnightsky.app"
-          src="https://plausible.seoa.dev/js/script.js"
-          strategy="beforeInteractive"
-        />
+        <GoogleAnalytics gaId="G-CGQLM25K79" />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
