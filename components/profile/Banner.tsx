@@ -1,18 +1,18 @@
 import { AppBskyRichtextFacet, RichText } from "@atproto/api";
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 
 import BackButton from "@/components/BackButton";
 import { Avatar } from "@/components/primitive/Avatar";
 import { formatNumber } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 
 type ProfileData = ProfileViewDetailed & {
   facets?: AppBskyRichtextFacet.Main[];
 };
 
-export async function ProfileBanner({ profile }: { profile: ProfileData }) {
-  const t = await getTranslations("Profile");
+export function ProfileBanner({ profile }: { profile: ProfileData }) {
+  const t =  useTranslations("Profile");
 
   return (
     <div>
@@ -39,7 +39,7 @@ export async function ProfileBanner({ profile }: { profile: ProfileData }) {
           {profile.displayName ?? profile.handle}
         </h1>
         <h2 className="leading-tight text-gray-400">@{profile.handle}</h2>
-        <ProfileCounts profile={profile} t={t} />
+        <ProfileCounts profile={profile} />
         <ProfileBio profile={profile} />
       </div>
     </div>
@@ -55,26 +55,29 @@ function ProfileAvatar({ profile }: { profile: ProfileData }) {
   );
 }
 
-async function ProfileCounts({ profile, t }: { profile: ProfileData; t: Awaited<ReturnType<typeof getTranslations<"Profile">>> }) {
+function ProfileCounts({ profile, }: { profile: ProfileData; }) {
+  const t = useTranslations("Profile");
+  const locale = useLocale(
+  );
   return (
     <dl className="mt-2 flex items-center gap-2">
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {await formatNumber(profile.followersCount ?? 0)}
+          {formatNumber(profile.followersCount ?? 0, locale)}
         </dt>
         <dd className="text-gray-400">{t("followers")}</dd>
       </div>
 
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {await formatNumber(profile.followsCount ?? 0)}
+          {formatNumber(profile.followsCount ?? 0, locale)}
         </dt>
         <dd className="text-gray-400">{t("following")}</dd>
       </div>
 
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {await formatNumber(profile.postsCount ?? 0)}
+          {formatNumber(profile.postsCount ?? 0, locale)}
         </dt>
         <dd className="text-gray-400">{t("posts")}</dd>
       </div>

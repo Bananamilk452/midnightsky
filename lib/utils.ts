@@ -3,7 +3,6 @@ import {
   isReasonRepost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { clsx } from "clsx";
-import { getLocale } from "next-intl/server";
 import { twMerge } from "tailwind-merge";
 
 import type { ClassValue } from "clsx";
@@ -38,8 +37,7 @@ export function parseAtUri(uri: string) {
   };
 }
 
-export async function formatNumber(num: number) {
-  const locale = await getLocale();
+export function formatNumber(num: number, locale: string) {
   return new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "en-US").format(num);
 }
 
