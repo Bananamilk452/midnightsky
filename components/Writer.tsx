@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Editor as TinyMCEEditor } from "tinymce";
-import { z } from "zod";
+import { useLocale, useTranslations } from "next-intl";
 
 import { OpenWriterParams } from "@/components/providers/WriterProvider";
 import { Spinner } from "@/components/Spinner";
@@ -38,9 +38,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageButton } from "@/components/writer/ImageButton";
-import { CreatePostParams, CreatePostSchema } from "@/lib/bluesky/types";
+import { CreatePostParams, createPostSchema } from "@/lib/bluesky/types";
 import { BLUESKY_CONTENT_LIMIT } from "@/lib/constants";
 import { useCreatePost, useMyLists } from "@/lib/hooks/useBluesky";
+import { PAYLOAD_TOO_LARGE } from "@/lib/utils";
 
 export function Writer({
   id = "main",
@@ -57,6 +58,9 @@ export function Writer({
   const router = useRouter();
   const editorRef = useRef<TinyMCEEditor>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const t = useTranslations("Writer");
+  const tFeed = useTranslations("Feed");
+  const locale = useLocale();
 
   function handleModalClose(value: boolean) {
     if (editorRef.current) {
@@ -70,8 +74,9 @@ export function Writer({
 
   const { data: listsData, status: listsStatus } = useMyLists();
   const { mutate: createPost, status } = useCreatePost();
+  const schema = createPostSchema(tFeed("maxChars"));
   const form = useForm<CreatePostParams>({
-    resolver: zodResolver(CreatePostSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       blueskyContent: "",
       content: "",
@@ -98,7 +103,7 @@ export function Writer({
 
   const blueskyContent = form.watch("blueskyContent");
 
-  function onSubmit(data: z.infer<typeof CreatePostSchema>) {
+  function onSubmit(data: CreatePostParams) {
     if (status === "pending") return;
 
     const body =
@@ -114,9 +119,11 @@ export function Writer({
         router.push(`/post/${data.post.authorDid}/${data.post.rkey}`);
       },
       onError: (error) => {
-        toast.error(
-          `글 작성에 실패했습니다. 다시 시도해주세요. (${error.message})`,
-        );
+        const msg =
+          error.message === PAYLOAD_TOO_LARGE
+            ? t("payloadTooLarge")
+            : t("failedToCreate", { error: error.message });
+        toast.error(msg);
         console.error("Error creating post:", error);
       },
     });
@@ -149,7 +156,7 @@ export function Writer({
         <DialogHeader>
           <div className="flex w-full items-center gap-2">
             <Button variant="ghost" onClick={() => setOpen(false)}>
-              취소
+              {t("cancel")}
             </Button>
             <div className="flex-grow"></div>
             {status === "pending" && <Spinner className="size-4" />}
@@ -157,19 +164,19 @@ export function Writer({
               onClick={form.handleSubmit(onSubmit)}
               disabled={!isEditorReady || status === "pending"}
             >
-              게시
+              {t("post")}
             </Button>
           </div>
           <VisuallyHidden>
-            <DialogTitle>글 작성</DialogTitle>
-            <DialogDescription className="sr-only">글 작성</DialogDescription>
+            <DialogTitle>{t("writePost")}</DialogTitle>
+            <DialogDescription className="sr-only">{t("writePost")}</DialogDescription>
           </VisuallyHidden>
         </DialogHeader>
 
         <Form {...form}>
           <form>
             <div className="flex flex-col gap-2">
-              <h2 className="font-medium">본문</h2>
+              <h2 className="font-medium">{t("body")}</h2>
               <FormField
                 name="blueskyContent"
                 render={({ field }) => (
@@ -177,7 +184,7 @@ export function Writer({
                     <FormControl>
                       <Textarea
                         className="h-24 resize-none rounded-lg border border-gray-400 !text-base"
-                        placeholder="무슨 일이 일어나고 있나요?"
+                        placeholder={t("placeholder")}
                         {...field}
                       />
                     </FormControl>
@@ -195,7 +202,7 @@ export function Writer({
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <div className="mb-1 flex flex-grow items-center justify-between sm:mb-0">
-                  <h2 className="font-medium">추가 글</h2>
+                   <h2 className="font-medium">{t("additionalText")}</h2>
                   <ImageButton setImage={onImageAdded} />
                 </div>
 
@@ -216,7 +223,7 @@ export function Writer({
                                 <RadioGroupItem value="public" />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                전체 공개
+                                {t("public")}
                               </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center">
@@ -224,7 +231,7 @@ export function Writer({
                                 <RadioGroupItem value="private" />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                맞팔만 공개
+                                {t("mutualOnly")}
                               </FormLabel>
                             </FormItem>
                             {!hideListType && (
@@ -233,7 +240,7 @@ export function Writer({
                                   <RadioGroupItem value="list" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  리스트
+                                  {t("list")}
                                 </FormLabel>
                               </FormItem>
                             )}
@@ -257,7 +264,7 @@ export function Writer({
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="리스트 선택" />
+                                <SelectValue placeholder={t("selectList")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -311,7 +318,7 @@ export function Writer({
                       autosave_prefix: `editor-${id}-`,
                       autosave_restore_when_empty: true,
                       autosave_retention: "60m",
-                      language: "ko_KR",
+                      language: locale === "ko" ? "ko_KR" : undefined,
                       mobile: {
                         toolbar_mode: "floating",
                         menubar: "file edit insert format table",
@@ -355,7 +362,7 @@ export function Writer({
         {!isEditorReady && (
           <div className="flex flex-col items-center justify-center gap-2 p-4">
             <Spinner className="size-6" />
-            <p className="text-sm">에디터를 불러오는 중입니다...</p>
+            <p className="text-sm">{t("loadingEditor")}</p>
           </div>
         )}
       </DialogContent>

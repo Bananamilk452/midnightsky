@@ -9,8 +9,10 @@ import {
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { format } from "date-fns";
-import { ko } from "date-fns/locale";
+import { ko } from "date-fns/locale/ko";
+import { enUS } from "date-fns/locale/en-US";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
 import { FeedRecord } from "@/components/feed";
 import { FeedContent } from "@/components/feed/Content";
@@ -30,14 +32,14 @@ export function FeedThread({
   thread: PostThreadData["thread"];
   threadgate?: ThreadgateView;
 }) {
-  // 1. Not Found
+  const t = useTranslations("Feed");
+
   if (isNotFoundPost(thread)) {
-    return <p>해당 게시글을 찾을 수 없습니다.</p>;
+    return <p>{t("postNotFound")}</p>;
   }
 
-  // 2. Blocked Post
   if (isBlockedPost(thread)) {
-    return <p>해당 게시글은 차단된 게시글입니다.</p>;
+    return <p>{t("postBlocked")}</p>;
   }
 
   // 3. ThreadViewPost
@@ -88,6 +90,9 @@ function FeedThreadRecord({
 }) {
   const record = validateRecord(post.record);
   const { rkey } = parseAtUri(post.uri);
+  const locale = useLocale();
+  const dateLocale = locale === "ko" ? ko : enUS;
+  const dateFormat = locale === "ko" ? "yyyy년 MM월 dd일 a h:mm" : "MMM d, yyyy h:mm a";
 
   if (!record) {
     throw new Error("Invalid post record");
@@ -115,8 +120,8 @@ function FeedThreadRecord({
           {Post.isRecord(record.embed) && <FeedPost content={record.embed} />}
         </FeedLabel>
         <p className="text-xs text-gray-400">
-          {format(new Date(post.indexedAt), "yyyy년 MM월 dd일 a h:mm", {
-            locale: ko,
+          {format(new Date(post.indexedAt), dateFormat, {
+            locale: dateLocale,
           })}
         </p>
         <FeedFooter post={post} threadgate={threadgate} className="mt-2" />
@@ -134,17 +139,16 @@ function FeedThreadReply({
   threadgate?: ThreadgateView;
   depth?: number;
 }) {
-  // 1. Not Found
+  const t = useTranslations("Feed");
+
   if (isNotFoundPost(reply)) {
-    return <p>해당 게시글을 찾을 수 없습니다.</p>;
+    return <p>{t("postNotFound")}</p>;
   }
 
-  // 2. Blocked Post
   if (isBlockedPost(reply)) {
-    return <p>해당 게시글은 차단된 게시글입니다.</p>;
+    return <p>{t("postBlocked")}</p>;
   }
 
-  // 3. ThreadViewPost
   if (isThreadViewPost(reply)) {
     const { post } = reply;
 
@@ -180,17 +184,16 @@ function FeedThreadParent({
   reply: PostThreadData["thread"];
   threadgate?: ThreadgateView;
 }) {
-  // 1. Not Found
+  const t = useTranslations("Feed");
+
   if (isNotFoundPost(reply)) {
-    return <p>해당 게시글을 찾을 수 없습니다.</p>;
+    return <p>{t("postNotFound")}</p>;
   }
 
-  // 2. Blocked Post
   if (isBlockedPost(reply)) {
-    return <p>해당 게시글은 차단된 게시글입니다.</p>;
+    return <p>{t("postBlocked")}</p>;
   }
 
-  // 3. ThreadViewPost
   if (isThreadViewPost(reply)) {
     const { post } = reply;
 

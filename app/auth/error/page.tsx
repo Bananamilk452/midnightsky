@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { Note } from "@/components/ui/note";
@@ -9,13 +10,14 @@ export default async function ErrorPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const error = (await searchParams).error;
+  const t = await getTranslations("Error");
 
   return (
     <div className="flex h-dvh w-dvw flex-col items-center justify-center gap-4">
-      <h1 className="text-lg">이런! 오류가 발생했어요🥺</h1>
-      <Note variant="error">{error || "알 수 없는 오류가 발생했습니다."}</Note>
+      <h1 className="text-lg">{t("oops")}</h1>
+      <Note variant="error">{error || t("unknownWithPeriod")}</Note>
       <Link href="/home">
-        <Button>홈으로 돌아가기</Button>
+        <Button>{t("goHome")}</Button>
       </Link>
     </div>
   );

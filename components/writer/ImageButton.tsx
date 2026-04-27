@@ -2,6 +2,7 @@
 
 import { ImageIcon } from "lucide-react";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +12,7 @@ interface ImageButtonProps {
 
 export function ImageButton({ setImage }: ImageButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations("Writer");
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -83,7 +85,7 @@ export function ImageButton({ setImage }: ImageButtonProps) {
         onClick={onButtonClick}
       >
         <ImageIcon />
-        이미지 추가
+        {t("addImage")}
       </Button>
     </div>
   );

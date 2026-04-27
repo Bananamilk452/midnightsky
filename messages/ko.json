@@ -1,0 +1,101 @@
+{
+  "Nav": {
+    "home": "홈",
+    "profile": "프로필",
+    "bookmarks": "북마크",
+    "logout": "로그아웃",
+    "write": "글 쓰기",
+    "language": "언어"
+  },
+  "Writer": {
+    "cancel": "취소",
+    "post": "게시",
+    "writePost": "글 작성",
+    "body": "본문",
+    "additionalText": "추가 글",
+    "placeholder": "무슨 일이 일어나고 있나요?",
+    "loadingEditor": "에디터를 불러오는 중입니다...",
+    "public": "전체 공개",
+    "mutualOnly": "맞팔만 공개",
+    "list": "리스트",
+    "selectList": "리스트 선택",
+    "failedToCreate": "글 작성에 실패했습니다. 다시 시도해주세요. ({error})",
+    "addImage": "이미지 추가",
+    "payloadTooLarge": "파일이 너무 큽니다. 이미지 크기를 줄여주세요."
+  },
+  "SignIn": {
+    "handleLabel": "Bluesky 핸들",
+    "handlePlaceholder": "example.bsky.social",
+    "handleRequired": "Bluesky 핸들을 입력해주세요.",
+    "handleInvalid": "유효한 Bluesky 핸들을 입력해주세요.",
+    "loginWith": "{handle}.bsky.social로 로그인",
+    "login": "로그인",
+    "loginFailed": "로그인에 실패했습니다.",
+    "errorPrefix": "에러: ",
+    "title": "MidnightSky✨",
+    "description": "Bluesky 공개글/비밀글 플랫폼",
+    "handleNotFound": "해당 핸들을 찾을 수 없습니다.",
+    "networkError": "네트워크 오류가 발생했습니다. 다시 시도해주세요.",
+    "authFailed": "인증에 실패했습니다. 다시 시도해주세요.",
+    "unknownError": "알 수 없는 오류가 발생했습니다."
+  },
+  "Feed": {
+    "linkCopied": "클립보드에 링크가 복사되었습니다!",
+    "linkCopyFailed": "링크 복사에 실패했습니다.",
+    "postDeleted": "게시글이 삭제되었습니다.",
+    "postDeleteFailed": "게시글 삭제에 실패했습니다.",
+    "deletePost": "게시글 삭제",
+    "pinned": "고정됨",
+    "reposted": "{name} 님이 재게시함",
+    "viewFullThread": "쓰레드 전체 보기",
+    "hide": "숨기기",
+    "show": "표시",
+    "adultContent": "성인 콘텐츠",
+    "nudity": "나체",
+    "graphicMedia": "불쾌감을 주는 미디어",
+    "postNotFound": "해당 게시글을 찾을 수 없습니다.",
+    "postBlocked": "해당 게시글은 차단된 게시글입니다.",
+    "seeArticle": "글 보기",
+    "maxChars": "최대 250자까지 입력 가능합니다."
+  },
+  "Profile": {
+    "banner": "{name}의 배너",
+    "followers": "팔로워",
+    "following": "팔로우 중",
+    "posts": "게시물"
+  },
+  "Post": {
+    "public": "전체 공개",
+    "private": "비밀글",
+    "list": "리스트",
+    "noPermissionMutual": "이 게시물을 볼 수 있는 권한이 없습니다. (맞팔이 아닙니다)",
+    "noPermissionList": "이 게시물을 볼 수 있는 권한이 없습니다. (사용자가 리스트에 없습니다.)"
+  },
+  "Error": {
+    "title": "에러가 발생했어요!",
+    "oops": "이런! 오류가 발생했어요🥺",
+    "unknown": "알 수 없는 오류가 발생했습니다",
+    "unknownWithPeriod": "알 수 없는 오류가 발생했습니다.",
+    "tryAgain": "다시 시도",
+    "goHome": "홈으로 돌아가기",
+    "dataLoadFailed": "데이터를 불러오는 중 오류가 발생했습니다"
+  },
+  "Actions": {
+    "signInFailed": "로그인 요청에 실패하였습니다.",
+    "threadFetchFailed": "게시물 스레드 조회에 실패했습니다.",
+    "postFetchFailed": "게시물 조회에 실패했습니다.",
+    "timelineFetchFailed": "타임라인 조회에 실패했습니다.",
+    "profileFetchFailed": "프로필 조회에 실패했습니다.",
+    "authorFeedFetchFailed": "작성자 피드 조회에 실패했습니다.",
+    "postCreateFailed": "게시물 생성에 실패했습니다.",
+    "listsFetchFailed": "리스트 조회에 실패했습니다.",
+    "repostFailed": "게시물 리포스트에 실패했습니다.",
+    "unrepostFailed": "게시물 리포스트 취소에 실패했습니다.",
+    "likeFailed": "게시물 좋아요에 실패했습니다.",
+    "unlikeFailed": "게시물 좋아요 취소에 실패했습니다.",
+    "deleteFailed": "게시물 삭제에 실패했습니다.",
+    "bookmarkCreateFailed": "북마크 생성에 실패했습니다.",
+    "bookmarkDeleteFailed": "북마크 삭제에 실패했습니다.",
+    "bookmarkFetchFailed": "북마크 조회에 실패했습니다."
+  }
+}

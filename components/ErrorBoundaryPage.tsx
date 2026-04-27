@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,18 +19,20 @@ export function ErrorBoundaryPage({
   error: any;
   onReset?: () => void;
 }) {
+  const t = useTranslations("Error");
+
   return (
     <div className="flex size-full items-center justify-center">
       <Card>
         <CardHeader>
-          <CardTitle>에러가 발생했어요!</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre style={{ whiteSpace: "normal" }}>{error.message}</pre>
         </CardContent>
         {onReset && (
           <CardFooter>
-            <Button onClick={onReset}>다시 시도</Button>
+            <Button onClick={onReset}>{t("tryAgain")}</Button>
           </CardFooter>
         )}
       </Card>

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
+import { useTranslations } from "next-intl";
 
 import { useWriter } from "@/components/providers/WriterProvider";
 import {
@@ -222,14 +223,15 @@ function LikeButton({ post }: { post: PostView }) {
 
 function ShareButton({ post }: { post: PostView }) {
   const [, copy] = useCopyToClipboard();
+  const t = useTranslations("Feed");
 
   function handleCopy(text: string) {
     copy(text)
       .then(() => {
-        toast.success("클립보드에 링크가 복사되었습니다!");
+        toast.success(t("linkCopied"));
       })
       .catch(() => {
-        toast.error("링크 복사에 실패했습니다.");
+        toast.error(t("linkCopyFailed"));
       });
   }
 
@@ -309,6 +311,7 @@ function MenuButton({ post }: { post: PostView }) {
 
   const { data: user } = useSession();
   const { mutate: deletePost } = useDeletePost();
+  const t = useTranslations("Feed");
 
   function handleDeletePost() {
     deletePost(
@@ -320,12 +323,12 @@ function MenuButton({ post }: { post: PostView }) {
       },
       {
         onSuccess: () => {
-          toast.success("게시글이 삭제되었습니다.");
+          toast.success(t("postDeleted"));
           router.replace("/home");
         },
         onError: (error) => {
           console.error("Error deleting post:", error);
-          toast.error("게시글 삭제에 실패했습니다.");
+          toast.error(t("postDeleteFailed"));
         },
       },
     );
@@ -342,7 +345,7 @@ function MenuButton({ post }: { post: PostView }) {
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleDeletePost}>
             <TrashIcon />
-            게시글 삭제
+            {t("deletePost")}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

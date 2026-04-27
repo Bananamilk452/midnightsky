@@ -1,6 +1,7 @@
 import { AppBskyRichtextFacet, RichText } from "@atproto/api";
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import BackButton from "@/components/BackButton";
 import { Avatar } from "@/components/primitive/Avatar";
@@ -10,7 +11,9 @@ type ProfileData = ProfileViewDetailed & {
   facets?: AppBskyRichtextFacet.Main[];
 };
 
-export function ProfileBanner({ profile }: { profile: ProfileData }) {
+export async function ProfileBanner({ profile }: { profile: ProfileData }) {
+  const t = await getTranslations("Profile");
+
   return (
     <div>
       <div className="relative">
@@ -20,7 +23,7 @@ export function ProfileBanner({ profile }: { profile: ProfileData }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={profile.banner}
-              alt={`${profile.displayName}의 배너`}
+              alt={t("banner", { name: profile.displayName || profile.handle })}
               className="h-[150px] w-full object-cover"
             />
           </>
@@ -36,7 +39,7 @@ export function ProfileBanner({ profile }: { profile: ProfileData }) {
           {profile.displayName ?? profile.handle}
         </h1>
         <h2 className="leading-tight text-gray-400">@{profile.handle}</h2>
-        <ProfileCounts profile={profile} />
+        <ProfileCounts profile={profile} t={t} />
         <ProfileBio profile={profile} />
       </div>
     </div>
@@ -52,28 +55,28 @@ function ProfileAvatar({ profile }: { profile: ProfileData }) {
   );
 }
 
-function ProfileCounts({ profile }: { profile: ProfileData }) {
+async function ProfileCounts({ profile, t }: { profile: ProfileData; t: Awaited<ReturnType<typeof getTranslations<"Profile">>> }) {
   return (
     <dl className="mt-2 flex items-center gap-2">
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {formatNumber(profile.followersCount ?? 0)}
+          {await formatNumber(profile.followersCount ?? 0)}
         </dt>
-        <dd className="text-gray-400">팔로워</dd>
+        <dd className="text-gray-400">{t("followers")}</dd>
       </div>
 
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {formatNumber(profile.followsCount ?? 0)}
+          {await formatNumber(profile.followsCount ?? 0)}
         </dt>
-        <dd className="text-gray-400">팔로우 중</dd>
+        <dd className="text-gray-400">{t("following")}</dd>
       </div>
 
       <div className="flex items-center gap-1">
         <dt className="font-semibold">
-          {formatNumber(profile.postsCount ?? 0)}
+          {await formatNumber(profile.postsCount ?? 0)}
         </dt>
-        <dd className="text-gray-400">게시물</dd>
+        <dd className="text-gray-400">{t("posts")}</dd>
       </div>
     </dl>
   );

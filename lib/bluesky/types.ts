@@ -1,10 +1,8 @@
 import { z } from "zod";
 
-export type CreatePostParams = z.infer<typeof CreatePostSchema>;
-
-const PostBaseSchema = {
+const PostBaseSchema = (maxCharsMsg: string) => ({
   content: z.string(),
-  blueskyContent: z.string().max(250, "최대 250자까지 입력 가능합니다."),
+  blueskyContent: z.string().max(250, maxCharsMsg),
   reply: z
     .object({
       root: z.object({
@@ -17,27 +15,28 @@ const PostBaseSchema = {
       }),
     })
     .optional(),
-};
+});
 
-export const CreatePostSchema =
-  // Public / Private
+export const createPostSchema = (maxCharsMsg: string) =>
   z
     .object({
-      ...PostBaseSchema,
+      ...PostBaseSchema(maxCharsMsg),
       type: z.enum(["public", "private"]),
     })
-    // List는 listId가 필요
     .or(
       z.object({
-        ...PostBaseSchema,
+        ...PostBaseSchema(maxCharsMsg),
         type: z.literal("list"),
         listId: z.string(),
       }),
     )
-    // Reply는 reply 객체가 필요
     .or(
       z.object({
-        ...PostBaseSchema,
+        ...PostBaseSchema(maxCharsMsg),
         type: z.literal("reply"),
       }),
     );
+
+export type CreatePostParams = z.infer<ReturnType<typeof createPostSchema>>;
+
+export const CreatePostSchema = createPostSchema("최대 250자까지 입력 가능합니다.");

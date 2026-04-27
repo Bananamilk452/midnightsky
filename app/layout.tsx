@@ -2,6 +2,8 @@ import localFont from "next/font/local";
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 import type { Metadata } from "next";
 
@@ -22,14 +24,17 @@ export const metadata: Metadata = {
   description: "MidnightSky✨",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="ko"
+      lang={locale}
       className={`${pretendard.variable}`}
       suppressHydrationWarning
     >
@@ -41,7 +46,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>{children}</QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            <QueryProvider>{children}</QueryProvider>
+          </NextIntlClientProvider>
         </ThemeProvider>
         <Toaster />
       </body>

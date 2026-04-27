@@ -1,13 +1,16 @@
 import BackButton from "@/components/BackButton";
 import { Header } from "@/components/Header";
 import { DefaultLayout } from "@/components/layouts/Default";
+import { getTranslations } from "next-intl/server";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const t = await getTranslations("Nav");
+
   return (
     <DefaultLayout>
       <Header>
         <BackButton />
-        <p className="ml-4 text-lg font-semibold">북마크</p>
+        <p className="ml-4 text-lg font-semibold">{t("bookmarks")}</p>
       </Header>
       {children}
     </DefaultLayout>

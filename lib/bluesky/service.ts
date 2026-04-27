@@ -19,6 +19,7 @@ import {
 } from "@/lib/lexicon/types/app/midnightsky/post";
 import { getSession } from "@/lib/session";
 import { ApiError } from "@/lib/utils.server";
+import { getLocale } from "next-intl/server";
 
 import { CreatePostParams } from "./types";
 import { addReadArticleFacets } from "./utils";
@@ -39,7 +40,7 @@ export async function applyWrites(
   });
   rt.detectFacets(agent);
 
-  const facets = addReadArticleFacets(rt, link).facets;
+  const facets = (await addReadArticleFacets(rt, link)).facets;
 
   const embed = {
     $type: "app.midnightsky.post",
@@ -51,7 +52,7 @@ export async function applyWrites(
     $type: "app.bsky.feed.post",
     text: rt.text,
     facets,
-    langs: ["ko"],
+    langs: [(await getLocale()) === "ko" ? "ko" : "en"],
     embed,
     createdAt: new Date().toISOString(),
     reply: params.reply,

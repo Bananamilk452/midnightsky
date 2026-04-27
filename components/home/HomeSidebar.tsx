@@ -3,10 +3,13 @@
 import {
   BookmarkIcon,
   CircleUserRoundIcon,
+  GlobeIcon,
   HomeIcon,
   LogOutIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
@@ -21,10 +24,14 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { signOut } from "@/lib/bluesky/action";
+import { setUserLocale } from "@/lib/i18n/action";
 import { useSession } from "@/lib/hooks/useBluesky";
 
 export function HomeSidebar() {
+  const router = useRouter();
+  const locale = useLocale();
   const { data: user } = useSession();
+  const t = useTranslations("Nav");
 
   return (
     <Sidebar>
@@ -57,24 +64,35 @@ export function HomeSidebar() {
               <SidebarMenuButton asChild className="h-12">
                 <Link href="/home">
                   <HomeIcon className="!size-6" />
-                  <span className="text-lg font-semibold">홈</span>
+                  <span className="text-lg font-semibold">{t("home")}</span>
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild className="h-12">
                 <Link href={user ? `/profile/${user.handle}` : ""}>
                   <CircleUserRoundIcon className="!size-6" />
-                  <span className="text-lg font-semibold">프로필</span>
+                  <span className="text-lg font-semibold">{t("profile")}</span>
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild className="h-12">
                 <Link href="/bookmarks">
                   <BookmarkIcon className="!size-6" />
-                  <span className="text-lg font-semibold">북마크</span>
+                  <span className="text-lg font-semibold">{t("bookmarks")}</span>
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton className="h-12" onClick={signOut}>
                 <LogOutIcon className="!size-6" />
-                <span className="text-lg font-semibold">로그아웃</span>
+                <span className="text-lg font-semibold">{t("logout")}</span>
+              </SidebarMenuButton>
+              <SidebarMenuButton
+                className="h-12"
+                onClick={async () => {
+                  const next = locale === "ko" ? "en" : "ko";
+                  await setUserLocale(next);
+                  router.refresh();
+                }}
+              >
+                <GlobeIcon className="!size-6" />
+                <span className="text-lg font-semibold">{t("language")}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

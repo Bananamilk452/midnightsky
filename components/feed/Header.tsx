@@ -3,6 +3,7 @@ import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 
 import { getRelativeTimeBasic } from "@/lib/bluesky/utils";
 import { cn } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 export function FeedHeader({
   post,
@@ -15,6 +16,7 @@ export function FeedHeader({
   children?: React.ReactNode;
   className?: string;
 }) {
+  const locale = useLocale();  
   return (
     <div className={cn("flex items-center gap-1", className)}>
       {children}
@@ -26,7 +28,7 @@ export function FeedHeader({
       </p>
       &middot;
       <span className="shrink-0 text-xs text-gray-400">
-        {getRelativeTimeBasic(createdAt)}
+        {getRelativeTimeBasic(createdAt, locale)}
       </span>
     </div>
   );

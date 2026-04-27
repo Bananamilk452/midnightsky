@@ -14,6 +14,7 @@ import { OutputSchema as getListsData } from "@atproto/api/dist/client/types/app
 import { Response as ApplyWritesData } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 import { TID } from "@atproto/common";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { blueskyClient } from "@/lib/bluesky";
 import {
@@ -42,6 +43,7 @@ export async function signInWithBluesky(
   handle: string,
   redirectTo?: string,
 ): Promise<ActionResult<string>> {
+  const t = await getTranslations("SignIn");
   try {
     const url = await blueskyClient.authorize(handle.trim(), {
       prompt: "none",
@@ -54,7 +56,31 @@ export async function signInWithBluesky(
     return { success: true, data: url.toString() };
   } catch (error) {
     console.error("Error signing in:", error);
-    return { success: false, error: "로그인 요청에 실패하였습니다." };
+
+    let message = t("unknownError");
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      if (
+        msg.includes("not found") ||
+        msg.includes("unable to resolve") ||
+        msg.includes("unresolvable") ||
+        msg.includes("does not exist")
+      ) {
+        message = t("handleNotFound");
+      } else if (
+        msg.includes("fetch") ||
+        msg.includes("network") ||
+        msg.includes("timeout") ||
+        msg.includes("econnrefused") ||
+        msg.includes("econnreset")
+      ) {
+        message = t("networkError");
+      } else {
+        message = t("authFailed");
+      }
+    }
+
+    return { success: false, error: message };
   }
 }
 
@@ -101,7 +127,7 @@ export async function getPostThread(
     };
   } catch (error) {
     console.error("Error fetching post thread:", error);
-    return { success: false, error: "게시물 스레드 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("threadFetchFailed") };
   }
 }
 
@@ -119,7 +145,7 @@ export async function getPublicPost(
     };
   } catch (error) {
     console.error("Error fetching public post:", error);
-    return { success: false, error: "게시물 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
   }
 }
 
@@ -143,7 +169,7 @@ export async function getPrivatePost(
       : { success: true, data: { isViewable } };
   } catch (error) {
     console.error("Error fetching private post:", error);
-    return { success: false, error: "게시물 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
   }
 }
 
@@ -167,7 +193,7 @@ export async function getListPost(
       : { success: true, data: { isViewable } };
   } catch (error) {
     console.error("Error fetching list post:", error);
-    return { success: false, error: "게시물 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
   }
 }
 
@@ -189,7 +215,7 @@ export async function getTimeline(
     };
   } catch (error) {
     console.error("Error fetching timeline:", error);
-    return { success: false, error: "타임라인 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("timelineFetchFailed") };
   }
 }
 
@@ -222,7 +248,7 @@ export async function getProfile(
     };
   } catch (error) {
     console.error("Error fetching profile:", error);
-    return { success: false, error: "프로필 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("profileFetchFailed") };
   }
 }
 
@@ -256,7 +282,7 @@ export async function getAuthorFeed({
     };
   } catch (error) {
     console.error("Error fetching author feed:", error);
-    return { success: false, error: "작성자 피드 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("authorFeedFetchFailed") };
   }
 }
 
@@ -351,7 +377,7 @@ export async function createPost(
     console.error("Error creating post:", error);
     return {
       success: false,
-      error: "게시물 생성에 실패했습니다.",
+      error: (await getTranslations("Actions"))("postCreateFailed"),
     };
   }
 }
@@ -387,13 +413,13 @@ export async function getMyLists(): Promise<ActionResult<getListsData>> {
         data: jsonify(response.data),
       };
     } else {
-      throw new Error("리스트 조회에 실패했습니다.");
+      throw new Error((await getTranslations("Actions"))("listsFetchFailed"));
     }
   } catch (error) {
     console.error("Error fetching lists:", error);
     return {
       success: false,
-      error: "리스트 조회에 실패했습니다.",
+      error: (await getTranslations("Actions"))("listsFetchFailed"),
     };
   }
 }
@@ -415,11 +441,11 @@ export async function repostPost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "게시물 리포스트에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("repostFailed") };
     }
   } catch (error) {
     console.error("Error reposting post:", error);
-    return { success: false, error: "게시물 리포스트에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("repostFailed") };
   }
 }
 
@@ -435,11 +461,11 @@ export async function unrepostPost(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "게시물 리포스트 취소에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("unrepostFailed") };
     }
   } catch (error) {
     console.error("Error unreposting post:", error);
-    return { success: false, error: "게시물 리포스트 취소에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("unrepostFailed") };
   }
 }
 
@@ -460,11 +486,11 @@ export async function likePost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "게시물 좋아요에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("likeFailed") };
     }
   } catch (error) {
     console.error("Error liking post:", error);
-    return { success: false, error: "게시물 좋아요에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("likeFailed") };
   }
 }
 
@@ -480,11 +506,11 @@ export async function unlikePost(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "게시물 좋아요 취소에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("unlikeFailed") };
     }
   } catch (error) {
     console.error("Error liking post:", error);
-    return { success: false, error: "게시물 좋아요 취소에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("unlikeFailed") };
   }
 }
 
@@ -510,11 +536,11 @@ export async function deletePost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "게시물 삭제에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("deleteFailed") };
     }
   } catch (error) {
     console.error("Error deleting post:", error);
-    return { success: false, error: "게시물 삭제에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("deleteFailed") };
   }
 }
 
@@ -537,11 +563,11 @@ export async function createBookmark({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "북마크 생성에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("bookmarkCreateFailed") };
     }
   } catch (error) {
     console.error("Error creating bookmark:", error);
-    return { success: false, error: "북마크 생성에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("bookmarkCreateFailed") };
   }
 }
 
@@ -557,11 +583,11 @@ export async function deleteBookmark(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: "북마크 삭제에 실패했습니다." };
+      return { success: false, error: (await getTranslations("Actions"))("bookmarkDeleteFailed") };
     }
   } catch (error) {
     console.error("Error deleting bookmark:", error);
-    return { success: false, error: "북마크 삭제에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("bookmarkDeleteFailed") };
   }
 }
 
@@ -583,6 +609,6 @@ export async function getBookmarks(
     };
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
-    return { success: false, error: "북마크 조회에 실패했습니다." };
+    return { success: false, error: (await getTranslations("Actions"))("bookmarkFetchFailed") };
   }
 }
