@@ -1,0 +1,101 @@
+{
+  "Nav": {
+    "home": "Home",
+    "profile": "Profile",
+    "bookmarks": "Bookmarks",
+    "logout": "Log out",
+    "write": "Write",
+    "language": "Language"
+  },
+  "Writer": {
+    "cancel": "Cancel",
+    "post": "Post",
+    "writePost": "Write post",
+    "body": "Body",
+    "additionalText": "Additional text",
+    "placeholder": "What's happening?",
+    "loadingEditor": "Loading editor...",
+    "public": "Public",
+    "mutualOnly": "Mutual followers only",
+    "list": "List",
+    "selectList": "Select list",
+    "failedToCreate": "Failed to create post. Please try again. ({error})",
+    "addImage": "Add image",
+    "payloadTooLarge": "Files are too large. Please reduce image sizes."
+  },
+  "SignIn": {
+    "handleLabel": "Bluesky Handle",
+    "handlePlaceholder": "example.bsky.social",
+    "handleRequired": "Please enter your Bluesky handle.",
+    "handleInvalid": "Please enter a valid Bluesky handle.",
+    "loginWith": "Log in with {handle}.bsky.social",
+    "login": "Log in",
+    "loginFailed": "Login failed.",
+    "errorPrefix": "Error: ",
+    "title": "MidnightSky✨",
+    "description": "Bluesky public/private post platform",
+    "handleNotFound": "Handle not found.",
+    "networkError": "A network error occurred. Please try again.",
+    "authFailed": "Authentication failed. Please try again.",
+    "unknownError": "An unknown error occurred."
+  },
+  "Feed": {
+    "linkCopied": "Link copied to clipboard!",
+    "linkCopyFailed": "Failed to copy link.",
+    "postDeleted": "Post deleted.",
+    "postDeleteFailed": "Failed to delete post.",
+    "deletePost": "Delete post",
+    "pinned": "Pinned",
+    "reposted": "{name} reposted",
+    "viewFullThread": "View full thread",
+    "hide": "Hide",
+    "show": "Show",
+    "adultContent": "Adult content",
+    "nudity": "Nudity",
+    "graphicMedia": "Graphic media",
+    "postNotFound": "This post could not be found.",
+    "postBlocked": "This post is blocked.",
+    "seeArticle": "See article",
+    "maxChars": "Maximum 250 characters allowed."
+  },
+  "Profile": {
+    "banner": "{name}'s banner",
+    "followers": "Followers",
+    "following": "Following",
+    "posts": "Posts"
+  },
+  "Post": {
+    "public": "Public",
+    "private": "Private",
+    "list": "List",
+    "noPermissionMutual": "You do not have permission to view this post. (Not mutual followers)",
+    "noPermissionList": "You do not have permission to view this post. (User is not in the list.)"
+  },
+  "Error": {
+    "title": "An error occurred!",
+    "oops": "Oops! An error occurred🥺",
+    "unknown": "An unknown error occurred",
+    "unknownWithPeriod": "An unknown error occurred.",
+    "tryAgain": "Try again",
+    "goHome": "Go back to home",
+    "dataLoadFailed": "An error occurred while loading data"
+  },
+  "Actions": {
+    "signInFailed": "Login request failed.",
+    "threadFetchFailed": "Failed to fetch post thread.",
+    "postFetchFailed": "Failed to fetch post.",
+    "timelineFetchFailed": "Failed to fetch timeline.",
+    "profileFetchFailed": "Failed to fetch profile.",
+    "authorFeedFetchFailed": "Failed to fetch author feed.",
+    "postCreateFailed": "Failed to create post.",
+    "listsFetchFailed": "Failed to fetch lists.",
+    "repostFailed": "Failed to repost.",
+    "unrepostFailed": "Failed to unrepost.",
+    "likeFailed": "Failed to like post.",
+    "unlikeFailed": "Failed to unlike post.",
+    "deleteFailed": "Failed to delete post.",
+    "bookmarkCreateFailed": "Failed to create bookmark.",
+    "bookmarkDeleteFailed": "Failed to delete bookmark.",
+    "bookmarkFetchFailed": "Failed to fetch bookmarks."
+  }
+}

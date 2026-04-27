@@ -3,6 +3,7 @@ import {
   isReasonRepost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { clsx } from "clsx";
+import { getLocale } from "next-intl/server";
 import { twMerge } from "tailwind-merge";
 
 import type { ClassValue } from "clsx";
@@ -37,16 +38,24 @@ export function parseAtUri(uri: string) {
   };
 }
 
-export function formatNumber(num: number) {
-  return new Intl.NumberFormat("ko-KR").format(num);
+export async function formatNumber(num: number) {
+  const locale = await getLocale();
+  return new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "en-US").format(num);
 }
+
+export const PAYLOAD_TOO_LARGE = "PAYLOAD_TOO_LARGE";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function serverActionErrorHandler<T, P extends any[]>(
   action: (...args: P) => Promise<ActionResult<T>>,
 ) {
   return async (...args: P) => {
-    const result = await action(...args);
+    let result: ActionResult<T>;
+    try {
+      result = await action(...args);
+    } catch {
+      throw new Error(PAYLOAD_TOO_LARGE);
+    }
     if (!result.success) {
       throw new Error(result.error);
     }

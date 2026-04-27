@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
@@ -28,21 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Note } from "@/components/ui/note";
 import { useSignIn } from "@/lib/hooks/useBluesky";
 
-const formSchema = z.object({
-  handle: z
-    .string()
-    .min(1, "Bluesky 핸들을 입력해주세요.")
-    .regex(
-      new RegExp(
-        "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$",
-      ),
-      {
-        message: "유효한 Bluesky 핸들을 입력해주세요.",
-      },
-    )
-    .trim(),
-});
-
 export default function SignIn() {
   return (
     <Suspense>
@@ -56,8 +42,24 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const t = useTranslations("SignIn");
 
   const { mutate: signIn, status } = useSignIn();
+
+  const formSchema = z.object({
+    handle: z
+      .string()
+      .min(1, t("handleRequired"))
+      .regex(
+        new RegExp(
+          "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$",
+        ),
+        {
+          message: t("handleInvalid"),
+        },
+      )
+      .trim(),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,11 +86,9 @@ function SignInForm() {
         },
         onError(error) {
           console.error("Sign in error:", error);
-          let str = "로그인에 실패했습니다. 다시 시도해주세요.";
-          if (error instanceof Error) {
-            str += `\n에러: ${error.message}`;
-          }
-          setFormError(str);
+          setFormError(
+            error instanceof Error ? error.message : t("loginFailed"),
+          );
         },
       },
     );
@@ -101,8 +101,8 @@ function SignInForm() {
     <div>
       <Card className="mx-auto w-fit border bg-white/10 shadow-md backdrop-blur-md">
         <CardHeader>
-          <CardTitle>MidnightSky✨</CardTitle>
-          <CardDescription>Bluesky 공개글/비밀글 플랫폼</CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -112,13 +112,13 @@ function SignInForm() {
                 name="handle"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bluesky 핸들</FormLabel>
+                    <FormLabel>{t("handleLabel")}</FormLabel>
                     <FormControl>
                       <Input
                         className="w-72"
                         id="handle"
                         type="text"
-                        placeholder="example.bsky.social"
+                        placeholder={t("handlePlaceholder")}
                         autoFocus
                         {...field}
                       />
@@ -141,7 +141,7 @@ function SignInForm() {
                   form.handleSubmit(onSubmit)();
                 }}
               >
-                {handle}.bsky.social로 로그인
+                {t("loginWith", { handle })}
               </Button>
             )}
             <Button
@@ -149,7 +149,7 @@ function SignInForm() {
               onClick={form.handleSubmit(onSubmit)}
               disabled={isLoading}
             >
-              로그인
+              {t("login")}
               {isLoading && <Spinner className="size-4" />}
             </Button>
           </div>

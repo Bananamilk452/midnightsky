@@ -3,13 +3,7 @@
 import { Label } from "@atproto/api";
 import { CircleAlertIcon } from "lucide-react";
 import { useState } from "react";
-
-const CONTENT_WARNING = {
-  sexual: "성인 콘텐츠",
-  nudity: "나체",
-  porn: "성인 콘텐츠",
-  "graphic-media": "불쾌감을 주는 미디어",
-} as Record<string, string>;
+import { useTranslations } from "next-intl";
 
 export function FeedLabel({
   labels,
@@ -19,8 +13,15 @@ export function FeedLabel({
   children?: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
+  const t = useTranslations("Feed");
 
-  // 항상 로그인 상태이므로 '!no-unauthenticated' 라벨은 제외
+  const contentWarningMap: Record<string, string> = {
+    sexual: t("adultContent"),
+    nudity: t("nudity"),
+    porn: t("adultContent"),
+    "graphic-media": t("graphicMedia"),
+  };
+
   labels = labels?.filter((l) => l.val !== "!no-unauthenticated");
 
   if (!labels || labels.length === 0) {
@@ -28,7 +29,7 @@ export function FeedLabel({
   }
 
   const title = labels
-    .map((label) => CONTENT_WARNING[label.val])
+    .map((label) => contentWarningMap[label.val])
     .filter(Boolean)
     .join(", ");
 
@@ -45,7 +46,7 @@ export function FeedLabel({
           className="cursor-pointer text-sm hover:underline"
           onClick={handleClick}
         >
-          {show ? "숨기기" : "표시"}
+          {show ? t("hide") : t("show")}
         </button>
       </div>
       {show && children}

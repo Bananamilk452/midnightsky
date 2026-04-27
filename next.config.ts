@@ -1,5 +1,8 @@
+import createNextIntlPlugin from "next-intl/plugin";
 import {withSentryConfig} from "@sentry/nextjs";
 import type { NextConfig } from "next";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   redirects: async () => {
@@ -18,7 +21,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withNextIntl(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

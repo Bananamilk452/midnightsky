@@ -3,23 +3,28 @@
 import {
   BookmarkIcon,
   CircleUserRoundIcon,
+  GlobeIcon,
   HomeIcon,
   LogOutIcon,
   SquarePenIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/primitive/Avatar";
 import { useWriter } from "@/components/providers/WriterProvider";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/bluesky/action";
+import { setUserLocale } from "@/lib/i18n/action";
 import { User } from "@/lib/bluesky/utils";
 import { cn } from "@/lib/utils";
 
 export function HomeSidemenuClient({ user }: { user: User }) {
   const router = useRouter();
   const pathname = usePathname();
+  const locale = useLocale();
   const { openWriter } = useWriter();
+  const t = useTranslations("Nav");
 
   return (
     <div
@@ -36,7 +41,7 @@ export function HomeSidemenuClient({ user }: { user: User }) {
           onClick={() => router.push("/home")}
         >
           <HomeIcon className="size-6" />
-          <span className="hidden lg:inline">홈</span>
+          <span className="hidden lg:inline">{t("home")}</span>
         </SidemenuButton>
         <SidemenuButton
           active={
@@ -46,18 +51,29 @@ export function HomeSidemenuClient({ user }: { user: User }) {
           onClick={() => router.push(`/profile/${user.handle}`)}
         >
           <CircleUserRoundIcon className="size-6" />
-          <span className="hidden lg:inline">프로필</span>
+          <span className="hidden lg:inline">{t("profile")}</span>
         </SidemenuButton>
         <SidemenuButton
           active={pathname === "/bookmarks"}
           onClick={() => router.push(`/bookmarks`)}
         >
           <BookmarkIcon className="size-6" />
-          <span className="hidden lg:inline">북마크</span>
+          <span className="hidden lg:inline">{t("bookmarks")}</span>
         </SidemenuButton>
         <SidemenuButton active={false} onClick={signOut}>
           <LogOutIcon className="size-6" />
-          <span className="hidden lg:inline">로그아웃</span>
+          <span className="hidden lg:inline">{t("logout")}</span>
+        </SidemenuButton>
+        <SidemenuButton
+          active={false}
+          onClick={async () => {
+            const next = locale === "ko" ? "en" : "ko";
+            await setUserLocale(next);
+            router.refresh();
+          }}
+        >
+          <GlobeIcon className="size-6" />
+          <span className="hidden lg:inline">{t("language")}</span>
         </SidemenuButton>
 
         <div className="ml-2 mt-12">
@@ -66,7 +82,7 @@ export function HomeSidemenuClient({ user }: { user: User }) {
             onClick={() => openWriter()}
           >
             <SquarePenIcon className="size-6 text-white" />
-            <span className="hidden lg:inline">글 쓰기</span>
+            <span className="hidden lg:inline">{t("write")}</span>
           </button>
         </div>
       </div>

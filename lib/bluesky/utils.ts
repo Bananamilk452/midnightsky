@@ -5,7 +5,9 @@ import {
   validateRecord as validateThreadgateRecord,
 } from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
+import { ko } from "date-fns/locale/ko";
+import { enUS } from "date-fns/locale/en-US";
+import { getTranslations } from "next-intl/server";
 
 import { getAgent } from "@/lib/bluesky/action";
 import { getSession } from "@/lib/session";
@@ -44,11 +46,12 @@ export function validateRecord(data: unknown) {
   }
 }
 
-export function getRelativeTimeBasic(postDate: Date | string): string {
+export function getRelativeTimeBasic(postDate: Date | string, locale: string) {
   const date = typeof postDate === "string" ? new Date(postDate) : postDate;
+  const dateLocale = locale === "ko" ? ko : enUS;
 
   return formatDistanceToNow(date, {
-    locale: ko,
+    locale: dateLocale,
   });
 }
 
@@ -57,8 +60,9 @@ function utf16IndexToUtf8Index(content: string, i: number) {
   return encoder.encode(content.slice(0, i)).byteLength;
 }
 
-export function addReadArticleFacets(rt: RichText, link: string) {
-  const text = "글 보기";
+export async function addReadArticleFacets(rt: RichText, link: string) {
+  const t = await getTranslations("Feed");
+  const text = t("seeArticle");
 
   if (rt.text.length === 0) {
     rt.insert(0, text);
