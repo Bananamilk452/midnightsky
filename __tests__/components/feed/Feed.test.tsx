@@ -1,13 +1,26 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { AppBskyEmbedRecord } from "@atproto/api";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  makeFeedPostRecord,
+  makeFeedViewPost,
+  makePostView,
+  makeReasonPin,
+  makeReasonRepost,
+} from "@/__tests__/helpers/feed";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: any) => (
+  default: ({
+    children,
+    href,
+    ...props
+  }: React.PropsWithChildren<{ href: string }>) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -15,7 +28,7 @@ vi.mock("next/link", () => ({
 }));
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string, params?: any) => {
+  useTranslations: () => (key: string, params?: Record<string, string>) => {
     if (key === "reposted" && params) return `Reposted by ${params.name}`;
     if (key === "pinned") return "Pinned";
     if (key === "viewFullThread") return "View full thread";
@@ -35,11 +48,13 @@ vi.mock("@/components/feed/Avatar", () => ({
 }));
 
 vi.mock("@/components/feed/Content", () => ({
-  FeedContent: ({ text }: any) => <p>{text}</p>,
+  FeedContent: () => <div data-testid="feed-content" />,
 }));
 
 vi.mock("@/components/feed/Embed", () => ({
-  FeedEmbed: () => <div data-testid="feed-embed" />,
+  FeedEmbed: ({ embed }: { embed?: unknown }) => (
+    <div data-testid="feed-embed">{embed ? "embed" : "no-embed"}</div>
+  ),
 }));
 
 vi.mock("@/components/feed/Footer", () => ({
@@ -47,17 +62,17 @@ vi.mock("@/components/feed/Footer", () => ({
 }));
 
 vi.mock("@/components/feed/Header", () => ({
-  FeedHeader: ({ post }: any) => (
-    <div data-testid="feed-header">{post.author.displayName || post.author.handle}</div>
-  ),
+  FeedHeader: () => <div data-testid="feed-header">Header</div>,
 }));
 
 vi.mock("@/components/feed/Label", () => ({
-  FeedLabel: ({ children }: any) => <div>{children}</div>,
+  FeedLabel: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/feed/Repost", () => ({
-  FeedRepost: ({ feed }: any) => <div data-testid="feed-repost">Reposted</div>,
+  FeedRepost: ({ feed }: { feed: unknown }) => (
+    <div data-testid="feed-repost">Reposted</div>
+  ),
 }));
 
 vi.mock("@/components/feed/Pin", () => ({
@@ -72,56 +87,14 @@ vi.mock("@/components/feed/embed/Post", () => ({
   FeedPost: () => <div data-testid="feed-post" />,
 }));
 
-vi.mock("@/lib/bluesky/utils", () => ({
-  validateRecord: (record: any) => {
-    if (record?.$type === "app.bsky.feed.post" || record?.text) {
-      return { text: record.text, createdAt: record.createdAt || "2024-01-01T00:00:00Z", facets: record.facets };
-    }
-    return undefined;
-  },
-  getRelativeTimeBasic: () => "2h",
-}));
-
 vi.mock("@/lib/utils", () => ({
-  cn: (...args: any[]) => args.filter(Boolean).join(" "),
+  cn: (...args: string[]) => args.filter(Boolean).join(" "),
   parseAtUri: (uri: string) => {
     const parts = uri.replace("at://", "").split("/");
     return { authority: parts[0], collection: parts[1], rkey: parts[2] };
   },
-  createFeedKey: (feed: any) => feed.post.uri,
+  createFeedKey: (feed: { post: { uri: string } }) => feed.post.uri,
 }));
-
-vi.mock("@/lib/lexicon/types/app/midnightsky/post", () => ({
-  isRecord: () => false,
-}));
-
-vi.mock("@atproto/api/dist/client/types/app/bsky/feed/defs", () => ({
-  isPostView: (v: any) => v?.$type === "app.bsky.feed.defs#postView",
-  isReasonPin: (v: any) => v?.$type === "app.bsky.feed.defs#reasonPin",
-  isReasonRepost: (v: any) => v?.$type === "app.bsky.feed.defs#reasonRepost",
-}));
-
-function makePost(overrides?: Partial<any>): any {
-  return {
-    uri: "at://did:plc:test/app.bsky.feed.post/rkey1",
-    cid: "cid1",
-    $type: "app.bsky.feed.defs#postView",
-    author: { did: "did:plc:test", handle: "test.bsky.social", displayName: "Test User" },
-    record: { text: "Hello world", $type: "app.bsky.feed.post", createdAt: "2024-01-01T00:00:00Z" },
-    replyCount: 0,
-    repostCount: 0,
-    likeCount: 0,
-    viewer: {},
-    ...overrides,
-  };
-}
-
-function makeFeed(overrides?: Partial<any>): any {
-  return {
-    post: makePost(),
-    ...overrides,
-  };
-}
 
 describe("Feed", () => {
   beforeEach(() => {
@@ -135,9 +108,9 @@ describe("Feed", () => {
 
   it("should render a simple feed item", async () => {
     const { Feed } = await importComponent();
-    render(<Feed feed={makeFeed()} />);
+    render(<Feed feed={makeFeedViewPost()} />);
 
-    expect(screen.getByText("Hello world")).toBeInTheDocument();
+    expect(screen.getByTestId("feed-content")).toBeInTheDocument();
     expect(screen.getByTestId("feed-footer")).toBeInTheDocument();
   });
 
@@ -145,11 +118,14 @@ describe("Feed", () => {
     const { Feed } = await importComponent();
     render(
       <Feed
-        feed={makeFeed({
-          reason: {
-            $type: "app.bsky.feed.defs#reasonRepost",
-            by: { displayName: "Alice", handle: "alice.bsky.social" },
-          },
+        feed={makeFeedViewPost({
+          reason: makeReasonRepost({
+            by: {
+              displayName: "Alice",
+              handle: "alice.bsky.social",
+              did: "did:plc:alice",
+            },
+          }),
         })}
       />,
     );
@@ -161,8 +137,8 @@ describe("Feed", () => {
     const { Feed } = await importComponent();
     render(
       <Feed
-        feed={makeFeed({
-          reason: { $type: "app.bsky.feed.defs#reasonPin" },
+        feed={makeFeedViewPost({
+          reason: makeReasonPin(),
         })}
       />,
     );
@@ -172,25 +148,27 @@ describe("Feed", () => {
 
   it("should render reply parent when present", async () => {
     const { Feed } = await importComponent();
-    const parent = makePost({
+    const parent = makePostView({
       uri: "at://did:plc:test/app.bsky.feed.post/parent1",
-      record: { text: "Parent post", $type: "app.bsky.feed.post", createdAt: "2024-01-01T00:00:00Z" },
+      record: makeFeedPostRecord({ text: "Parent post" }),
     });
-    const root = makePost({
+    const root = makePostView({
       uri: "at://did:plc:test/app.bsky.feed.post/root1",
-      record: { text: "Root post", $type: "app.bsky.feed.post", createdAt: "2024-01-01T00:00:00Z" },
+      record: makeFeedPostRecord({ text: "Root post" }),
     });
 
     render(
       <Feed
-        feed={makeFeed({
+        feed={makeFeedViewPost({
           reply: { parent, root },
         })}
       />,
     );
 
-    expect(screen.getByText("Parent post")).toBeInTheDocument();
-    expect(screen.getByText("Hello world")).toBeInTheDocument();
+    expect(screen.getAllByTestId("feed-content").length).toBeGreaterThanOrEqual(
+      2,
+    );
+    expect(document.getElementById("parent1")).toBeInTheDocument();
   });
 });
 
@@ -206,24 +184,26 @@ describe("FeedRecord", () => {
 
   it("should render post content", async () => {
     const { FeedRecord } = await importComponent();
-    render(<FeedRecord post={makePost()} />);
+    render(<FeedRecord post={makePostView()} />);
 
-    expect(screen.getByText("Hello world")).toBeInTheDocument();
+    expect(screen.getByTestId("feed-content")).toBeInTheDocument();
     expect(screen.getByTestId("feed-avatar")).toBeInTheDocument();
     expect(screen.getByTestId("feed-footer")).toBeInTheDocument();
   });
 
   it("should throw for invalid record", async () => {
     const { FeedRecord } = await importComponent();
-    const invalidPost = makePost({ record: { $type: "invalid" } });
+    const invalidPost = makePostView({ record: { $type: "invalid" } });
 
-    expect(() => render(<FeedRecord post={invalidPost} />)).toThrow("Invalid post record");
+    expect(() => render(<FeedRecord post={invalidPost} />)).toThrow(
+      "Invalid post record",
+    );
   });
 
   it("should render top line when line.top is true", async () => {
     const { FeedRecord } = await importComponent();
     const { container } = render(
-      <FeedRecord post={makePost()} line={{ top: true, bottom: false }} />,
+      <FeedRecord post={makePostView()} line={{ top: true, bottom: false }} />,
     );
 
     const lines = container.querySelectorAll(".bg-gray-400");
@@ -233,7 +213,7 @@ describe("FeedRecord", () => {
   it("should render children", async () => {
     const { FeedRecord } = await importComponent();
     render(
-      <FeedRecord post={makePost()}>
+      <FeedRecord post={makePostView()}>
         <span data-testid="child-element">Child</span>
       </FeedRecord>,
     );
@@ -250,24 +230,34 @@ describe("EmbedPost", () => {
 
   it("should render embedded post content", async () => {
     const { EmbedPost } = await importComponent();
-    const embedPost = {
+    const embedPost: AppBskyEmbedRecord.ViewRecord = {
+      $type: "app.bsky.embed.record#viewRecord",
       uri: "at://did:plc:test/app.bsky.feed.post/embed1",
-      author: { did: "did:plc:test", handle: "test.bsky.social", displayName: "Test" },
-      value: { text: "Embedded text", $type: "app.bsky.feed.post", createdAt: "2024-01-01T00:00:00Z" },
-    } as any;
+      cid: "cid-embed1",
+      author: {
+        did: "did:plc:test",
+        handle: "test.bsky.social",
+        displayName: "Test",
+      },
+      value: makeFeedPostRecord({ text: "Embedded text" }),
+      indexedAt: "2024-01-01T00:00:00Z",
+    };
 
     render(<EmbedPost post={embedPost} />);
 
-    expect(screen.getByText("Embedded text")).toBeInTheDocument();
+    expect(screen.getByTestId("feed-content")).toBeInTheDocument();
   });
 
   it("should throw for invalid embed value", async () => {
     const { EmbedPost } = await importComponent();
-    const invalidPost = {
+    const invalidPost: AppBskyEmbedRecord.ViewRecord = {
+      $type: "app.bsky.embed.record#viewRecord",
       uri: "at://did:plc:test/app.bsky.feed.post/embed1",
+      cid: "cid-embed1",
       author: { did: "did:plc:test", handle: "test.bsky.social" },
       value: { $type: "invalid" },
-    } as any;
+      indexedAt: "2024-01-01T00:00:00Z",
+    };
 
     expect(() => render(<EmbedPost post={invalidPost} />)).toThrow();
   });

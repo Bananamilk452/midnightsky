@@ -1,15 +1,17 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockUseTimeline = vi.fn();
 
 vi.mock("@/lib/hooks/useBluesky", () => ({
-  useTimeline: (params: any) => mockUseTimeline(params),
+  useTimeline: (params: { limit: number }) => mockUseTimeline(params),
 }));
 
 vi.mock("@/components/feed", () => ({
-  Feed: ({ feed }: any) => <div data-testid="feed-item">{feed.post.record.text}</div>,
+  Feed: ({ feed }: { feed: { post: { record: { text: string } } } }) => (
+    <div data-testid="feed-item">{feed.post.record.text}</div>
+  ),
 }));
 
 vi.mock("@/components/home/HomeHeader", () => ({
@@ -17,15 +19,31 @@ vi.mock("@/components/home/HomeHeader", () => ({
 }));
 
 vi.mock("@/components/InfiniteScrollTrigger", () => ({
-  InfiniteScrollTrigger: ({ onTrigger, hasNextPage, isFetching }: any) => (
-    <div data-testid="scroll-trigger" data-has-next={hasNextPage} data-fetching={isFetching} />
+  InfiniteScrollTrigger: ({
+    onTrigger,
+    hasNextPage,
+    isFetching,
+  }: {
+    onTrigger: () => void;
+    hasNextPage: boolean;
+    isFetching: boolean;
+  }) => (
+    <div
+      data-testid="scroll-trigger"
+      data-has-next={hasNextPage}
+      data-fetching={isFetching}
+    />
   ),
 }));
 
 vi.mock("@/components/ErrorBoundaryPage", () => ({
-  ErrorBoundaryPage: ({ error, onReset }: any) => (
-    <div data-testid="error-page">{error.message}</div>
-  ),
+  ErrorBoundaryPage: ({
+    error,
+    onReset,
+  }: {
+    error: { message: string };
+    onReset?: () => void;
+  }) => <div data-testid="error-page">{error.message}</div>,
 }));
 
 vi.mock("@/components/LoadingFallback", () => ({
@@ -33,7 +51,7 @@ vi.mock("@/components/LoadingFallback", () => ({
 }));
 
 vi.mock("@/lib/utils", () => ({
-  createFeedKey: (feed: any) => feed.post.uri,
+  createFeedKey: (feed: { post: { uri: string } }) => feed.post.uri,
 }));
 
 describe("Home Page", () => {

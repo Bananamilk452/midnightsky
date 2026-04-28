@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("lucide-react", () => ({
@@ -7,11 +7,19 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key === "addImage" ? "Add Image" : key,
+  useTranslations: () => (key: string) =>
+    key === "addImage" ? "Add Image" : key,
 }));
 
 vi.mock("@/components/ui/button", () => ({
-  Button: ({ children, onClick, ...props }: any) => (
+  Button: ({
+    children,
+    onClick,
+    ...props
+  }: React.PropsWithChildren<{
+    onClick?: React.MouseEventHandler;
+  }> &
+    Record<string, unknown>) => (
     <button onClick={onClick} {...props}>
       {children}
     </button>
@@ -40,7 +48,9 @@ describe("ImageButton", () => {
     const ImageButton = await importComponent();
     const { container } = render(<ImageButton setImage={vi.fn()} />);
 
-    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = container.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute("accept", "image/*");
     expect(input).toHaveClass("hidden");

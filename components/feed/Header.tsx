@@ -1,22 +1,20 @@
-import { AppBskyEmbedRecord } from "@atproto/api";
-import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+"use client";
 
-import { getRelativeTimeBasic } from "@/lib/bluesky/utils";
-import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
 
+import { useFeedContext } from "@/components/feed/context";
+import { getRelativeTimeBasic } from "@/lib/bluesky/utils";
+import { cn } from "@/lib/utils";
+
 export function FeedHeader({
-  post,
-  createdAt,
   children,
   className = "",
 }: {
-  post: PostView | AppBskyEmbedRecord.ViewRecord;
-  createdAt: string;
   children?: React.ReactNode;
   className?: string;
 }) {
-  const locale = useLocale();  
+  const { post, record } = useFeedContext();
+  const locale = useLocale();
   return (
     <div className={cn("flex items-center gap-1", className)}>
       {children}
@@ -28,7 +26,7 @@ export function FeedHeader({
       </p>
       &middot;
       <span className="shrink-0 text-xs text-gray-400">
-        {getRelativeTimeBasic(createdAt, locale)}
+        {getRelativeTimeBasic(record.createdAt, locale)}
       </span>
     </div>
   );

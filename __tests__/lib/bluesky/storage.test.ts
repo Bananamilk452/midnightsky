@@ -1,15 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { StateStore, SessionStore } from "@/lib/bluesky/storage";
+import { SessionStore, StateStore } from "@/lib/bluesky/storage";
 
-function createMockPrisma(modelName: string) {
+import type {
+  NodeSavedSession,
+  NodeSavedState,
+} from "@atproto/oauth-client-node";
+
+type MockPrismaModel = {
+  findFirst: ReturnType<typeof vi.fn>;
+  upsert: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
+
+function createMockPrisma(modelName: string): Record<string, MockPrismaModel> {
   return {
     [modelName]: {
       findFirst: vi.fn(),
       upsert: vi.fn(),
       delete: vi.fn(),
     },
-  } as any;
+  };
 }
 
 describe("StateStore", () => {
@@ -18,7 +29,7 @@ describe("StateStore", () => {
 
   beforeEach(() => {
     prisma = createMockPrisma("authState");
-    store = new StateStore(prisma);
+    store = new StateStore(prisma as never);
   });
 
   describe("get", () => {
@@ -51,7 +62,7 @@ describe("StateStore", () => {
       const val = { dpopJwk: "key", redirectUri: "uri" };
       prisma.authState.upsert.mockResolvedValue({});
 
-      await store.set("test-key", val as any);
+      await store.set("test-key", val as unknown as NodeSavedState);
 
       expect(prisma.authState.upsert).toHaveBeenCalledWith({
         where: { key: "test-key" },
@@ -80,7 +91,7 @@ describe("SessionStore", () => {
 
   beforeEach(() => {
     prisma = createMockPrisma("authSession");
-    store = new SessionStore(prisma);
+    store = new SessionStore(prisma as never);
   });
 
   describe("get", () => {
@@ -113,7 +124,7 @@ describe("SessionStore", () => {
       const val = { dpopJwk: "key", session: "data" };
       prisma.authSession.upsert.mockResolvedValue({});
 
-      await store.set("test-key", val as any);
+      await store.set("test-key", val as unknown as NodeSavedSession);
 
       expect(prisma.authSession.upsert).toHaveBeenCalledWith({
         where: { key: "test-key" },

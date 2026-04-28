@@ -1,17 +1,18 @@
+import { AppBskyActorDefs } from "@atproto/api";
 import { describe, expect, it } from "vitest";
 
 import { createUser } from "@/lib/bluesky/utils";
 
 describe("createUser", () => {
   it("should extract user fields from ProfileViewDetailed", () => {
-    const data = {
+    const data: AppBskyActorDefs.ProfileViewDetailed = {
       did: "did:plc:abc123",
       handle: "alice.bsky.social",
       displayName: "Alice",
       avatar: "https://cdn.example.com/avatar.jpg",
       description: "Hello world",
       banner: "https://cdn.example.com/banner.jpg",
-    } as any;
+    };
 
     const user = createUser(data);
 
@@ -26,14 +27,14 @@ describe("createUser", () => {
   });
 
   it("should handle undefined optional fields", () => {
-    const data = {
+    const data: AppBskyActorDefs.ProfileViewDetailed = {
       did: "did:plc:abc123",
       handle: "bob.bsky.social",
       displayName: undefined,
       avatar: undefined,
       description: undefined,
       banner: undefined,
-    } as any;
+    };
 
     const user = createUser(data);
 

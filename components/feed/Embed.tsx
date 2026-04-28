@@ -1,24 +1,39 @@
+"use client";
+
 import {
+  $Typed,
   AppBskyEmbedExternal,
   AppBskyEmbedImages,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
   AppBskyEmbedVideo,
-  AppBskyFeedDefs,
 } from "@atproto/api";
+import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 
 import { EmbedPost } from "@/components/feed";
+import { useFeedContext } from "@/components/feed/context";
 import { FeedExternal } from "@/components/feed/embed/External";
 import { FeedImage } from "@/components/feed/embed/Image";
 import { FeedVideo } from "@/components/feed/embed/Video";
 import { validateRecord } from "@/lib/bluesky/utils";
 
-export function FeedEmbed({
-  embed,
-}: {
-  embed: AppBskyFeedDefs.FeedViewPost["post"]["embed"];
-}) {
-  // 1. Image
+type EmbedType =
+  | $Typed<AppBskyEmbedImages.View>
+  | $Typed<AppBskyEmbedVideo.View>
+  | $Typed<AppBskyEmbedExternal.View>
+  | $Typed<AppBskyEmbedRecord.View>
+  | $Typed<AppBskyEmbedRecordWithMedia.View>
+  | { $type: string };
+
+export function FeedEmbed({ embed: embedProp }: { embed?: EmbedType }) {
+  const { post: _post } = useFeedContext();
+  // Thread에서 내려오는 Post는 PostView 타입이지만,
+  // $type이 없어서 isPostView 사용 불가능. 따라서 as 사용
+  const post = _post as PostView;
+  if (!embedProp && !post.embed) return null;
+
+  const embed: EmbedType = embedProp! ?? post.embed!;
+
   if (AppBskyEmbedImages.isView(embed)) {
     return <FeedImage content={embed} />;
   }
@@ -62,7 +77,6 @@ export function FeedEmbed({
     );
   }
 
-  // 5. Video
   if (AppBskyEmbedVideo.isView(embed)) {
     return <FeedVideo content={embed} />;
   }

@@ -21,6 +21,11 @@ describe("LoadingFallback", () => {
     const { container } = render(<LoadingFallback />);
 
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveClass("flex", "h-32", "items-center", "justify-center");
+    expect(wrapper).toHaveClass(
+      "flex",
+      "h-32",
+      "items-center",
+      "justify-center",
+    );
   });
 });

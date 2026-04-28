@@ -1,8 +1,8 @@
 "use client";
 
 import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { parseAtUri } from "@/lib/utils";
 
@@ -19,7 +19,9 @@ export function FeedThreadEllipsis({ post }: { post: PostView }) {
       <div className="mr-3 flex h-6 w-10 justify-center">
         <div className="border-l-2 border-dotted border-gray-400"></div>
       </div>
-      <p className="text-blue-500 group-hover:underline">{t("viewFullThread")}</p>
+      <p className="text-blue-500 group-hover:underline">
+        {t("viewFullThread")}
+      </p>
     </Link>
   );
 }

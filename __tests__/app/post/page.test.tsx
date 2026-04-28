@@ -10,15 +10,18 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/lib/hooks/useBluesky", () => ({
-  usePostThread: (authority: string, rkey: string) => mockUsePostThread(authority, rkey),
+  usePostThread: (authority: string, rkey: string) =>
+    mockUsePostThread(authority, rkey),
 }));
 
 vi.mock("@/components/feed/thread", () => ({
-  FeedThread: ({ thread }: any) => <div data-testid="feed-thread">Thread</div>,
+  FeedThread: ({ thread }: { thread: unknown }) => (
+    <div data-testid="feed-thread">Thread</div>
+  ),
 }));
 
 vi.mock("@/components/ErrorBoundaryPage", () => ({
-  ErrorBoundaryPage: ({ error }: any) => (
+  ErrorBoundaryPage: ({ error }: { error: { message: string } }) => (
     <div data-testid="error-page">{error.message}</div>
   ),
 }));
@@ -30,8 +33,14 @@ vi.mock("@/components/LoadingFallback", () => ({
 describe("Post Detail Page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({ top: 100 });
-    const mockEl = { scrollTo: mockScrollTo, scrollTop: 0, getBoundingClientRect: () => ({ top: 100 }) };
+    Element.prototype.getBoundingClientRect = vi
+      .fn()
+      .mockReturnValue({ top: 100 });
+    const mockEl = {
+      scrollTo: mockScrollTo,
+      scrollTop: 0,
+      getBoundingClientRect: () => ({ top: 100 }),
+    };
     document.getElementById = vi.fn().mockReturnValue(mockEl);
   });
 
@@ -93,7 +102,10 @@ describe("Post Detail Page", () => {
     const Page = await importPage();
     render(<Page />);
 
-    expect(mockUsePostThread).toHaveBeenCalledWith("test.bsky.social", "3kabc123");
+    expect(mockUsePostThread).toHaveBeenCalledWith(
+      "test.bsky.social",
+      "3kabc123",
+    );
   });
 
   it("should render bottom spacer on success", async () => {

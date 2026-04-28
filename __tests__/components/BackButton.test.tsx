@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import BackButton from "@/components/BackButton";
 
 const mockBack = vi.fn();
 const mockPush = vi.fn();
@@ -13,12 +15,16 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("lucide-react", () => ({
-  ArrowLeftIcon: ({ onClick, className }: { onClick?: () => void; className?: string }) => (
+  ArrowLeftIcon: ({
+    onClick,
+    className,
+  }: {
+    onClick?: () => void;
+    className?: string;
+  }) => (
     <svg data-testid="arrow-left" onClick={onClick} className={className} />
   ),
 }));
-
-import BackButton from "@/components/BackButton";
 
 describe("BackButton", () => {
   beforeEach(() => {

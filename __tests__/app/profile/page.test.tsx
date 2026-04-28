@@ -11,11 +11,14 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/hooks/useBluesky", () => ({
   useProfile: (actor: string) => mockUseProfile(actor),
-  useAuthorFeed: (params: any) => mockUseAuthorFeed(params),
+  useAuthorFeed: (params: { actor: string; limit: number }) =>
+    mockUseAuthorFeed(params),
 }));
 
 vi.mock("@/components/feed", () => ({
-  Feed: ({ feed }: any) => <div data-testid="feed-item">{feed.post.record.text}</div>,
+  Feed: ({ feed }: { feed: { post: { record: { text: string } } } }) => (
+    <div data-testid="feed-item">{feed.post.record.text}</div>
+  ),
 }));
 
 vi.mock("@/components/InfiniteScrollTrigger", () => ({
@@ -27,19 +30,19 @@ vi.mock("@/components/LoadingFallback", () => ({
 }));
 
 vi.mock("@/components/ErrorBoundaryPage", () => ({
-  ErrorBoundaryPage: ({ error }: any) => (
+  ErrorBoundaryPage: ({ error }: { error: { message: string } }) => (
     <div data-testid="error-page">{error.message}</div>
   ),
 }));
 
 vi.mock("@/components/profile/Banner", () => ({
-  ProfileBanner: ({ profile }: any) => (
+  ProfileBanner: ({ profile }: { profile: { handle: string } }) => (
     <div data-testid="profile-banner">{profile.handle}</div>
   ),
 }));
 
 vi.mock("@/lib/utils", () => ({
-  createFeedKey: (feed: any) => feed.post.uri,
+  createFeedKey: (feed: { post: { uri: string } }) => feed.post.uri,
 }));
 
 describe("Profile Page", () => {
@@ -53,10 +56,20 @@ describe("Profile Page", () => {
   }
 
   it("should show loading when both profile and feed are pending", async () => {
-    mockUseProfile.mockReturnValue({ data: undefined, error: null, status: "pending", refetch: vi.fn() });
+    mockUseProfile.mockReturnValue({
+      data: undefined,
+      error: null,
+      status: "pending",
+      refetch: vi.fn(),
+    });
     mockUseAuthorFeed.mockReturnValue({
-      data: undefined, error: null, status: "pending",
-      fetchNextPage: vi.fn(), hasNextPage: false, isFetching: false, refetch: vi.fn(),
+      data: undefined,
+      error: null,
+      status: "pending",
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
 
     const Page = await importPage();
@@ -67,11 +80,19 @@ describe("Profile Page", () => {
 
   it("should show profile error state", async () => {
     mockUseProfile.mockReturnValue({
-      data: undefined, error: { message: "Profile not found" }, status: "error", refetch: vi.fn(),
+      data: undefined,
+      error: { message: "Profile not found" },
+      status: "error",
+      refetch: vi.fn(),
     });
     mockUseAuthorFeed.mockReturnValue({
-      data: { pages: [{ feed: [] }] }, error: null, status: "success",
-      fetchNextPage: vi.fn(), hasNextPage: false, isFetching: false, refetch: vi.fn(),
+      data: { pages: [{ feed: [] }] },
+      error: null,
+      status: "success",
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
 
     const Page = await importPage();
@@ -83,11 +104,18 @@ describe("Profile Page", () => {
   it("should show profile banner on success", async () => {
     mockUseProfile.mockReturnValue({
       data: { handle: "test.bsky.social", displayName: "Test" },
-      error: null, status: "success", refetch: vi.fn(),
+      error: null,
+      status: "success",
+      refetch: vi.fn(),
     });
     mockUseAuthorFeed.mockReturnValue({
-      data: { pages: [{ feed: [] }] }, error: null, status: "success",
-      fetchNextPage: vi.fn(), hasNextPage: false, isFetching: false, refetch: vi.fn(),
+      data: { pages: [{ feed: [] }] },
+      error: null,
+      status: "success",
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
 
     const Page = await importPage();
@@ -100,18 +128,26 @@ describe("Profile Page", () => {
   it("should render feed items", async () => {
     mockUseProfile.mockReturnValue({
       data: { handle: "test.bsky.social" },
-      error: null, status: "success", refetch: vi.fn(),
+      error: null,
+      status: "success",
+      refetch: vi.fn(),
     });
     mockUseAuthorFeed.mockReturnValue({
       data: {
-        pages: [{
-          feed: [
-            { post: { uri: "at://a/b/1", record: { text: "My post" } } },
-          ],
-        }],
+        pages: [
+          {
+            feed: [
+              { post: { uri: "at://a/b/1", record: { text: "My post" } } },
+            ],
+          },
+        ],
       },
-      error: null, status: "success",
-      fetchNextPage: vi.fn(), hasNextPage: false, isFetching: false, refetch: vi.fn(),
+      error: null,
+      status: "success",
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
 
     const Page = await importPage();
@@ -123,11 +159,18 @@ describe("Profile Page", () => {
   it("should show feed error state", async () => {
     mockUseProfile.mockReturnValue({
       data: { handle: "test.bsky.social" },
-      error: null, status: "success", refetch: vi.fn(),
+      error: null,
+      status: "success",
+      refetch: vi.fn(),
     });
     mockUseAuthorFeed.mockReturnValue({
-      data: undefined, error: { message: "Feed error" }, status: "error",
-      fetchNextPage: vi.fn(), hasNextPage: false, isFetching: false, refetch: vi.fn(),
+      data: undefined,
+      error: { message: "Feed error" },
+      status: "error",
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
 
     const Page = await importPage();

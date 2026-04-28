@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { type ReactNode } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/bluesky/action", () => ({
   signInWithBluesky: vi.fn(),
@@ -51,14 +51,21 @@ vi.mock("@/lib/session", () => ({
 }));
 
 vi.mock("@/lib/utils", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/utils")>("@/lib/utils");
+  const actual =
+    await vi.importActual<typeof import("@/lib/utils")>("@/lib/utils");
   return {
     ...actual,
-    serverActionErrorHandler: (action: any) => async (...args: any[]) => {
-      const result = await action(...args);
-      if (result.success) return result.data;
-      throw new Error(result.error);
-    },
+    serverActionErrorHandler:
+      <T,>(
+        action: (
+          ...args: never[]
+        ) => Promise<{ success: boolean; data?: T; error?: string }>,
+      ) =>
+      async (...args: never[]) => {
+        const result = await action(...args);
+        if (result.success) return result.data;
+        throw new Error(result.error);
+      },
   };
 });
 
@@ -98,10 +105,9 @@ describe("useBluesky hooks", () => {
       const { useTimeline } = await import("@/lib/hooks/useBluesky");
       const wrapper = createWrapper();
 
-      const { result } = renderHook(
-        () => useTimeline({ limit: 30 }),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useTimeline({ limit: 30 }), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });
@@ -112,10 +118,9 @@ describe("useBluesky hooks", () => {
       const { useProfile } = await import("@/lib/hooks/useBluesky");
       const wrapper = createWrapper();
 
-      const { result } = renderHook(
-        () => useProfile("alice.bsky.social"),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useProfile("alice.bsky.social"), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });
@@ -126,10 +131,9 @@ describe("useBluesky hooks", () => {
       const { useBookmarks } = await import("@/lib/hooks/useBluesky");
       const wrapper = createWrapper();
 
-      const { result } = renderHook(
-        () => useBookmarks({ limit: 30 }),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useBookmarks({ limit: 30 }), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });

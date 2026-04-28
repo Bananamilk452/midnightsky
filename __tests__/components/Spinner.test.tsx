@@ -13,7 +13,9 @@ describe("Spinner", () => {
   });
 
   it("should pass additional props to SVG", () => {
-    const { container } = render(<Spinner className="test-class" data-testid="spinner" />);
+    const { container } = render(
+      <Spinner className="test-class" data-testid="spinner" />,
+    );
 
     const svg = container.querySelector("svg");
     expect(svg).toHaveClass("test-class");

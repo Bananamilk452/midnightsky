@@ -1,17 +1,26 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockCallback, mockAuthorize, mockSave, mockGetOptionalSession, mockCreateUser } =
-  vi.hoisted(() => ({
-    mockCallback: vi.fn(),
-    mockAuthorize: vi.fn(),
-    mockSave: vi.fn(),
-    mockGetOptionalSession: vi.fn(),
-    mockCreateUser: vi.fn(),
-  }));
+import { GET } from "@/app/auth/callback/route";
+
+const {
+  mockCallback,
+  mockAuthorize,
+  mockSave,
+  mockGetOptionalSession,
+  mockCreateUser,
+} = vi.hoisted(() => ({
+  mockCallback: vi.fn(),
+  mockAuthorize: vi.fn(),
+  mockSave: vi.fn(),
+  mockGetOptionalSession: vi.fn(),
+  mockCreateUser: vi.fn(),
+}));
 
 vi.mock("@atproto/api", () => ({
-  Agent: vi.fn().mockImplementation(function (this: any) {
+  Agent: vi.fn().mockImplementation(function (this: {
+    getProfile: ReturnType<typeof vi.fn>;
+  }) {
     this.getProfile = vi.fn().mockResolvedValue({
       data: {
         did: "did:plc:abc",
@@ -47,15 +56,13 @@ vi.mock("@/lib/bluesky", () => ({
 }));
 
 vi.mock("@/lib/session", () => ({
-  getOptionalSession: () =>
-    mockGetOptionalSession(),
+  getOptionalSession: () => mockGetOptionalSession(),
 }));
 
 vi.mock("@/lib/bluesky/utils", () => ({
-  createUser: (data: any) => mockCreateUser(data),
+  createUser: <T extends Record<string, unknown>>(data: T) =>
+    mockCreateUser(data),
 }));
-
-import { GET } from "@/app/auth/callback/route";
 
 const originalEnv = process.env;
 
@@ -67,12 +74,14 @@ describe("GET /auth/callback", () => {
       user: null,
       save: mockSave,
     });
-    mockCreateUser.mockImplementation((data: any) => ({
-      did: data.did,
-      handle: data.handle,
-      displayName: data.displayName,
-      avatar: data.avatar,
-    }));
+    mockCreateUser.mockImplementation(
+      <T extends Record<string, unknown>>(data: T) => ({
+        did: data.did,
+        handle: data.handle,
+        displayName: data.displayName,
+        avatar: data.avatar,
+      }),
+    );
   });
 
   afterEach(() => {
@@ -177,7 +186,7 @@ describe("GET /auth/callback", () => {
   it("should re-authorize on login_required error", async () => {
     const { OAuthCallbackError } = await import("@atproto/oauth-client-node");
 
-    const oauthError = new (OAuthCallbackError as any)(
+    const oauthError = new OAuthCallbackError(
       "login_required",
       { error: "login_required" },
       JSON.stringify({ handle: "alice.bsky.social", redirectTo: "/home" }),
@@ -204,7 +213,7 @@ describe("GET /auth/callback", () => {
   it("should re-authorize on consent_required error", async () => {
     const { OAuthCallbackError } = await import("@atproto/oauth-client-node");
 
-    const oauthError = new (OAuthCallbackError as any)(
+    const oauthError = new OAuthCallbackError(
       "consent_required",
       { error: "consent_required" },
       JSON.stringify({ handle: "bob.bsky.social", redirectTo: "/home" }),
@@ -225,7 +234,7 @@ describe("GET /auth/callback", () => {
   it("should redirect to error page when re-authorization fails", async () => {
     const { OAuthCallbackError } = await import("@atproto/oauth-client-node");
 
-    const oauthError = new (OAuthCallbackError as any)(
+    const oauthError = new OAuthCallbackError(
       "login_required",
       { error: "login_required" },
       JSON.stringify({ handle: "alice.bsky.social", redirectTo: "/home" }),

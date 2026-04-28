@@ -15,7 +15,8 @@ vi.mock("next/headers", () => ({
 describe("session", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.COOKIE_PASSWORD = "test-cookie-password-that-is-long-enough-32chars";
+    process.env.COOKIE_PASSWORD =
+      "test-cookie-password-that-is-long-enough-32chars";
   });
 
   describe("getOptionalSession", () => {
