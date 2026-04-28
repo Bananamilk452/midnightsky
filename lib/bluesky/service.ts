@@ -11,6 +11,7 @@ import {
   isCreate,
   validateCreate,
 } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
+import { getLocale } from "next-intl/server";
 
 import { getAgent } from "@/lib/bluesky/action";
 import {
@@ -19,7 +20,6 @@ import {
 } from "@/lib/lexicon/types/app/midnightsky/post";
 import { getSession } from "@/lib/session";
 import { ApiError } from "@/lib/utils.server";
-import { getLocale } from "next-intl/server";
 
 import { CreatePostParams } from "./types";
 import { addReadArticleFacets } from "./utils";

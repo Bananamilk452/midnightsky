@@ -14,9 +14,7 @@ export function PrivatePost({ post }: { post: Post.Record }) {
   if (!data.isViewable) {
     return (
       <div className="rounded-lg border border-gray-400 bg-gray-50 p-4 shadow">
-        <p className="text-black">
-          {t("noPermissionMutual")}
-        </p>
+        <p className="text-black">{t("noPermissionMutual")}</p>
       </div>
     );
   }

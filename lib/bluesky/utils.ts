@@ -5,8 +5,8 @@ import {
   validateRecord as validateThreadgateRecord,
 } from "@atproto/api/dist/client/types/app/bsky/feed/threadgate";
 import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale/ko";
 import { enUS } from "date-fns/locale/en-US";
+import { ko } from "date-fns/locale/ko";
 import { getTranslations } from "next-intl/server";
 
 import { getAgent } from "@/lib/bluesky/action";

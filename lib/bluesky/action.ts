@@ -13,8 +13,8 @@ import {
 import { OutputSchema as getListsData } from "@atproto/api/dist/client/types/app/bsky/graph/getLists";
 import { Response as ApplyWritesData } from "@atproto/api/dist/client/types/com/atproto/repo/applyWrites";
 import { TID } from "@atproto/common";
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { blueskyClient } from "@/lib/bluesky";
 import {
@@ -127,7 +127,10 @@ export async function getPostThread(
     };
   } catch (error) {
     console.error("Error fetching post thread:", error);
-    return { success: false, error: (await getTranslations("Actions"))("threadFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("threadFetchFailed"),
+    };
   }
 }
 
@@ -145,7 +148,10 @@ export async function getPublicPost(
     };
   } catch (error) {
     console.error("Error fetching public post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("postFetchFailed"),
+    };
   }
 }
 
@@ -169,7 +175,10 @@ export async function getPrivatePost(
       : { success: true, data: { isViewable } };
   } catch (error) {
     console.error("Error fetching private post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("postFetchFailed"),
+    };
   }
 }
 
@@ -193,7 +202,10 @@ export async function getListPost(
       : { success: true, data: { isViewable } };
   } catch (error) {
     console.error("Error fetching list post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("postFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("postFetchFailed"),
+    };
   }
 }
 
@@ -215,7 +227,10 @@ export async function getTimeline(
     };
   } catch (error) {
     console.error("Error fetching timeline:", error);
-    return { success: false, error: (await getTranslations("Actions"))("timelineFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("timelineFetchFailed"),
+    };
   }
 }
 
@@ -248,7 +263,10 @@ export async function getProfile(
     };
   } catch (error) {
     console.error("Error fetching profile:", error);
-    return { success: false, error: (await getTranslations("Actions"))("profileFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("profileFetchFailed"),
+    };
   }
 }
 
@@ -282,7 +300,10 @@ export async function getAuthorFeed({
     };
   } catch (error) {
     console.error("Error fetching author feed:", error);
-    return { success: false, error: (await getTranslations("Actions"))("authorFeedFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("authorFeedFetchFailed"),
+    };
   }
 }
 
@@ -441,11 +462,17 @@ export async function repostPost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("repostFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("repostFailed"),
+      };
     }
   } catch (error) {
     console.error("Error reposting post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("repostFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("repostFailed"),
+    };
   }
 }
 
@@ -461,11 +488,17 @@ export async function unrepostPost(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("unrepostFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("unrepostFailed"),
+      };
     }
   } catch (error) {
     console.error("Error unreposting post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("unrepostFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("unrepostFailed"),
+    };
   }
 }
 
@@ -486,11 +519,17 @@ export async function likePost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("likeFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("likeFailed"),
+      };
     }
   } catch (error) {
     console.error("Error liking post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("likeFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("likeFailed"),
+    };
   }
 }
 
@@ -506,11 +545,17 @@ export async function unlikePost(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("unlikeFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("unlikeFailed"),
+      };
     }
   } catch (error) {
     console.error("Error liking post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("unlikeFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("unlikeFailed"),
+    };
   }
 }
 
@@ -536,11 +581,17 @@ export async function deletePost({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("deleteFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("deleteFailed"),
+      };
     }
   } catch (error) {
     console.error("Error deleting post:", error);
-    return { success: false, error: (await getTranslations("Actions"))("deleteFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("deleteFailed"),
+    };
   }
 }
 
@@ -563,11 +614,17 @@ export async function createBookmark({
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("bookmarkCreateFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("bookmarkCreateFailed"),
+      };
     }
   } catch (error) {
     console.error("Error creating bookmark:", error);
-    return { success: false, error: (await getTranslations("Actions"))("bookmarkCreateFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("bookmarkCreateFailed"),
+    };
   }
 }
 
@@ -583,11 +640,17 @@ export async function deleteBookmark(uri: string): Promise<ActionResult<void>> {
     if (response.success) {
       return { success: true, data: undefined };
     } else {
-      return { success: false, error: (await getTranslations("Actions"))("bookmarkDeleteFailed") };
+      return {
+        success: false,
+        error: (await getTranslations("Actions"))("bookmarkDeleteFailed"),
+      };
     }
   } catch (error) {
     console.error("Error deleting bookmark:", error);
-    return { success: false, error: (await getTranslations("Actions"))("bookmarkDeleteFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("bookmarkDeleteFailed"),
+    };
   }
 }
 
@@ -609,6 +672,9 @@ export async function getBookmarks(
     };
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
-    return { success: false, error: (await getTranslations("Actions"))("bookmarkFetchFailed") };
+    return {
+      success: false,
+      error: (await getTranslations("Actions"))("bookmarkFetchFailed"),
+    };
   }
 }

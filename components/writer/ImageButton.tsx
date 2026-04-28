@@ -1,8 +1,8 @@
 "use client";
 
 import { ImageIcon } from "lucide-react";
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
+import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 
