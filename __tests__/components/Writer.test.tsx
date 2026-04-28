@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -40,13 +40,13 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("@radix-ui/react-visually-hidden", () => ({
-  VisuallyHidden: ({ children }: any) => <div>{children}</div>,
+  VisuallyHidden: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock("@tinymce/tinymce-react", () => ({
-  Editor: ({ onInit }: any) => {
-    return <div data-testid="tinymce-editor">Editor</div>;
-  },
+  Editor: () => <div data-testid="tinymce-editor">Editor</div>,
 }));
 
 vi.mock("sonner", () => ({
@@ -63,7 +63,16 @@ vi.mock("@/components/Spinner", () => ({
 }));
 
 vi.mock("@/components/ui/button", () => ({
-  Button: ({ children, onClick, disabled, ...props }: any) => (
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    ...props
+  }: React.PropsWithChildren<{
+    onClick?: () => void;
+    disabled?: boolean;
+  }> &
+    Record<string, unknown>) => (
     <button onClick={onClick} disabled={disabled} {...props}>
       {children}
     </button>
@@ -71,37 +80,67 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 vi.mock("@/components/ui/dialog", () => ({
-  Dialog: ({ children, open }: any) => (open ? <div>{children}</div> : null),
-  DialogContent: ({ children }: any) => <div>{children}</div>,
-  DialogDescription: ({ children }: any) => <div>{children}</div>,
-  DialogHeader: ({ children }: any) => <div>{children}</div>,
-  DialogTitle: ({ children }: any) => <div>{children}</div>,
+  Dialog: ({ children, open }: React.PropsWithChildren<{ open?: boolean }>) =>
+    open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  DialogDescription: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  DialogTitle: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/ui/form", () => ({
-  Form: ({ children }: any) => <div>{children}</div>,
-  FormControl: ({ children }: any) => <div>{children}</div>,
-  FormField: ({ render }: any) => render({ field: { value: "", onChange: vi.fn() } }),
-  FormItem: ({ children }: any) => <div>{children}</div>,
-  FormLabel: ({ children }: any) => <label>{children}</label>,
-  FormMessage: ({ children }: any) => <div>{children}</div>,
+  Form: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  FormControl: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  FormField: ({
+    render,
+  }: {
+    render: (props: {
+      field: { value: string; onChange: ReturnType<typeof vi.fn> };
+    }) => React.ReactNode;
+  }) => render({ field: { value: "", onChange: vi.fn() } }),
+  FormItem: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  FormLabel: ({ children }: React.PropsWithChildren) => (
+    <label>{children}</label>
+  ),
+  FormMessage: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/ui/radio-group", () => ({
-  RadioGroup: ({ children, onValueChange, defaultValue }: any) => <div>{children}</div>,
-  RadioGroupItem: ({ value }: any) => <input type="radio" value={value} />,
+  RadioGroup: ({
+    children,
+  }: React.PropsWithChildren<{
+    onValueChange?: (value: string) => void;
+    defaultValue?: string;
+  }>) => <div>{children}</div>,
+  RadioGroupItem: ({ value }: { value: string }) => (
+    <input type="radio" value={value} />
+  ),
 }));
 
 vi.mock("@/components/ui/select", () => ({
-  Select: ({ children }: any) => <div>{children}</div>,
-  SelectContent: ({ children }: any) => <div>{children}</div>,
-  SelectItem: ({ children }: any) => <div>{children}</div>,
-  SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ children }: any) => <div>{children}</div>,
+  Select: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+  SelectContent: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  SelectItem: ({ children }: React.PropsWithChildren<{ value: string }>) => (
+    <div>{children}</div>
+  ),
+  SelectTrigger: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  SelectValue: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
 vi.mock("@/components/ui/textarea", () => ({
-  Textarea: ({ ...props }: any) => <textarea {...props} />,
+  Textarea: (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+    <textarea {...props} />
+  ),
 }));
 
 vi.mock("@/components/writer/ImageButton", () => ({
@@ -124,12 +163,15 @@ vi.mock("@/lib/constants", () => ({
 }));
 
 vi.mock("@/lib/hooks/useBluesky", () => ({
-  useCreatePost: () => ({ mutate: mockMutateCreatePost, status: mockMutateStatus.value }),
+  useCreatePost: () => ({
+    mutate: mockMutateCreatePost,
+    status: mockMutateStatus.value,
+  }),
   useMyLists: () => ({ data: { lists: [] }, status: "success" }),
 }));
 
 vi.mock("@/lib/utils", () => ({
-  cn: (...args: any[]) => args.filter(Boolean).join(" "),
+  cn: (...args: string[]) => args.filter(Boolean).join(" "),
   PAYLOAD_TOO_LARGE: "PAYLOAD_TOO_LARGE",
 }));
 
@@ -155,7 +197,9 @@ describe("Writer", () => {
 
   it("should not render dialog when closed", async () => {
     const Writer = await importComponent();
-    const { container } = render(<Writer open={false} setOpen={vi.fn()} hideTypeSelect={false} />);
+    const { container } = render(
+      <Writer open={false} setOpen={vi.fn()} hideTypeSelect={false} />,
+    );
 
     expect(container.innerHTML).toBe("");
   });
@@ -164,7 +208,9 @@ describe("Writer", () => {
     const Writer = await importComponent();
     render(<Writer open={true} setOpen={vi.fn()} hideTypeSelect={false} />);
 
-    expect(screen.getByPlaceholderText("What's happening?")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("What's happening?"),
+    ).toBeInTheDocument();
   });
 
   it("should render type radio buttons when hideTypeSelect is false", async () => {

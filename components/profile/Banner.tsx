@@ -1,18 +1,18 @@
 import { AppBskyRichtextFacet, RichText } from "@atproto/api";
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
 import BackButton from "@/components/BackButton";
 import { Avatar } from "@/components/primitive/Avatar";
 import { formatNumber } from "@/lib/utils";
-import { useLocale, useTranslations } from "next-intl";
 
 type ProfileData = ProfileViewDetailed & {
   facets?: AppBskyRichtextFacet.Main[];
 };
 
 export function ProfileBanner({ profile }: { profile: ProfileData }) {
-  const t =  useTranslations("Profile");
+  const t = useTranslations("Profile");
 
   return (
     <div>
@@ -55,10 +55,9 @@ function ProfileAvatar({ profile }: { profile: ProfileData }) {
   );
 }
 
-function ProfileCounts({ profile, }: { profile: ProfileData; }) {
+function ProfileCounts({ profile }: { profile: ProfileData }) {
   const t = useTranslations("Profile");
-  const locale = useLocale(
-  );
+  const locale = useLocale();
   return (
     <dl className="mt-2 flex items-center gap-2">
       <div className="flex items-center gap-1">

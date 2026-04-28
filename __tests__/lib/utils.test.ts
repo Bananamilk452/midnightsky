@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { cn, createFeedKey, parseAtUri, serverActionErrorHandler, PAYLOAD_TOO_LARGE } from "@/lib/utils";
-import type { ActionResult } from "@/lib/utils";
+import {
+  cn,
+  createFeedKey,
+  parseAtUri,
+  PAYLOAD_TOO_LARGE,
+  serverActionErrorHandler,
+} from "@/lib/utils";
+
+import type { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 
 describe("cn", () => {
   it("should merge class names", () => {
@@ -59,21 +66,27 @@ describe("parseAtUri", () => {
 
 describe("createFeedKey", () => {
   it("should return post uri as key when no repost reason", () => {
-    const post = {
-      post: { uri: "at://did:plc:abc/app.bsky.feed.post/123" },
-    } as any;
+    const post: FeedViewPost = {
+      $type: "app.bsky.feed.defs#feedViewPost",
+      post: {
+        uri: "at://did:plc:abc/app.bsky.feed.post/123",
+      } as FeedViewPost["post"],
+    };
 
     expect(createFeedKey(post)).toBe("at://did:plc:abc/app.bsky.feed.post/123");
   });
 
   it("should append repost uri when reason is a repost", () => {
-    const post = {
-      post: { uri: "at://did:plc:abc/app.bsky.feed.post/123" },
+    const post: FeedViewPost = {
+      $type: "app.bsky.feed.defs#feedViewPost",
+      post: {
+        uri: "at://did:plc:abc/app.bsky.feed.post/123",
+      } as FeedViewPost["post"],
       reason: {
         $type: "app.bsky.feed.defs#reasonRepost",
         uri: "at://did:plc:abc/app.bsky.feed.repost/456",
-      },
-    } as any;
+      } as never,
+    };
 
     expect(createFeedKey(post)).toBe(
       "at://did:plc:abc/app.bsky.feed.post/123-at://did:plc:abc/app.bsky.feed.repost/456",

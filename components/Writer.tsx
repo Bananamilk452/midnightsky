@@ -3,12 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Editor } from "@tinymce/tinymce-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Editor as TinyMCEEditor } from "tinymce";
-import { useLocale, useTranslations } from "next-intl";
 
 import { OpenWriterParams } from "@/components/providers/WriterProvider";
 import { Spinner } from "@/components/Spinner";
@@ -169,7 +169,9 @@ export function Writer({
           </div>
           <VisuallyHidden>
             <DialogTitle>{t("writePost")}</DialogTitle>
-            <DialogDescription className="sr-only">{t("writePost")}</DialogDescription>
+            <DialogDescription className="sr-only">
+              {t("writePost")}
+            </DialogDescription>
           </VisuallyHidden>
         </DialogHeader>
 
@@ -202,7 +204,7 @@ export function Writer({
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <div className="mb-1 flex flex-grow items-center justify-between sm:mb-0">
-                   <h2 className="font-medium">{t("additionalText")}</h2>
+                  <h2 className="font-medium">{t("additionalText")}</h2>
                   <ImageButton setImage={onImageAdded} />
                 </div>
 

@@ -8,15 +8,15 @@ import {
   LogOutIcon,
   SquarePenIcon,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Avatar } from "@/components/primitive/Avatar";
 import { useWriter } from "@/components/providers/WriterProvider";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/bluesky/action";
-import { setUserLocale } from "@/lib/i18n/action";
 import { User } from "@/lib/bluesky/utils";
+import { setUserLocale } from "@/lib/i18n/action";
 import { cn } from "@/lib/utils";
 
 export function HomeSidemenuClient({ user }: { user: User }) {

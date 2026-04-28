@@ -1,22 +1,14 @@
+"use client";
+
 import { RichText } from "@atproto/api";
-import { Record } from "@atproto/api/dist/client/types/app/bsky/feed/post";
 import Link from "next/link";
 
+import { useFeedContext } from "@/components/feed/context";
 import { cn } from "@/lib/utils";
 
-export function FeedContent({
-  className = "",
-  text,
-  facets,
-}: {
-  className?: string;
-  text: string;
-  facets: Record["facets"];
-}) {
-  const rt = new RichText({
-    text,
-    facets,
-  });
+export function FeedContent({ className = "" }: { className?: string }) {
+  const { record } = useFeedContext();
+  const rt = new RichText({ text: record.text, facets: record.facets });
 
   const content = [];
 

@@ -7,9 +7,9 @@ import {
   HomeIcon,
   LogOutIcon,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/primitive/Avatar";
 import { Spinner } from "@/components/Spinner";
@@ -24,8 +24,8 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { signOut } from "@/lib/bluesky/action";
-import { setUserLocale } from "@/lib/i18n/action";
 import { useSession } from "@/lib/hooks/useBluesky";
+import { setUserLocale } from "@/lib/i18n/action";
 
 export function HomeSidebar() {
   const router = useRouter();
@@ -76,7 +76,9 @@ export function HomeSidebar() {
               <SidebarMenuButton asChild className="h-12">
                 <Link href="/bookmarks">
                   <BookmarkIcon className="!size-6" />
-                  <span className="text-lg font-semibold">{t("bookmarks")}</span>
+                  <span className="text-lg font-semibold">
+                    {t("bookmarks")}
+                  </span>
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton className="h-12" onClick={signOut}>

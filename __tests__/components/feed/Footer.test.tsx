@@ -1,15 +1,15 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  makeFeedPostRecord,
+  makePostView,
+  makeViewerState,
+  wrapWithFeedContext,
+} from "@/__tests__/helpers/feed";
+
 const mockUseSession = vi.fn();
-const mockUseRepost = vi.fn();
-const mockUseUnrepost = vi.fn();
-const mockUseLike = vi.fn();
-const mockUseUnlike = vi.fn();
-const mockUseCreateBookmark = vi.fn();
-const mockUseDeleteBookmark = vi.fn();
-const mockUseDeletePost = vi.fn();
 const mockOpenWriter = vi.fn();
 const mockMutateRepost = vi.fn();
 const mockMutateUnrepost = vi.fn();
@@ -46,10 +46,16 @@ vi.mock("usehooks-ts", () => ({
 
 vi.mock("lucide-react", () => ({
   MessageSquareIcon: () => <svg data-testid="msg-icon" />,
-  Repeat2Icon: ({ className }: any) => <svg data-testid="repeat-icon" className={className} />,
-  HeartIcon: ({ className }: any) => <svg data-testid="heart-icon" className={className} />,
+  Repeat2Icon: ({ className }: { className?: string }) => (
+    <svg data-testid="repeat-icon" className={className} />
+  ),
+  HeartIcon: ({ className }: { className?: string }) => (
+    <svg data-testid="heart-icon" className={className} />
+  ),
   ShareIcon: () => <svg data-testid="share-icon" />,
-  BookmarkIcon: ({ className }: any) => <svg data-testid="bookmark-icon" className={className} />,
+  BookmarkIcon: ({ className }: { className?: string }) => (
+    <svg data-testid="bookmark-icon" className={className} />
+  ),
   EllipsisIcon: () => <svg data-testid="ellipsis-icon" />,
   TrashIcon: () => <svg data-testid="trash-icon" />,
 }));
@@ -59,19 +65,38 @@ vi.mock("@/components/providers/WriterProvider", () => ({
 }));
 
 vi.mock("@/components/ui/dropdown-menu", () => ({
-  DropdownMenu: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuGroup: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuItem: ({ children, onClick }: any) => (
-    <button data-testid="dropdown-item" onClick={onClick}>{children}</button>
+  DropdownMenu: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
   ),
-  DropdownMenuTrigger: ({ children, disabled }: any) => (
-    <div data-testid="dropdown-trigger" data-disabled={disabled}>{children}</div>
+  DropdownMenuContent: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  DropdownMenuGroup: ({ children }: React.PropsWithChildren) => (
+    <div>{children}</div>
+  ),
+  DropdownMenuItem: ({
+    children,
+    onClick,
+  }: React.PropsWithChildren<{ onClick?: () => void }>) => (
+    <button data-testid="dropdown-item" onClick={onClick}>
+      {children}
+    </button>
+  ),
+  DropdownMenuTrigger: ({
+    children,
+    disabled,
+  }: React.PropsWithChildren<{ disabled?: boolean }>) => (
+    <div data-testid="dropdown-trigger" data-disabled={disabled}>
+      {children}
+    </div>
   ),
 }));
 
 vi.mock("@/lib/bluesky/utils", () => ({
-  validateRecord: () => ({ createdAt: "2024-01-01T00:00:00Z", text: "test" }),
+  validateRecord: () => ({
+    createdAt: "2024-01-01T00:00:00Z",
+    text: "test",
+  }),
   getValidThreadgateRecord: () => undefined,
 }));
 
@@ -87,23 +112,13 @@ vi.mock("@/lib/hooks/useBluesky", () => ({
 }));
 
 vi.mock("@/lib/utils", () => ({
-  cn: (...args: any[]) => args.filter(Boolean).join(" "),
-  parseAtUri: () => ({ rkey: "abc123", authority: "did:plc:test", collection: "app.bsky.feed.post" }),
+  cn: (...args: string[]) => args.filter(Boolean).join(" "),
+  parseAtUri: () => ({
+    rkey: "abc123",
+    authority: "did:plc:test",
+    collection: "app.bsky.feed.post",
+  }),
 }));
-
-function mockPost(overrides?: Partial<any>): any {
-  return {
-    uri: "at://did:plc:test/app.bsky.feed.post/abc123",
-    cid: "cid123",
-    author: { did: "did:plc:test", handle: "test.bsky.social" },
-    record: { text: "Hello", createdAt: "2024-01-01T00:00:00Z", $type: "app.bsky.feed.post" },
-    replyCount: 5,
-    repostCount: 10,
-    likeCount: 20,
-    viewer: { like: undefined, repost: undefined },
-    ...overrides,
-  };
-}
 
 describe("FeedFooter", () => {
   beforeEach(() => {
@@ -111,14 +126,17 @@ describe("FeedFooter", () => {
     mockUseSession.mockReturnValue({ data: { did: "did:plc:test" } });
   });
 
-  async function importComponent() {
-    const { FeedFooter, FeedFooterButton } = await import("@/components/feed/Footer");
-    return { FeedFooter, FeedFooterButton };
+  async function importModules() {
+    const { FeedFooter, FeedFooterButton } = await import(
+      "@/components/feed/Footer"
+    );
+    const { FeedContext } = await import("@/components/feed/context");
+    return { FeedFooter, FeedFooterButton, FeedContext };
   }
 
   it("should render all action buttons", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     expect(screen.getByTestId("msg-icon")).toBeInTheDocument();
     expect(screen.getByTestId("repeat-icon")).toBeInTheDocument();
@@ -129,15 +147,19 @@ describe("FeedFooter", () => {
   });
 
   it("should show reply count when greater than 0", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost({ replyCount: 5 })} />);
+    const { FeedFooter } = await importModules();
+    render(
+      wrapWithFeedContext(<FeedFooter />, {
+        post: makePostView({ replyCount: 5 }),
+      }),
+    );
 
     expect(screen.getByText("5")).toBeInTheDocument();
   });
 
   it("should open writer on mention button click", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[0]);
@@ -146,69 +168,75 @@ describe("FeedFooter", () => {
   });
 
   it("should toggle like on click", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[2]);
 
     expect(mockMutateLike).toHaveBeenCalledWith(
-      { cid: "cid123", uri: "at://did:plc:test/app.bsky.feed.post/abc123" },
+      { cid: "cid1", uri: "at://did:plc:test/app.bsky.feed.post/rkey1" },
       expect.any(Object),
     );
   });
 
   it("should toggle unlike when already liked", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost({ viewer: { like: "at://like" } })} />);
+    const { FeedFooter } = await importModules();
+    render(
+      wrapWithFeedContext(<FeedFooter />, {
+        post: makePostView({
+          viewer: makeViewerState({ like: "at://like" }),
+        }),
+      }),
+    );
 
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[2]);
 
     expect(mockMutateUnlike).toHaveBeenCalledWith(
-      "at://did:plc:test/app.bsky.feed.post/abc123",
+      "at://did:plc:test/app.bsky.feed.post/rkey1",
       expect.any(Object),
     );
   });
 
   it("should toggle repost on click", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[1]);
 
     expect(mockMutateRepost).toHaveBeenCalledWith(
-      { cid: "cid123", uri: "at://did:plc:test/app.bsky.feed.post/abc123" },
+      { cid: "cid1", uri: "at://did:plc:test/app.bsky.feed.post/rkey1" },
       expect.any(Object),
     );
   });
 
   it("should toggle bookmark on click", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[3]);
 
     expect(mockMutateCreateBookmark).toHaveBeenCalledWith(
-      { cid: "cid123", uri: "at://did:plc:test/app.bsky.feed.post/abc123" },
+      { cid: "cid1", uri: "at://did:plc:test/app.bsky.feed.post/rkey1" },
       expect.any(Object),
     );
   });
 
   it("should disable menu dropdown when user is not author", async () => {
     mockUseSession.mockReturnValue({ data: { did: "did:plc:other" } });
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const trigger = screen.getByTestId("dropdown-trigger");
     expect(trigger).toHaveAttribute("data-disabled", "true");
   });
 
   it("should enable menu dropdown when user is author", async () => {
-    const { FeedFooter } = await importComponent();
-    render(<FeedFooter post={mockPost()} />);
+    const { FeedFooter } = await importModules();
+    render(wrapWithFeedContext(<FeedFooter />));
 
     const trigger = screen.getByTestId("dropdown-trigger");
     expect(trigger).toHaveAttribute("data-disabled", "false");

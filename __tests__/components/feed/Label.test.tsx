@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { makePostView, wrapWithFeedContext } from "@/__tests__/helpers/feed";
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
@@ -24,31 +26,46 @@ describe("FeedLabel", () => {
     vi.clearAllMocks();
   });
 
-  async function importComponent() {
+  async function importModules() {
     const { FeedLabel } = await import("@/components/feed/Label");
-    return FeedLabel;
+    return { FeedLabel };
   }
 
   it("should render children when no labels", async () => {
-    const FeedLabel = await importComponent();
-    render(<FeedLabel>Content</FeedLabel>);
+    const { FeedLabel } = await importModules();
+    render(
+      wrapWithFeedContext(<FeedLabel>Content</FeedLabel>, {
+        post: makePostView({ labels: undefined }),
+      }),
+    );
 
     expect(screen.getByText("Content")).toBeInTheDocument();
   });
 
   it("should render children when labels is empty array", async () => {
-    const FeedLabel = await importComponent();
-    render(<FeedLabel labels={[]}>Content</FeedLabel>);
+    const { FeedLabel } = await importModules();
+    render(
+      wrapWithFeedContext(<FeedLabel>Content</FeedLabel>, {
+        post: makePostView({ labels: [] }),
+      }),
+    );
 
     expect(screen.getByText("Content")).toBeInTheDocument();
   });
 
   it("should show warning and hide content by default when labels exist", async () => {
-    const FeedLabel = await importComponent();
+    const { FeedLabel } = await importModules();
     render(
-      <FeedLabel labels={[{ val: "sexual" } as any]}>
-        <span data-testid="content">Hidden content</span>
-      </FeedLabel>,
+      wrapWithFeedContext(
+        <FeedLabel>
+          <span data-testid="content">Hidden content</span>
+        </FeedLabel>,
+        {
+          post: makePostView({
+            labels: [{ val: "sexual" } as never],
+          }),
+        },
+      ),
     );
 
     expect(screen.getByText("Adult Content")).toBeInTheDocument();
@@ -57,11 +74,18 @@ describe("FeedLabel", () => {
   });
 
   it("should toggle show/hide on button click", async () => {
-    const FeedLabel = await importComponent();
+    const { FeedLabel } = await importModules();
     render(
-      <FeedLabel labels={[{ val: "sexual" } as any]}>
-        <span data-testid="content">Hidden content</span>
-      </FeedLabel>,
+      wrapWithFeedContext(
+        <FeedLabel>
+          <span data-testid="content">Hidden content</span>
+        </FeedLabel>,
+        {
+          post: makePostView({
+            labels: [{ val: "sexual" } as never],
+          }),
+        },
+      ),
     );
 
     fireEvent.click(screen.getByText("Show"));
@@ -71,11 +95,13 @@ describe("FeedLabel", () => {
   });
 
   it("should filter out !no-unauthenticated labels", async () => {
-    const FeedLabel = await importComponent();
+    const { FeedLabel } = await importModules();
     render(
-      <FeedLabel labels={[{ val: "!no-unauthenticated" } as any]}>
-        Content
-      </FeedLabel>,
+      wrapWithFeedContext(<FeedLabel>Content</FeedLabel>, {
+        post: makePostView({
+          labels: [{ val: "!no-unauthenticated" } as never],
+        }),
+      }),
     );
 
     expect(screen.getByText("Content")).toBeInTheDocument();

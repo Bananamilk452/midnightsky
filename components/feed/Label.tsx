@@ -2,14 +2,27 @@
 
 import { Label } from "@atproto/api";
 import { CircleAlertIcon } from "lucide-react";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
-export function FeedLabel({
+import { useFeedContext } from "@/components/feed/context";
+
+export function FeedLabel({ children }: { children?: React.ReactNode }) {
+  const { post } = useFeedContext();
+  const labels = post.labels?.filter((l) => l.val !== "!no-unauthenticated");
+
+  if (!labels || labels.length === 0) {
+    return children;
+  }
+
+  return <FeedLabelContent labels={labels}>{children}</FeedLabelContent>;
+}
+
+function FeedLabelContent({
   labels,
   children,
 }: {
-  labels?: Label[];
+  labels: Label[];
   children?: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
@@ -22,20 +35,10 @@ export function FeedLabel({
     "graphic-media": t("graphicMedia"),
   };
 
-  labels = labels?.filter((l) => l.val !== "!no-unauthenticated");
-
-  if (!labels || labels.length === 0) {
-    return children;
-  }
-
   const title = labels
     .map((label) => contentWarningMap[label.val])
     .filter(Boolean)
     .join(", ");
-
-  function handleClick() {
-    setShow(!show);
-  }
 
   return (
     <div className="flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
@@ -44,7 +47,7 @@ export function FeedLabel({
         <p className="flex-grow text-sm font-semibold text-gray-400">{title}</p>
         <button
           className="cursor-pointer text-sm hover:underline"
-          onClick={handleClick}
+          onClick={() => setShow(!show)}
         >
           {show ? t("hide") : t("show")}
         </button>

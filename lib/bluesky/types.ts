@@ -39,4 +39,6 @@ export const createPostSchema = (maxCharsMsg: string) =>
 
 export type CreatePostParams = z.infer<ReturnType<typeof createPostSchema>>;
 
-export const CreatePostSchema = createPostSchema("최대 250자까지 입력 가능합니다.");
+export const CreatePostSchema = createPostSchema(
+  "최대 250자까지 입력 가능합니다.",
+);

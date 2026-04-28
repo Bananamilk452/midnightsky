@@ -21,14 +21,20 @@ describe("InfiniteScrollTrigger", () => {
   });
 
   async function importComponent() {
-    const { InfiniteScrollTrigger } = await import("@/components/InfiniteScrollTrigger");
+    const { InfiniteScrollTrigger } = await import(
+      "@/components/InfiniteScrollTrigger"
+    );
     return InfiniteScrollTrigger;
   }
 
   it("should render a trigger div element", async () => {
     const InfiniteScrollTrigger = await importComponent();
     const { container } = render(
-      <InfiniteScrollTrigger onTrigger={vi.fn()} hasNextPage={true} isFetching={false} />,
+      <InfiniteScrollTrigger
+        onTrigger={vi.fn()}
+        hasNextPage={true}
+        isFetching={false}
+      />,
     );
 
     expect(container.querySelector("div")).toBeInTheDocument();
@@ -37,7 +43,11 @@ describe("InfiniteScrollTrigger", () => {
   it("should show Spinner when isFetching is true", async () => {
     const InfiniteScrollTrigger = await importComponent();
     const { container } = render(
-      <InfiniteScrollTrigger onTrigger={vi.fn()} hasNextPage={true} isFetching={true} />,
+      <InfiniteScrollTrigger
+        onTrigger={vi.fn()}
+        hasNextPage={true}
+        isFetching={true}
+      />,
     );
 
     const svg = container.querySelector("svg");
@@ -47,7 +57,11 @@ describe("InfiniteScrollTrigger", () => {
   it("should not show Spinner when isFetching is false", async () => {
     const InfiniteScrollTrigger = await importComponent();
     const { container } = render(
-      <InfiniteScrollTrigger onTrigger={vi.fn()} hasNextPage={true} isFetching={false} />,
+      <InfiniteScrollTrigger
+        onTrigger={vi.fn()}
+        hasNextPage={true}
+        isFetching={false}
+      />,
     );
 
     const svg = container.querySelector("svg");
@@ -60,7 +74,11 @@ describe("InfiniteScrollTrigger", () => {
 
     const InfiniteScrollTrigger = await importComponent();
     render(
-      <InfiniteScrollTrigger onTrigger={onTrigger} hasNextPage={true} isFetching={false} />,
+      <InfiniteScrollTrigger
+        onTrigger={onTrigger}
+        hasNextPage={true}
+        isFetching={false}
+      />,
     );
 
     expect(onTrigger).toHaveBeenCalled();

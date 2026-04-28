@@ -14,12 +14,13 @@ import {
   ShareIcon,
   TrashIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
-import { useTranslations } from "next-intl";
 
+import { useFeedContext } from "@/components/feed/context";
 import { useWriter } from "@/components/providers/WriterProvider";
 import {
   DropdownMenu,
@@ -42,29 +43,22 @@ import {
 import { Record as Post } from "@/lib/lexicon/types/app/midnightsky/post";
 import { cn, parseAtUri } from "@/lib/utils";
 
-export function FeedFooter({
-  post,
-  threadgate,
-  className,
-}: {
-  post: PostView;
-  threadgate?: ThreadgateView;
-  className?: string;
-}) {
-  return (
-    <>
-      <div className={cn("flex items-center justify-between", className)}>
-        <MentionButton post={post} threadgate={threadgate} />
-        <RepostButton post={post} />
-        <LikeButton post={post} />
+export function FeedFooter({ className }: { className?: string }) {
+  const { post, threadgate } = useFeedContext();
+  const _post = post as PostView;
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <BookmarkButton post={post} />
-          <ShareButton post={post} />
-          <MenuButton post={post} />
-        </div>
+  return (
+    <div className={cn("flex items-center justify-between", className)}>
+      <MentionButton post={_post} threadgate={threadgate} />
+      <RepostButton post={_post} />
+      <LikeButton post={_post} />
+
+      <div className="flex items-center gap-2 sm:gap-4">
+        <BookmarkButton post={_post} />
+        <ShareButton post={_post} />
+        <MenuButton post={_post} />
       </div>
-    </>
+    </div>
   );
 }
 

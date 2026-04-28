@@ -1,15 +1,10 @@
-import { AppBskyEmbedRecord } from "@atproto/api";
-import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+"use client";
 
+import { useFeedContext } from "@/components/feed/context";
 import { Avatar } from "@/components/primitive/Avatar";
 
-export function FeedAvatar({
-  post,
-  className,
-}: {
-  post: PostView | AppBskyEmbedRecord.ViewRecord;
-  className?: string;
-}) {
+export function FeedAvatar({ className }: { className?: string }) {
+  const { post } = useFeedContext();
   return (
     <Avatar
       src={post.author.avatar}

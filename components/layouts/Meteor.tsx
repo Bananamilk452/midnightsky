@@ -232,8 +232,8 @@ export function Meteor() {
       }
 
       function handleFadeInOver() {
-          initializeCanvas();
-          setIsFading(false);
+        initializeCanvas();
+        setIsFading(false);
       }
 
       setIsFading(true);
@@ -252,7 +252,9 @@ export function Meteor() {
   }, []);
 
   return (
-    <div className={`transition-opacity duration-100 ${isFading ? "opacity-0" : null} relative h-full w-full`}>
+    <div
+      className={`transition-opacity duration-100 ${isFading ? "opacity-0" : null} relative h-full w-full`}
+    >
       <canvas
         ref={backgroundCanvasRef}
         id="bgCanvas"

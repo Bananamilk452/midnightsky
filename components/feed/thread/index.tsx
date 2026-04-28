@@ -9,13 +9,14 @@ import {
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import { OutputSchema as PostThreadData } from "@atproto/api/dist/client/types/app/bsky/feed/getPostThread";
 import { format } from "date-fns";
-import { ko } from "date-fns/locale/ko";
 import { enUS } from "date-fns/locale/en-US";
-import Link from "next/link";
+import { ko } from "date-fns/locale/ko";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { FeedRecord } from "@/components/feed";
 import { FeedContent } from "@/components/feed/Content";
+import { FeedContext } from "@/components/feed/context";
 import { FeedEmbed } from "@/components/feed/Embed";
 import { FeedPost } from "@/components/feed/embed/Post";
 import { FeedFooter } from "@/components/feed/Footer";
@@ -24,6 +25,8 @@ import { FeedThreadHeader } from "@/components/feed/thread/Header";
 import { validateRecord } from "@/lib/bluesky/utils";
 import * as Post from "@/lib/lexicon/types/app/midnightsky/post";
 import { parseAtUri } from "@/lib/utils";
+
+import type { FeedContextValue } from "@/components/feed/context";
 
 export function FeedThread({
   thread,
@@ -42,7 +45,6 @@ export function FeedThread({
     return <p>{t("postBlocked")}</p>;
   }
 
-  // 3. ThreadViewPost
   if (isThreadViewPost(thread)) {
     const { post } = thread;
 
@@ -52,8 +54,6 @@ export function FeedThread({
       throw new Error("Invalid post record");
     }
 
-    // 왠지 모르게 bsky.app에서 렌더링 하는 것과
-    // 서버에서 오는 값 순서가 반대라서 reverse 추가함
     const replies = thread.replies?.toReversed() || [];
 
     return (
@@ -92,41 +92,45 @@ function FeedThreadRecord({
   const { rkey } = parseAtUri(post.uri);
   const locale = useLocale();
   const dateLocale = locale === "ko" ? ko : enUS;
-  const dateFormat = locale === "ko" ? "yyyy년 MM월 dd일 a h:mm" : "MMM d, yyyy h:mm a";
+  const dateFormat =
+    locale === "ko" ? "yyyy년 MM월 dd일 a h:mm" : "MMM d, yyyy h:mm a";
 
   if (!record) {
     throw new Error("Invalid post record");
   }
 
+  const contextValue: FeedContextValue = { post, threadgate, record };
+
   return (
-    <div id={rkey} className="flex flex-col border-b border-white/30 px-4 pb-2">
-      <div className="flex h-4 w-[40px] justify-center">
-        {line?.top && <div className="h-full w-0.5 bg-gray-400" />}
+    <FeedContext.Provider value={contextValue}>
+      <div
+        id={rkey}
+        className="flex flex-col border-b border-white/30 px-4 pb-2"
+      >
+        <div className="flex h-4 w-[40px] justify-center">
+          {line?.top && <div className="h-full w-0.5 bg-gray-400" />}
+        </div>
+        <div className="flex w-full min-w-0 flex-col gap-2">
+          <Link
+            className="inline-block w-fit max-w-full"
+            href={`/profile/${post.author.handle}`}
+          >
+            <FeedThreadHeader />
+          </Link>
+          <FeedLabel>
+            <FeedContent className="text-lg" />
+            <FeedEmbed />
+            {Post.isRecord(record.embed) && <FeedPost content={record.embed} />}
+          </FeedLabel>
+          <p className="text-xs text-gray-400">
+            {format(new Date(post.indexedAt), dateFormat, {
+              locale: dateLocale,
+            })}
+          </p>
+          <FeedFooter className="mt-2" />
+        </div>
       </div>
-      <div className="flex w-full min-w-0 flex-col gap-2">
-        <Link
-          className="inline-block w-fit max-w-full"
-          href={`/profile/${post.author.handle}`}
-        >
-          <FeedThreadHeader post={post} />
-        </Link>
-        <FeedLabel labels={post.labels}>
-          <FeedContent
-            className="text-lg"
-            text={record.text}
-            facets={record.facets}
-          />
-          {post.embed && <FeedEmbed embed={post.embed} />}
-          {Post.isRecord(record.embed) && <FeedPost content={record.embed} />}
-        </FeedLabel>
-        <p className="text-xs text-gray-400">
-          {format(new Date(post.indexedAt), dateFormat, {
-            locale: dateLocale,
-          })}
-        </p>
-        <FeedFooter post={post} threadgate={threadgate} className="mt-2" />
-      </div>
-    </div>
+    </FeedContext.Provider>
   );
 }
 

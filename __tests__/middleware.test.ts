@@ -4,8 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockGetOptionalSession = vi.fn();
 
 vi.mock("@/lib/session", () => ({
-  getOptionalSession: (...args: unknown[]) =>
-    mockGetOptionalSession(...args),
+  getOptionalSession: (...args: unknown[]) => mockGetOptionalSession(...args),
 }));
 
 describe("middleware", () => {

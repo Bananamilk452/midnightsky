@@ -1,9 +1,9 @@
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import localFont from "next/font/local";
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { GoogleAnalytics } from '@next/third-parties/google'
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
 
 import type { Metadata } from "next";
 

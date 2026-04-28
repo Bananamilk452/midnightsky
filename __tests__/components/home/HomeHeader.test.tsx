@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockToggleSidebar = vi.fn();
@@ -9,7 +9,13 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("next/image", () => ({
-  default: ({ src, alt, ...props }: any) => <img src={src} alt={alt} data-testid="logo" />,
+  default: ({
+    src,
+    alt,
+    ...props
+  }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img src={src} alt={alt} data-testid="logo" />
+  ),
 }));
 
 vi.mock("@/components/ui/sidebar", () => ({
@@ -30,8 +36,14 @@ describe("HomeHeader", () => {
     const HomeHeader = await importComponent();
     render(<HomeHeader />);
 
-    expect(screen.getByTestId("logo")).toHaveAttribute("src", "/images/logo.png");
-    expect(screen.getByTestId("logo")).toHaveAttribute("alt", "MidnightSky Logo");
+    expect(screen.getByTestId("logo")).toHaveAttribute(
+      "src",
+      "/images/logo.png",
+    );
+    expect(screen.getByTestId("logo")).toHaveAttribute(
+      "alt",
+      "MidnightSky Logo",
+    );
   });
 
   it("should render menu toggle button", async () => {

@@ -2,8 +2,14 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { makePostView } from "@/__tests__/helpers/feed";
+
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: any) => (
+  default: ({
+    children,
+    href,
+    ...props
+  }: React.PropsWithChildren<{ href: string }>) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -29,29 +35,36 @@ describe("FeedThreadEllipsis", () => {
   });
 
   async function importComponent() {
-    const { FeedThreadEllipsis } = await import("@/components/feed/ThreadEllipsis");
+    const { FeedThreadEllipsis } = await import(
+      "@/components/feed/ThreadEllipsis"
+    );
     return FeedThreadEllipsis;
   }
 
   it("should render 'View full thread' link", async () => {
     const FeedThreadEllipsis = await importComponent();
-    const post = {
+    const post = makePostView({
       uri: "at://did:plc:abc/app.bsky.feed.post/3k123abc",
-      author: { handle: "alice.bsky.social" },
-    } as any;
+      author: { did: "did:plc:abc", handle: "alice.bsky.social" },
+    });
 
     render(<FeedThreadEllipsis post={post} />);
 
     const link = screen.getByText("View full thread");
     expect(link).toBeInTheDocument();
-    expect(link.closest("a")).toHaveAttribute("href", "/post/alice.bsky.social/3k123abc");
+    expect(link.closest("a")).toHaveAttribute(
+      "href",
+      "/post/alice.bsky.social/3k123abc",
+    );
   });
 
   it("should render dotted line connector", async () => {
     const FeedThreadEllipsis = await importComponent();
-    const { container } = render(
-      <FeedThreadEllipsis post={{ uri: "at://x/y/z", author: { handle: "a" } } as any} />,
-    );
+    const post = makePostView({
+      uri: "at://did:plc:abc/app.bsky.feed.post/3k123abc",
+      author: { did: "did:plc:abc", handle: "alice.bsky.social" },
+    });
+    const { container } = render(<FeedThreadEllipsis post={post} />);
 
     const dottedBorder = container.querySelector(".border-dotted");
     expect(dottedBorder).toBeInTheDocument();

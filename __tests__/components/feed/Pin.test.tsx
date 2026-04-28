@@ -2,16 +2,14 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { makeFeedViewPost, makeReasonPin } from "@/__tests__/helpers/feed";
+
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key === "pinned" ? "Pinned" : key,
+  useTranslations: () => (key: string) => (key === "pinned" ? "Pinned" : key),
 }));
 
 vi.mock("lucide-react", () => ({
   PinIcon: () => <svg data-testid="pin-icon" />,
-}));
-
-vi.mock("@atproto/api/dist/client/types/app/bsky/feed/defs", () => ({
-  isReasonPin: (reason: any) => reason?.$type === "app.bsky.feed.defs#reasonPin",
 }));
 
 describe("FeedPin", () => {
@@ -26,9 +24,9 @@ describe("FeedPin", () => {
 
   it("should render pinned indicator", async () => {
     const FeedPin = await importComponent();
-    const feed = {
-      reason: { $type: "app.bsky.feed.defs#reasonPin" },
-    } as any;
+    const feed = makeFeedViewPost({
+      reason: makeReasonPin(),
+    });
 
     render(<FeedPin feed={feed} />);
 
@@ -38,7 +36,9 @@ describe("FeedPin", () => {
 
   it("should not render when reason is not pin", async () => {
     const FeedPin = await importComponent();
-    const feed = { reason: { $type: "other" } } as any;
+    const feed = makeFeedViewPost({
+      reason: { $type: "other" } as never,
+    });
     const { container } = render(<FeedPin feed={feed} />);
 
     expect(container.innerHTML).toBe("");

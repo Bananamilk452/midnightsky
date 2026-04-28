@@ -56,7 +56,7 @@ vi.mock("@/lib/bluesky/service", () => ({
 }));
 
 vi.mock("@/lib/bluesky/utils", () => ({
-  createUser: vi.fn((d: any) => d),
+  createUser: vi.fn(<T extends Record<string, unknown>>(d: T) => d),
   createRecord: vi.fn(),
   deleteRecord: vi.fn(),
   addReadArticleFacets: vi.fn(),
@@ -82,14 +82,22 @@ vi.mock("@/lib/utils.server", () => ({
       this.name = "ApiError";
     }
   },
-  jsonify: vi.fn((d: any) => JSON.parse(JSON.stringify(d))),
+  jsonify: vi.fn(<T>(d: T) => JSON.parse(JSON.stringify(d)) as T),
 }));
 
 vi.mock("@atproto/api", () => ({
-  Agent: vi.fn().mockImplementation(function (this: any) {
+  Agent: vi.fn().mockImplementation(function (this: unknown) {
     return mockAgent;
   }),
-  RichText: vi.fn().mockImplementation(function (this: any, { text }: { text: string }) {
+  RichText: vi.fn().mockImplementation(function (
+    this: {
+      text: string;
+      facets: unknown[];
+      detectFacets: ReturnType<typeof vi.fn>;
+      insert: ReturnType<typeof vi.fn>;
+    },
+    { text }: { text: string },
+  ) {
     this.text = text;
     this.facets = [];
     this.detectFacets = vi.fn();
@@ -263,7 +271,7 @@ describe("bluesky/action", () => {
   describe("likePost / unlikePost", () => {
     it("should return success after liking a post", async () => {
       const { createRecord } = await import("@/lib/bluesky/utils");
-      (createRecord as any).mockResolvedValue({ success: true });
+      vi.mocked(createRecord).mockResolvedValue({ success: true } as never);
 
       const { likePost } = await import("@/lib/bluesky/action");
       const result = await likePost({
@@ -276,12 +284,10 @@ describe("bluesky/action", () => {
 
     it("should return success after unliking a post", async () => {
       const { deleteRecord } = await import("@/lib/bluesky/utils");
-      (deleteRecord as any).mockResolvedValue({ success: true });
+      vi.mocked(deleteRecord).mockResolvedValue({ success: true } as never);
 
       const { unlikePost } = await import("@/lib/bluesky/action");
-      const result = await unlikePost(
-        "at://did:plc:a/app.bsky.feed.like/123",
-      );
+      const result = await unlikePost("at://did:plc:a/app.bsky.feed.like/123");
 
       expect(result.success).toBe(true);
     });
@@ -290,7 +296,7 @@ describe("bluesky/action", () => {
   describe("repostPost / unrepostPost", () => {
     it("should return success after reposting", async () => {
       const { createRecord } = await import("@/lib/bluesky/utils");
-      (createRecord as any).mockResolvedValue({ success: true });
+      vi.mocked(createRecord).mockResolvedValue({ success: true } as never);
 
       const { repostPost } = await import("@/lib/bluesky/action");
       const result = await repostPost({
@@ -303,7 +309,7 @@ describe("bluesky/action", () => {
 
     it("should return success after unreposting", async () => {
       const { deleteRecord } = await import("@/lib/bluesky/utils");
-      (deleteRecord as any).mockResolvedValue({ success: true });
+      vi.mocked(deleteRecord).mockResolvedValue({ success: true } as never);
 
       const { unrepostPost } = await import("@/lib/bluesky/action");
       const result = await unrepostPost(

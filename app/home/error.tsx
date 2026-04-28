@@ -1,9 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FallbackProps } from "react-error-boundary";
-import { useTranslations } from "next-intl";
 
 export default function Error({ error, resetErrorBoundary }: FallbackProps) {
   const router = useRouter();

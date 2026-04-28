@@ -33,9 +33,10 @@ vi.mock("@/lib/session", () => ({
 }));
 
 vi.mock("@/lib/utils.server", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/utils.server")>(
-    "@/lib/utils.server",
-  );
+  const actual =
+    await vi.importActual<typeof import("@/lib/utils.server")>(
+      "@/lib/utils.server",
+    );
   return {
     ...actual,
     ApiError: actual.ApiError,

@@ -15,7 +15,9 @@ export function FeedRepost({ feed }: { feed: FeedViewPost }) {
       <div className="ml-3 mt-4 flex items-center gap-1 text-gray-400">
         <Repeat2Icon className="size-4" />
         <span className="text-xs font-medium">
-          {t("reposted", { name: feed.reason.by.displayName || feed.reason.by.handle })}
+          {t("reposted", {
+            name: feed.reason.by.displayName || feed.reason.by.handle,
+          })}
         </span>
       </div>
     )
